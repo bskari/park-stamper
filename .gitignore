@@ -1,0 +1,5 @@
+.coverage
+Parks.sqlite
+
+*.swp
+*.pyc
