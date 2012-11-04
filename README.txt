@@ -4,11 +4,9 @@ Parks README
 Getting Started
 ---------------
 
-- cd <directory containing this file>
-
-- $venv/bin/python setup.py develop
-
-- $venv/bin/initialize_Parks_db development.ini
-
-- $venv/bin/pserve development.ini
-
+cd ..
+virtualenv --no-site-packages pyramid
+cd pyramid/Parks
+../bin/python setup.py develop
+../bin/initialize_Parks_db development.ini
+../bin/pserve development.ini
