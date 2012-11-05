@@ -1,0 +1,37 @@
+/* I want to keep modifications separate from Bootstrap, because I don't
+really know what I'm doing. */
+
+body {
+    padding-top: 60px;
+}
+
+body .backwards {
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+
+.footer {
+    float: bottom;
+    padding: 10px 0;
+    margin-top: 10px;
+    border-top: 1px solid #e3e3e3;
+    background-color: #f5f5f5;
+}
+
+.footer p {
+    margin-bottom: 0;
+    color: #333;
+}
+
+.footer-links {
+    margin: 10px 0;
+}
+
+.footer-links li {
+    display: inline;
+    padding: 0 2px;
+}
+
+.footer-links li:first-child {
+    padding-left: 0;
+}

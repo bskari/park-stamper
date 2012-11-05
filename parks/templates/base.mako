@@ -2,13 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal">
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
-        <style type="text/css">
-            body {
-                padding-top: 60px;
-                padding-bottom: 40px;
-            }
-        </style>
+        <link rel="stylesheet" href="/static/css/main.css" />
     </head>
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top">
@@ -51,8 +49,27 @@
             <%block name="content" />
         </div>
 
+        ${footer()}
+
         ## JS placed at the bottom for faster loading
         <script src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.2.min.js" type="text/javascript"></script>
         <script src="/static/bootstrap/js/bootstrap.js"></script>
     </body>
 </html>
+
+<%def name="footer()">
+    <footer class="footer">
+        <div class="container">
+            <p>Built by <a href="http://www.skari.org">Brandon Skari</a>
+                <span class="backwards">
+                    <script type="text/javascript">
+                        <!--
+                        var email = ('(gro.' + 'irzks' + '@nodnzrb)');
+                        document.write(email.replace(/z/g, 'a'));
+                        //-->
+                    </script>
+                </span>
+            </p>
+        </div>
+    </footefooterr>
+</%def>
