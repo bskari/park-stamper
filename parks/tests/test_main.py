@@ -2,15 +2,20 @@ from pyramid import testing
 from sqlalchemy import create_engine
 from unittest import TestCase
 from transaction import manager
+from webtest import TestApp
 
-from .models import DBSession
-from .models import Base
-from .models import User
-from .views import main
+from parks.models import DBSession
+from parks.models import Base
+from parks.models import User
+from parks.routes import add_routes
+from parks.routes import add_static_views
+from parks.views.main import main
 
-class TestMainView(TestCase):
+class MainViewTest(TestCase):
     def setUp(self):
         self.config = testing.setUp()
+        add_routes(self.config)
+        add_static_views(self.config)
         engine = create_engine('sqlite://')
         DBSession.configure(bind=engine)
         Base.metadata.create_all(engine)
@@ -22,8 +27,7 @@ class TestMainView(TestCase):
         DBSession.remove()
         testing.tearDown()
 
-    def test_it(self):
+    def test_smoke(self):
         request = testing.DummyRequest()
-        info = main(request)
-        #self.assertEqual(info['one'].name, 'one')
-        #self.assertEqual(info['project'], 'Parks')
+        page = main(request)
+        page # TODO(bskari|2012-05-12) Do something with the response

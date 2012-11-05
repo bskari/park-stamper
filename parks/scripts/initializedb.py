@@ -6,15 +6,14 @@ from pyramid.paster import get_appsettings
 from pyramid.paster import setup_logging
 from sqlalchemy import engine_from_config
 
-from ..models import DBSession
-from ..models import Base
-
-from ..models import Park
-from ..models import Stamp
-from ..models import StampCollection
-from ..models import State
-from ..models import User
-from ..models import UserEmail
+from parks.models import DBSession
+from parks.models import Base
+from parks.models import Park
+from parks.models import Stamp
+from parks.models import StampCollection
+from parks.models import State
+from parks.models import User
+from parks.models import UserEmail
 
 
 def usage(argv):
