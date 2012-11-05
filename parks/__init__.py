@@ -15,6 +15,7 @@ def main(global_config, **settings):
 
     config = Configurator(settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_static_view('static/images/', 'Parks:images', cache_max_age=3600)
     config.add_route('main', '/')
     config.add_route('park', '/park/{park_url}')
     config.set_session_factory(session_factory)
