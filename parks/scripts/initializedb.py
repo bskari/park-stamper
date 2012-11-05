@@ -40,13 +40,30 @@ def main(argv=sys.argv):
         user = DBSession.query(User.id).filter(User.username == 'guest').first()
         user_email = UserEmail(user=user.id, email='guest@parkstamper.org')
         DBSession.add(user_email)
-        state = State(name='Wyoming', abbreviation='wy', type='state')
-        DBSession.add(state)
-        park = Park(name='Yellowstone', url='yellowstone', state='wy')
-        DBSession.add(park)
-        stamp = Stamp(park='Yellowstone', text='Yellowstone\nNational Park')
-        DBSession.add(stamp)
-        # Uses can collect stamps more than once
-        for i in xrange(2):
-            collection = StampCollection(user.id, stamp.id)
-            DBSession.add(collection)
+        for name, abbreviation in (
+            ('Colorado', 'co'),
+            ('New York', 'ny'),
+            ('Utah', 'ut'),
+            ('Virginia', 'va'),
+            ('Wyoming', 'wy'),
+        ):
+            state = State(name=name, abbreviation=abbreviation, type='state')
+            DBSession.add(state)
+        park_info = (
+            ('Arches', 'arches', 'ut'),
+            ('Grand Tetons', 'grand-tetons', 'wy'),
+            ('Great Sand Dunes', 'great-sand-dunes', 'co'),
+            ('Shenandoah', 'shenandoah', 'va'),
+            ('Statue of Liberty', 'statue-of-liberty', 'ny'),
+            ('Yellowstone', 'yellowstone', 'wy'),
+        )
+        for name, url, state in park_info:
+            park = Park(name=name, url=url, state=state)
+            DBSession.add(park)
+        for name, _, _ in park_info:
+            stamp = Stamp(park=name, text=(name + '\nNational Park'))
+            DBSession.add(stamp)
+            # Uses can collect stamps more than once
+            for i in xrange(2):
+                collection = StampCollection(user.id, stamp.id)
+                DBSession.add(collection)
