@@ -68,7 +68,7 @@ class Park(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     url = Column(Text, nullable=False, unique=True)
-    state_id = Column(Integer, ForeignKey('state.id'), nullable=False, unique=True)
+    state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
     latitude = Column(Float)
     longitude = Column(Float)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
