@@ -22,7 +22,7 @@
     </div>
 
     <div class="row">
-        <div class="span10">
+        <div class="span9">
             <div id="park-carousel" class="carousel slide" style="width: 640px; margin-left: auto; margin-right: auto;">
                 <div class="carousel-inner">
                     % for num, (img_url, header, caption, url) in enumerate(carousel_information):
@@ -45,10 +45,11 @@
                 <a class="carousel-control right" href="#park-carousel" data-slide="next">&rsaquo;</a>
             </div>
         </div>
-        <div class="span2">
+        <div class="span3">
             <h3>Recent</h3>
             <div>Some text</div>
             <div>Some text</div>
             <div>Some text</div>
         </div>
+    </div>
 </%block>
