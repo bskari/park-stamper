@@ -1,5 +1,6 @@
 .coverage
 Parks.sqlite
+Parks.egg-info
 
 *.swp
 *.pyc
