@@ -102,6 +102,9 @@ class Stamp(Base):
     __tablename__ = 'stamp'
     id = Column(Integer, primary_key=True)
     park_id = Column(Integer, ForeignKey('park.id'), nullable=False)
+    location = Column(Text)
+    latitude = Column(Float)
+    longitude = Column(Float)
     text = Column(Text, nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
@@ -121,6 +124,7 @@ class StampCollection(Base):
     id = Column(Integer, primary_key=True)
     stamp_id = Column(Integer, ForeignKey('stamp.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
+    time_collected = Column(DateTime, nullable=False, default=datetime.utcnow())
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     def __init__(self, stamp_id, user):
