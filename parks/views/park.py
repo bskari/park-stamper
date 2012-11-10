@@ -1,5 +1,6 @@
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.view import view_config
+from sqlalchemy import func
 
 from parks.models import DBSession
 from parks.models import Park
@@ -14,21 +15,19 @@ def park(request):
     if park is None:
         return HTTPNotFound('No park found')
 
-    statement = DBSession.query(
-        StampCollection.id.label('stamp_id'),
-        StampCollection.time_collected.label('most_recent_collection_time'),
-    ).order_by(
-        StampCollection.time_collected.desc(),
-    ).limit(
-        1
+    max_time_subquery = DBSession.query(
+        StampCollection.stamp_id.label('stamp_id'),
+        func.max(StampCollection.time_collected).label('most_recent_time'),
+    ).group_by(
+        StampCollection.stamp_id
     ).subquery()
 
     stamps = DBSession.query(
         Stamp,
-        statement.c.most_recent_collection_time,
+        max_time_subquery.c.most_recent_time,
     ).outerjoin(
-        statement,
-        Stamp.id == statement.c.stamp_id,
+        max_time_subquery,
+        Stamp.id == max_time_subquery.c.stamp_id,
     ).filter(
         Stamp.park_id == park.id,
     ).all()

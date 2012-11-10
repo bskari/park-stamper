@@ -9,7 +9,7 @@
                 <th>Text</th>
                 <th>Location</th>
                 <th>GPS Coordinates</th>
-                <th>Last Collection Time</th>
+                <th>Last Seen</th>
             </tr>
         </thead>
         % for stamp, most_recent_collection_time in stamps:

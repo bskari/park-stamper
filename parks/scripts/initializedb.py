@@ -1,3 +1,4 @@
+import datetime
 import os
 import sys
 import transaction
@@ -36,8 +37,8 @@ def main(argv=sys.argv):
     with transaction.manager:
         user = User(username='guest', password='password', signup_ip=1)
         DBSession.add(user)
-        user = DBSession.query(User.id).filter(User.username == 'guest').first()
-        user_email = UserEmail(user=user.id, email='guest@parkstamper.org')
+        user_id = DBSession.query(User.id).filter(User.username == 'guest').scalar()
+        user_email = UserEmail(user=user_id, email='guest@parkstamper.org')
         DBSession.add(user_email)
         for name, abbreviation in (
             ('Colorado', 'co'),
@@ -60,9 +61,23 @@ def main(argv=sys.argv):
             park = Park(name=name, url=url, state=state)
             DBSession.add(park)
         for name, _, _ in park_info:
-            stamp = Stamp(park=name, text=(name + '\nNational Park'))
-            DBSession.add(stamp)
-            # Uses can collect stamps more than once
-            for i in xrange(2):
-                collection = StampCollection(user.id, stamp.id)
-                DBSession.add(collection)
+            stamp_text = name + '\nNational Park'
+            for text in (stamp_text, stamp_text.upper(), stamp_text.lower()):
+                stamp = Stamp(park=name, text=text)
+                DBSession.add(stamp)
+
+                # Let's leave some stamps uncollected
+                if text != stamp_text.lower():
+                    stamp_id = DBSession.query(
+                        Stamp.id
+                    ).filter(
+                        Stamp.text == text
+                    ).scalar()
+                    # Users can collect stamps more than once
+                    for i in xrange(2):
+                        collection = StampCollection(
+                            stamp_id=stamp_id,
+                            user_id=user_id,
+                            time_collected=datetime.datetime.now() - datetime.timedelta(days=i),
+                        )
+                        DBSession.add(collection)

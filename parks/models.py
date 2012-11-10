@@ -126,12 +126,3 @@ class StampCollection(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     time_collected = Column(DateTime, nullable=False, default=datetime.utcnow())
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
-
-    def __init__(self, stamp_id, user):
-        self.stamp_id = stamp_id
-
-        if isinstance(user, int):
-            self.user_id = user
-        elif isinstance(user, str) or isinstance(user, unicode):
-            user_id = DBSession.query(User.id).filter_by(username=user).first()
-            self.user_id = user_id.id
