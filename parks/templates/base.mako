@@ -71,5 +71,5 @@
                 </span>
             </p>
         </div>
-    </footefooterr>
+    </footer>
 </%def>
