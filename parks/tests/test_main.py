@@ -2,7 +2,6 @@ from pyramid import testing
 from sqlalchemy import create_engine
 from unittest import TestCase
 from transaction import manager
-from webtest import TestApp
 
 from parks.models import DBSession
 from parks.models import Base
