@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import transaction
+import unicodedata
 import urllib2
 
 from pyramid.paster import get_appsettings
@@ -33,6 +34,7 @@ parks = set()
 park_set = set()
 stamps = set()
 addresses = set()
+states = []
 
 
 def usage(argv):
@@ -112,19 +114,17 @@ def get_td_text(td):
 
 
 def add_park_entry(park_name, state_name):
-    if state_name:
-        # Well, I'd rather have special cases in code then have to do them by
-        # hand, so at the very least they automatically get filled in when I
-        # run this batch
-        if 'Yellowstone' in park_name:
-            state_abbreviation = 'WY'
-        else:
-            state_abbreviation = state_name
-    if park_name and state_name and state_abbreviation:
+    # Well, I'd rather have special cases in code then have to do them by
+    # hand, so at the very least they automatically get filled in when I
+    # run this batch
+    if u'Yellowstone' in park_name:
+        state_name = u'Wyoming'
+
+    if park_name and state_name:
         entry = u'"{park}","{state}","{region}"'.format(
             park=park_name,
-            state=state_abbreviation,
-            region=get_region_from_state(state_abbreviation)
+            state=state_name,
+            region=get_region_from_state(state_name),
         )
 
         if park_name not in parks:
@@ -142,9 +142,9 @@ def add_park_entry(park_name, state_name):
                     logging.error(u'\tEntry: {entry}\n'.format(entry=i))
     else:
         logging.info(
-            'Skipping {park} {state}\n'.format(
+            u'Skipping {park} {state}\n'.format(
                 park=park_name,
-                state=state_name
+                state=state_name,
             )
         )
 
@@ -155,8 +155,8 @@ def parse_list(park_list, state):
     # Well, I'd rather have special cases in code then have to do them by
     # hand, so at the very least they automatically get filled in when I
     # run this batch
-    if 'National Capital Parks-East' in links[0]['title']:
-        state_name = 'Maryland'
+    if u'National Capital Parks-East' in links[0]['title']:
+        state_name = u'Maryland'
 
     for link in links:
         park_name = link['title']
@@ -329,7 +329,8 @@ def load_states(filename=None):
     # First row is just headers so skip it
     reader.next()
     return [
-        StateTuple(name=name, abbreviation=abbreviation, type=type)
+        # statetable.com has spaces after most Canadian provinces, so strip
+        StateTuple(name=name.strip(), abbreviation=abbreviation, type=type)
         for _, name, abbreviation, _, type, _, _, occupied, _ in reader
         if occupied != 'unoccupied' # Skip unoccupied areas, like islands
     ]
@@ -360,16 +361,77 @@ def save_parks(session):
                 'Unknown park type for {park}\n'.format(park=park_name)
             )
 
+        # Replace spaces with dashes, drop the "National Park", etc.
+        url = park_name.lower()
+        need_full_name_for_url = False
+        # Some things start with the word "National", like
+        # "National COnstitution Center"
+        for i in (u'national', u'international'):
+            if url.startswith(i):
+                need_full_name_for_url = True
+                break
+        # Some things are named the same thing but have different types, e.g.
+        # Andrew Johnson National Cemetery and National Historic Site
+        for duplicate in (
+            u'andrew johnson',
+            u'clara barton',
+            u'colonial',
+            u'fort vancouver',
+            u'lewis and clark',
+            u'martin luther king',
+            u'shiloh',
+            u'stones river',
+            u'vicksburg',
+        ):
+            if duplicate in url:
+                need_full_name_for_url = True
+                break
+        if not need_full_name_for_url:
+            url = re.sub(u'national.*', u'', url)
+            url = re.sub(u'memorial.*', u'', url)
+            url = re.sub(u'park.*', u'', url)
+        url = url.strip()
+        url = re.sub(u"'", u'', url)
+        def strip_accents(unicode):
+            return ''.join([
+                c for c in unicodedata.normalize('NFD', unicode)
+                if unicodedata.category(c) != 'Mn'
+            ])
+        url = strip_accents(url)
+        # Don't include the UNICODE flag here, so that we remove all non-ASCII
+        url = re.sub(u'\\W', u'-', url)
+        # Removing punctuation can cause duplicate dashes
+        url = re.sub(u'-+', u'-', url)
+        url = re.sub(u'-$', u'', url)
+        url = re.sub(u'^-', u'', url)
+
+        # Wikipedia sometimes has disambiguation crap, so remove it
+        park_state = re.sub(u' \\(U\\.S\\. state\\)', u'', park_state)
+        park_state = park_state.strip()
+
+        # Normalize to statetable.com's naming convention
+        if (
+            re.search(u'washington.*d.*c', park_state.lower()) or \
+            re.search(u'district.*of.*columbia', park_state.lower())
+        ):
+            park_state = u'Washington DC'
+
         park = Park(
             name=park_name,
-            # TODO(2012-11-11) Replace spaces with dashes, drop the "National Park", etc.
-            url=park_name,
+            url=url,
             type=park_type,
             region=park_region,
             state=park_state,
         )
 
         session.add(park)
+
+
+def save_stamps(session):
+    unique_stamp_text = set([stamp_text for _, stamp_text, _ in rows])
+    for stamp_text in unique_stamp_text:
+        stamp = Stamp(text=stamp_text)
+        session.add(stamp)
 
 
 def main(argv=sys.argv):
