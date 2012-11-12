@@ -4,3 +4,6 @@ Parks.egg-info
 
 *.swp
 *.pyc
+
+# This is downloaded automatically from Wikipedia
+parks/scripts/initialize_db/wiki.txt
