@@ -13,6 +13,7 @@ requires = [
     'pyramid_debugtoolbar',
     'pyramid_beaker',
     'pyramid_tm',
+    'python-dateutil',
     'SQLAlchemy',
     'transaction',
     'waitress',
