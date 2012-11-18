@@ -20,12 +20,12 @@
 
 <%def name="stamp_row(stamp, most_recent_collection_time)">
     <tr>
-        <th>${stamp.text.replace('\n', '<br />') | n}</th>
+        <th width="200px" style="text-align: center;">${stamp.text.replace('\n', '<br />') | n}</th>
         <th>${blank_if_none(stamp.location)}</th>
         <th>${blank_if_none(stamp.latitude)} ${blank_if_none(stamp.longitude)}</th>
 
         % if most_recent_collection_time is not None:
-            <th>${most_recent_collection_time}</th>
+            <th>${most_recent_collection_time.strftime('%Y-%m-%d')}</th>
         % else:
             <th>Never</th>
         % endif
