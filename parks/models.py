@@ -1,23 +1,19 @@
-import re
-
 from datetime import datetime
 from bcrypt import gensalt
 from bcrypt import hashpw
 from socket import inet_aton
-from sqlalchemy import Binary
 from sqlalchemy import Column
 from sqlalchemy import DateTime
+from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
-from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.util import buffer
 from zope.sqlalchemy import ZopeTransactionExtension
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -33,13 +29,22 @@ class User(Base):
     signup_ip = Column(Integer(unsigned=True), nullable=False) # TODO(2012-10-27) support IPv6
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
+    def __init__(self, username, password, signup_ip):
+        self.username = username
+        self.password = hashpw(password, gensalt())
+
+        if isinstance(signup_ip, int):
+            self.signup_ip = signup_ip
+        else:
+            self.signup_ip = inet_aton(signup_ip)
+
 
 class UserEmail(Base):
     """An email address that's attached to a user account."""
     __tablename__ = 'user_email'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False) 
-    email = Column(Text, unique=True, nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     def __init__(self, user, email):
@@ -103,12 +108,13 @@ class Park(Base):
     """
     __tablename__ = 'park'
     id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False, unique=True)
-    url = Column(Text, nullable=False, unique=True)
+    name = Column(String(255), nullable=False, unique=True)
+    url = Column(String(255), nullable=False, unique=True)
     state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
     latitude = Column(Float)
     longitude = Column(Float)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    date_founded = Column(Date)
     region = Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA')
     type = Enum(get_park_types().keys(), nullable=False)
 
@@ -142,11 +148,8 @@ class Stamp(Base):
     """A passport park stamp."""
     __tablename__ = 'stamp'
     id = Column(Integer, primary_key=True)
-    park_id = Column(Integer, ForeignKey('park.id'), nullable=False)
-    location = Column(Text)
-    latitude = Column(Float)
-    longitude = Column(Float)
-    text = Column(Text, nullable=False)
+    location_id = Column(Integer, ForeignKey('stamp_location.id'))
+    text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     def __init__(self, park, text):
@@ -167,3 +170,32 @@ class StampCollection(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     time_collected = Column(DateTime, nullable=False, default=datetime.utcnow())
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+
+
+class StampLocation(Base):
+    """A location where stamps can be collected, e.g. a visitor's center."""
+    __tablename__ = 'stamp_location'
+    id = Column(Integer, primary_key=True)
+    park_id = Column(Integer, ForeignKey('park.id'), nullable=False)
+    description = Column(String(255))
+    address = Column(String(255))
+    latitude = Column(Float)
+    longitude = Column(Float)
+
+
+class StampToLocation(Base):
+    """One stamp can be at multiple locations. This is a junction table that
+    stores that relationship.
+    """
+    __tablename__ = 'stamp_at_location'
+    id = Column(Integer, primary_key=True)
+    stamp_id = Column(
+        Integer,
+        ForeignKey('stamp.id'),
+        nullable=False,
+    )
+    stamp_location_id = Column(
+        Integer,
+        ForeignKey('stamp_location.id'),
+        nullable=False,
+    )
