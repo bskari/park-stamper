@@ -43,7 +43,7 @@ class UserEmail(Base):
     """An email address that's attached to a user account."""
     __tablename__ = 'user_email'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False) 
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 

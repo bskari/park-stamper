@@ -154,10 +154,10 @@ def load_wiki_page(wiki_page_name):
 
 def get_national_parks():
     """Loads the list of national parks from Wikipedia."""
-    soup = load_wiki_page('List_of_National_Parks_of_the_United_States')
+    soup = load_wiki_page('List_of_national_parks_of_the_United_States')
     tables = soup.fetch('table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
-    assert(len(wikitables) == 1)
+    assert len(wikitables) == 1
     np_table = wikitables[0]
     trs = np_table.fetch('tr')
 
@@ -202,7 +202,7 @@ def get_national_monuments():
     tables = soup.fetch('table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
     # There's an 'breakdown by agency' table and a list table
-    assert(len(wikitables) == 2)
+    assert len(wikitables) == 2
     nm_table = wikitables[1]
     trs = nm_table.fetch('tr')
 
@@ -249,6 +249,156 @@ def get_national_monuments():
         )
 
     return monuments
+
+
+def get_national_lakeshores_and_seashores():
+    """Loads the list of national lakeshores and seashores from Wikipedia."""
+    soup = load_wiki_page('List_of_United_States_national_lakeshores_and_seashores')
+    tables = soup.fetch('table')
+    wikitables = [t for t in tables if u'wikitable' in t['class']]
+    # There's a seashore table and a lakeshore table
+    assert len(wikitables) == 2
+
+    lakeshores = []
+    seashores = []
+
+    for table, list in zip(wikitables, (lakeshores, seashores)):
+        trs = table.fetch('tr')
+        # Skip the header row
+        for tr in trs[1:]:
+            # The columns are name, photo, location, date, area, description
+            name_column, _, location_column, date_column, _, _ = tr.fetch('td')
+            name = name_column.fetch('a')[0].text
+
+            # The location column has one or more states and a GPS coordinate
+            state_name = location_column.fetch('a')[0].text
+            gps_text = location_column.fetch('a')[-1].text
+            # gps_text looks like:
+            # 44°21′N68°13′W / 44.35°N 68.21°W /44.35; -68.21 (Acadia)
+            float_text = gps_text.split('/')[-1]
+            latitude = float(float_text.split(';')[0])
+            # There's some weird Unicode crap in the above, so I can't just split by ' '
+            longitude = float(re.search(r'((?:-)?\d+(?:\.\d+)?)', float_text).group())
+
+            date = parse(date_column.fetch('span')[-1].text, fuzzy=True)
+
+            list.append(
+                ParkTuple(
+                    name=name,
+                    state=state_name,
+                    latitude=latitude,
+                    longitude=longitude,
+                    agency='NPS',
+                    date=date,
+                )
+            )
+
+    return (lakeshores, seashores)
+
+
+def get_national_grasslands():
+    """Loads the list of national grasslands from Wikipedia."""
+    soup = load_wiki_page('United_States_National_Grassland')
+    ul_lists = soup.fetch('ul')
+    # There's a list for TOC, a list of national grasslands, a list of prairie
+    # reserves, a list of "See also" stuff, and a ton of other crap
+    grassland_list = ul_lists[1]
+
+    grasslands = []
+
+    for li in grassland_list.fetch('li'):
+        # Most are formatted as follows:
+        # Little Missouri National Grassland -- western North Dakota, blah blah...
+        name = li.fetch('a')[0].text
+        # Texas Panhandle => Texas
+        state_name = li.fetch('a')[1].text.replace(' Panhandle', '')
+        # Fannin County => Texas
+        if state_name == 'Fannin County':
+            state_name = 'Texas'
+
+        grasslands.append(
+            ParkTuple(
+                name=name,
+                state=state_name,
+                agency='NFS',
+                latitude=None,
+                longitude=None,
+                date=None,
+            )
+        )
+
+    return grasslands
+
+
+def get_national_marine_sanctuaries():
+    """Loads the list of national marine sanctuaries from Wikipedia."""
+    soup = load_wiki_page('United_States_National_Marine_Sanctuary')
+    ul_lists = soup.fetch('ul')
+    # There's a list of marine sanctuaries, and a ton of other crap
+    sanctuary_list = ul_lists[0]
+
+    sanctuaries = []
+
+    for li in sanctuary_list.fetch('li'):
+        name = li.fetch('a')[0].text
+        # Wikipedia includes some national monuments here too
+        if u'National Marine Sanctuary' not in name:
+            logger.warning(
+                u'Skipping {name} claiming to be a national marine anctuary'.format(
+                    name=name,
+                )
+            )
+            continue
+
+        sanctuaries.append(
+            ParkTuple(
+                name=name,
+                state=None,
+                agency='NMSP', # National Marine Sanctuaries Program
+                latitude=None,
+                longitude=None,
+                date=None,
+            )
+        )
+
+    return sanctuaries 
+
+
+def get_national_recreation_areas():
+    """Loads the list of national recreation areas from Wikipedia."""
+    # This doesn't have its own page
+    soup = load_wiki_page('List_of_areas_in_the_United_States_National_Park_System')
+    tables = soup.fetch('table')
+    wikitables = [t for t in tables if u'wikitable' in t['class']]
+    assert len(wikitables) == 32
+    nra_table = wikitables[19]
+    trs = nra_table.fetch('tr')
+
+    areas = []
+
+    # Skip the header row
+    for tr in trs[1:]:
+        # The columns are name, states
+        name_column, state_column = tr.fetch('td')
+        name = name_column.fetch('a')[0].text
+
+        state_name = state_column.fetch('a')[0].text
+
+        # TODO(bskari|2012-11-18) Load each NRA's Wiki page and scrape other
+        # information
+
+        areas.append(
+            ParkTuple(
+                name=name,
+                state=state_name,
+                latitude=None,
+                longitude=None,
+                agency='NPS',
+                date=None,
+            )
+        )
+
+    return areas
 
 
 def guess_canonical_park(park_name, session):
@@ -451,12 +601,25 @@ def load_states(filename=None):
     StateTuple = namedtuple('StateTuple', ['name', 'abbreviation', 'type'])
     # First row is just headers so skip it
     reader.next()
-    return [
+    states = [
         # statetable.com has spaces after most Canadian provinces, so strip
         StateTuple(name=name.strip(), abbreviation=abbreviation, type=type)
         for _, name, abbreviation, _, type, _, _, occupied, _ in reader
         if occupied != 'unoccupied' # Skip unoccupied areas, like islands
     ]
+    # Add some that aren't included by statetable.com
+    # These are in the list, but they're listed separately as islands, and the
+    # Pacific Remote Islands Marine National Monument spans multiple islands
+    # anyway, so just lump them together
+    states.append(
+        StateTuple(
+            name='U.S. Minor Outlying Islands',
+            abbreviation='MOI',
+            type='minor outlying islands',
+        )
+    )
+    return states
+
 
 
 def save_states(states, session):
@@ -470,22 +633,22 @@ def save_states(states, session):
 
 
 def save_parks(session, parks):
-    sorted_list = list(parks)
-    sorted_list.sort()
+    for park in parks:
+        park_type = guess_park_type(park.name)
 
-    for string in sorted_list:
-        park_name = string.split('"')[1]
-        park_state = string.split('"')[3]
-        park_region = string.split('"')[5]
-        park_type = guess_park_type(park_name)
-
-        if not park_type:
-            logger.error(
-                'Unknown park type for {park}\n'.format(park=park_name)
+        if park_type is None:
+            logger.warning(
+                'Unknown park type for {park}'.format(park=park.name)
             )
+        if park.state is None:
+            logger.error(
+                'No state given for {park}'.format(park=park.name)
+            )
+            continue
+        state = park.state
 
         # Replace spaces with dashes, drop the "National Park", etc.
-        url = park_name.lower()
+        url = park.name.lower()
         need_full_name_for_url = False
         # Some things start with the word "National", like
         # "National COnstitution Center"
@@ -528,31 +691,33 @@ def save_parks(session, parks):
         url = re.sub(u'-$', u'', url)
         url = re.sub(u'^-', u'', url)
 
-        # Wikipedia sometimes has disambiguation crap, so remove it
-        park_state = re.sub(u' \\(U\\.S\\. state\\)', u'', park_state)
-        park_state = park_state.strip()
-
         # Normalize to statetable.com's naming convention
         if (
-            re.search(u'washington.*d.*c', park_state.lower()) or \
-            re.search(u'district.*of.*columbia', park_state.lower())
+            re.search(u'washington.*d.*c', state.lower()) or \
+            re.search(u'district.*of.*columbia', state.lower())
         ):
-            park_state = u'Washington DC'
+            state = u'Washington DC'
+        # US Virgin Islands, US Minor Outlying Islands, etc.
+        state = state.replace('US ', 'U.S. ')
 
-        park = Park(
-            name=park_name,
-            url=url,
-            type=park_type,
-            region=park_region,
-            state=park_state,
-        )
+        try:
+            park = Park(
+                name=park.name,
+                url=url,
+                type=park_type,
+                region=get_region_from_state(state),
+                state=state,
+            )
+        except (IOError, Exception), e:
+            print('******************' + park.state + ':' + str(e))
+            continue
 
         session.add(park)
 
 
 def save_stamps(session, stamp_texts):
     """Creates Stamp entries in the database."""
-    assert(len(stamp_texts) == len(set(stamp_texts)))
+    assert len(stamp_texts) == len(set(stamp_texts))
     for text in stamp_texts:
         stamp = Stamp(text=text)
         session.add(stamp)
@@ -577,8 +742,12 @@ def main(argv=sys.argv):
     Base.metadata.create_all(engine)
 
     # Load the canonical park list from Wikipedia
-    #nps = get_national_parks()
+    nps = get_national_parks()
     nms = get_national_monuments()
+    lss, sss = get_national_lakeshores_and_seashores()
+    gls = get_national_grasslands()
+    nmss = get_national_marine_sanctuaries()
+    nras = get_national_recreation_areas()
 
     # Load data for parks
     with open('parks/scripts/initialize_db/master_list.csv', 'rb') as f:
@@ -588,7 +757,8 @@ def main(argv=sys.argv):
     with transaction.manager:
         states = load_states()
         save_states(states, DBSession)
-        save_parks(DBSession, set([stamp_info.park for stamp_info in stamp_info_entries]))
+        for location_list in (nps, nms, lss, sss, gls, nmss, nras):
+            save_parks(DBSession, location_list)
         save_stamp_locations(DBSession, stamp_info_entries)
 
         user = User(
