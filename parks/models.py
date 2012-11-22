@@ -128,7 +128,7 @@ class Park(Base):
             self.state_id = state
         elif isinstance(state, str) or isinstance(state, unicode):
             # Try both the name and the abbreviation
-            state_id = DBSession.query(
+            self.state_id = DBSession.query(
                 State.id
             ).filter(
                 or_(
@@ -136,9 +136,6 @@ class Park(Base):
                     State.name == state
                 )
             ).scalar()
-            if state_id is None:
-                state_id = DBSession.query(State.id).filter_by(abbreviation=state).scalar()
-            self.state_id = state_id
 
         self.latitude = latitude
         self.longitude = longitude
