@@ -444,6 +444,46 @@ def get_rivers():
     return rivers
 
 
+def get_national_scenic_trails_and_national_historic_trails():
+    """Loads the list of national scenic trails and national historic trails
+    from Wikipedia.
+    """
+    national_scenic_trails = []
+    national_historic_trails = []
+    for page, list in zip(
+        (u'National_Historic_Trail', u'National_Scenic_Trail'),
+        (national_scenic_trails, national_historic_trails)
+    ):
+        soup = load_wiki_page(page)
+        tables = soup.fetch(u'table')
+        wikitables = [t for t in tables if u'wikitable' in t['class']]
+        assert len(wikitables) == 1
+
+        trs = wikitables[0].fetch(u'tr')
+
+        # Skip the header row and total length row
+        for tr in trs[1:-1]:
+            # The columns are trail name, year established, length authorized
+            name_column, date_column, _ = tr.fetch(u'td')
+            name = name_column.fetch(u'a')[0]['title']
+
+            date_text = date_column.text
+            date = parse(date_text)
+
+            list.append(
+                ParkTuple(
+                    name=name,
+                    latitude=None,
+                    longitude=None,
+                    state=None,
+                    agency=u'NPS',
+                    date=date,
+                )
+            )
+
+    return (national_scenic_trails, national_historic_trails)
+
+
 def get_national_memorials():
     """Loads the list of national memorials from Wikipedia."""
     soup = load_wiki_page(u'List_of_National_Memorials_of_the_United_States')
@@ -469,7 +509,7 @@ def get_national_memorials():
 
             date_text = date_column.fetch(u'span')[-1].text
             if len(date_text) > 0:
-                date = parse(date_column.fetch(u'span')[-1].text, fuzzy=True)
+                date = parse(date_text, fuzzy=True)
             else:
                 date = None
 
@@ -501,14 +541,17 @@ def get_national_heritage_areas(state_names):
         name = name.replace(u'&amp;', u'&')
 
         # Some names leave off the NHA or whatever, so add them back in
-        if u'Canal' in name:
-            name = name + u' National Heritage Area'
-        if u'River' in name:
-            name = name + u' Corridor'
+        if u'National Heritage Area' not in name:
+            if u'Canal' in name:
+                name = name + u' National Heritage Area'
+            elif u'River' in name:
+                name = name + u' Corridor'
 
         if u'Heritage' not in name and u'Corridor' not in name and u'District' not in name:
             logger.warning(
-                u'Incomplete name: "{name}", skipping'.format(name=name)
+                u'Incomplete name for heritage area: "{name}", skipping'.format(
+                    name=name
+                )
             )
             continue
 
@@ -529,7 +572,7 @@ def get_national_heritage_areas(state_names):
     return heritage_areas
 
 
-def get_nps_exclusive_areas():
+def get_nps_exclusive_areas(state_names):
     """Loads the list of national whatevers from Wikipedia. These are areas
     that are exclusively listed by the National Park Service and therefore
     the list on the areas in the US NPS wiki page is exhaustive.
@@ -580,21 +623,140 @@ def get_nps_exclusive_areas():
 
             state_name = state_column.fetch(u'a')[0].text
 
-            # TODO(bskari|2012-11-18) Load each area's wiki page and scrape
-            # other information, like lat/long and date
+            wiki_page_name = name_column.fetch(u'a')[0][u'href'].split(u'wiki/')[-1]
+            latitude, longitude = _get_latitude_longitude_from_wiki_page(
+                wiki_page_name
+            )
+            date = _get_date_from_wiki_page(wiki_page_name)
 
             areas.append(
                 ParkTuple(
                     name=name,
                     state=state_name,
-                    latitude=None,
-                    longitude=None,
+                    latitude=latitude,
+                    longitude=longitude,
                     agency=u'NPS',
-                    date=None,
+                    date=date,
+                )
+            )
+
+    # The other table has sublists with stuff in it, e.g. National Capital
+    # Parks-East also has Anacostia Park, Baltimore-Washington Parkway, etc.
+    uls = other_table.fetch(u'ul')
+    for ul in uls:
+        for li in ul.fetch(u'li'):
+            name = li.fetch(u'a')[0].text
+
+            wiki_page_name = name_column.fetch(u'a')[0][u'href'].split(u'wiki/')[-1]
+            latitude, longitude = _get_latitude_longitude_from_wiki_page(
+                wiki_page_name
+            )
+            date = _get_date_from_wiki_page(wiki_page_name)
+            state = _get_state_from_wiki_page(state_names, wiki_page_name)
+
+            areas.append(
+                ParkTuple(
+                    name=name,
+                    state=state,
+                    latitude=latitude,
+                    longitude=longitude,
+                    agency=u'NPS',
+                    date=date,
                 )
             )
 
     return areas
+
+
+def get_other_areas():
+    """Returns a list of areas that, for whatever reason, aren't in thr other
+    lists.
+    """
+    return (
+        ParkTuple(
+            name=u'Sunset Crater Volcano National Monument',
+            state=u'Arizona',
+            latitude=35.365579283,
+            longitude=-111.500652017,
+            agency=u'NPS',
+            date=parse(u'1930'),
+        ),
+        ParkTuple(
+            name=u'Big Sur River',
+            state=u'California',
+            latitude=36.280519,
+            longitude=-121.8599558,
+            agency=u'USFS',
+            date=parse(u'1936'),
+        ),
+        ParkTuple(
+            name=u'National AIDS Memorial Grove',
+            state=u'California',
+            latitude=37.77,
+            longitude=-122.461389,
+            agency=u'NPS',
+            date=parse(u'1996'),
+        ),
+        ParkTuple(
+            name=u'USS Arizona Memorial',
+            state=u'Hawaii',
+            latitude=21.365,
+            longitude=-157.95,
+            agency=u'NPS',
+            date=parse(u'May 30, 1962'),
+        ),
+        ParkTuple(
+            name=u'Inupiat Heritage Center',
+            state=u'Alaska',
+            latitude=71.298611,
+            longitude=-156.753333,
+            agency=u'NPS',
+            date=parse(u'February 1999'),
+        ),
+        ParkTuple(
+            name=u'Land Between the Lakes National Recreation Area',
+            state=u'Kentucky',
+            latitude=36.856944,
+            longitude=-88.074722,
+            agency=u'USFS',
+            date=parse(u'1963'),
+        ),
+        # This one is listed in the list of areas administed by the NPS, but
+        # not on the list of national wild and scenic rivers page
+        ParkTuple(
+            name=u'Big South Fork National River and Recreation Area',
+            state=u'Tennessee',
+            latitude=36.4865,
+            longitude=-84.6985,
+            agency=u'NPS',
+            date=parse(u'March 4, 1974'),
+        ),
+        ParkTuple(
+            name=u'Chesapeake Bay Gateways Network',
+            state=u'Maryland',
+            latitude=37.32212,
+            longitude=-76.25336,
+            agency=u'NPS',
+            date=parse(u'1998'),
+        ),
+        ParkTuple(
+            name=u'Clara Barton Parkway',
+            state=u'Maryland',
+            # Midway between two end points
+            latitude=(38.930403 + 38.978528) / 2.0,
+            longitude=(-77.111922 + -77.206678) / 2.0,
+            agency=u'NPS',
+            date=parse(u'1989'),
+        ),
+        ParkTuple(
+            name=u'Glen Echo Park',
+            state=u'Maryland',
+            latitude=38.966389,
+            longitude=-77.138056,
+            agency=u'NPS',
+            date=parse(u'June 8, 1984'),
+        ),
+    )
 
 
 def _get_state_from_wiki_page(state_names, wiki_page_name):
@@ -669,7 +831,7 @@ def _get_latitude_longitude_from_wiki_page(wiki_page_name):
     try:
         latitude = float(latitude_text)
         longitude = float(longitude_text)
-        return (latitude, longitude)
+        return (latitude, -longitude)
     except:
         return (None, None)
 
@@ -684,6 +846,19 @@ def _get_date_from_wiki_page(wiki_page_name):
     if len(date_tr) == 1:
         try:
             date_string = date_tr[0].td.text
+
+            # If there's a Wiki citation, ignore it
+            if u'[' in date_string:
+                date_string = date_string.split(u'[')[0]
+            # If there's HTML markup, ignore it
+            if u'&' in date_string:
+                date_string = date_string.split(u'&')[0]
+            # If there's a clarification e.g.:
+            # December 2, 1980(Park &; Preserve)December 1, 1978(National Monument)
+            # then ignore it
+            if u'(' in date_string:
+                date_string = date_string.split(u'(')[0]
+
             date = parse(date_string)
         except:
             try:
@@ -752,9 +927,9 @@ def _remove_common_park_words(park_name):
         r'\bHeritage\b',
         r'\bArea\b',
         r'\bWild\b',
-        r'\nScenic\b',
-        r'\nMonument\b',
-        r'\nMemorial\b',
+        r'\bScenic\b',
+        r'\bMonument\b',
+        r'\bMemorial\b',
         r'&', # No word boundary here; I was having trouble getting it to work
     )
     for regex in common_word_regexes:
@@ -970,6 +1145,7 @@ def save_parks(session, parks):
             ])
         url = strip_accents(url)
         # Don't include the UNICODE flag here, so that we remove all non-ASCII
+        url = url.strip()
         url = re.sub(u'\\W', u'-', url)
         # Removing punctuation can cause duplicate dashes
         url = re.sub(u'-+', u'-', url)
@@ -984,6 +1160,9 @@ def save_parks(session, parks):
         url = re.sub(u'national.*', u'', url)
         url = re.sub(u'memorial.*', u'', url)
         url = re.sub(u'park.*', u'', url)
+        url = url.strip()
+        url = re.sub(u'-$', u'', url)
+        url = re.sub(u'^-', u'', url)
         url = url.strip()
         return url
 
@@ -1081,7 +1260,10 @@ def main(argv=sys.argv):
     rivers = get_rivers()
     memorials = get_national_memorials()
     heritage_areas = get_national_heritage_areas([s.name for s in states])
-    nps_exclusives = get_nps_exclusive_areas()
+    nps_exclusives = get_nps_exclusive_areas([s.name for s in states])
+    national_scenic_trails, national_historic_trails = \
+        get_national_scenic_trails_and_national_historic_trails()
+    other_areas = get_other_areas()
 
     # Load data for parks
     with open(u'parks/scripts/initialize_db/master_list.csv', u'rb') as f:
@@ -1106,6 +1288,9 @@ def main(argv=sys.argv):
             memorials,
             heritage_areas,
             nps_exclusives,
+            national_scenic_trails,
+            national_historic_trails,
+            other_areas,
         ):
             for area in areas_list:
                 if area.name not in names:
