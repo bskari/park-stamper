@@ -110,7 +110,7 @@ class Park(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
     url = Column(String(255), nullable=False, unique=True)
-    state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
+    state_id = Column(Integer, ForeignKey('state.id'))
     latitude = Column(Float)
     longitude = Column(Float)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
@@ -148,15 +148,6 @@ class Stamp(Base):
     location_id = Column(Integer, ForeignKey('stamp_location.id'))
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
-
-    def __init__(self, park, text):
-        if isinstance(park, int):
-            self.park_id = park
-        elif isinstance(park, str) or isinstance(park, unicode):
-            park_id = DBSession.query(Park.id).filter_by(name=park).first()
-            self.park_id = park_id.id
-
-        self.text = text
 
 
 class StampCollection(Base):
