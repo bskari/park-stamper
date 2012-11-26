@@ -358,9 +358,10 @@ def get_national_marine_sanctuaries(state_names):
 
     for li in sanctuary_list.fetch(u'li'):
         wiki_page_name = li.fetch(u'a')[0][u'href'].split(u'wiki/')[-1]
-        state = _get_state_from_wiki_page(state_names, wiki_page_name)
-        latitude, longitude = _get_latitude_longitude_from_wiki_page(wiki_page_name)
-        date = _get_date_from_wiki_page(wiki_page_name)
+        soup = load_wiki_page(wiki_page_name)
+        state = _get_state_from_wiki_soup(state_names, soup)
+        latitude, longitude = _get_latitude_longitude_from_wiki_soup(soup)
+        date = _get_date_from_wiki_soup(soup)
 
         name = li.fetch(u'a')[0].text
         # Wikipedia includes some national monuments here too
@@ -553,7 +554,8 @@ def get_national_heritage_areas(state_names):
             continue
 
         wiki_page_name = li.fetch(u'a')[0][u'href'].split(u'wiki/')[-1]
-        state = _get_state_from_wiki_page(state_names, wiki_page_name)
+        soup = load_wiki_page(wiki_page_name)
+        state = _get_state_from_wiki_soup(state_names, soup)
 
         heritage_areas.append(
             ParkTuple(
@@ -621,10 +623,9 @@ def get_nps_exclusive_areas(state_names):
             state_name = state_column.fetch(u'a')[0].text
 
             wiki_page_name = name_column.fetch(u'a')[0][u'href'].split(u'wiki/')[-1]
-            latitude, longitude = _get_latitude_longitude_from_wiki_page(
-                wiki_page_name
-            )
-            date = _get_date_from_wiki_page(wiki_page_name)
+            soup = load_wiki_page(wiki_page_name)
+            latitude, longitude = _get_latitude_longitude_from_wiki_soup(soup)
+            date = _get_date_from_wiki_soup(soup)
 
             areas.append(
                 ParkTuple(
@@ -645,11 +646,10 @@ def get_nps_exclusive_areas(state_names):
             name = li.fetch(u'a')[0].text
 
             wiki_page_name = name_column.fetch(u'a')[0][u'href'].split(u'wiki/')[-1]
-            latitude, longitude = _get_latitude_longitude_from_wiki_page(
-                wiki_page_name
-            )
-            date = _get_date_from_wiki_page(wiki_page_name)
-            state = _get_state_from_wiki_page(state_names, wiki_page_name)
+            soup = load_wiki_page(wiki_page_name)
+            latitude, longitude = _get_latitude_longitude_from_wiki_soup(soup)
+            date = _get_date_from_wiki_soup(soup)
+            state = _get_state_from_wiki_soup(soup)
 
             areas.append(
                 ParkTuple(
@@ -796,16 +796,15 @@ def get_other_areas():
     )
 
 
-def _get_state_from_wiki_page(state_names, wiki_page_name):
+def _get_state_from_wiki_soup(state_names, wiki_soup):
     """Try to guess the state by just seeing which one has the most links on
     on its respective wiki page.
     """
-    soup = load_wiki_page(wiki_page_name)
     state_counts = dict()
     state_set = set(state_names)
 
     # Try to count direct links to states first
-    for a in soup.fetch(u'a'):
+    for a in wiki_soup.fetch(u'a'):
         if a.has_key(u'href') and u'/wiki/' in a['href']:
             wiki_state = a[u'href'].split(u'/wiki/')[1]
             state = wiki_state.replace('_', ' ')
@@ -828,7 +827,7 @@ def _get_state_from_wiki_page(state_names, wiki_page_name):
         # like "Essex County, Massachusetts". I could do this in a one-liner, but
         # it would be create tons of temporary variables and be super slow.
         state_counts = dict()
-        for a in soup.fetch(u'a'):
+        for a in wiki_soup.fetch(u'a'):
             link_text = a.text
             for state in state_set:
                 if state.replace(' ', '_') in link_text:
@@ -848,7 +847,7 @@ def _get_state_from_wiki_page(state_names, wiki_page_name):
     if len(ties_for_first) > 1:
         logger.warning(''.join((
             'Unable to choose between states for ',
-            wiki_page_name,
+            wiki_soup.fetch(u'title')[0].text.split(' - Wikipedia')[0],
             ': ',
             ', '.join(ties_for_first),
             '; returning first',
@@ -857,10 +856,9 @@ def _get_state_from_wiki_page(state_names, wiki_page_name):
     return most_common_state
 
 
-def _get_latitude_longitude_from_wiki_page(wiki_page_name):
+def _get_latitude_longitude_from_wiki_soup(wiki_soup):
     """Get the latitude and longitude from the wiki."""
-    soup = load_wiki_page(wiki_page_name)
-    geo_decimal_spans = soup.fetch(u'span', {'class': 'geo-dec'})
+    geo_decimal_spans = wiki_soup.fetch(u'span', {'class': 'geo-dec'})
     if len(geo_decimal_spans) == 0:
         return (None, None)
     geo_dec_text = geo_decimal_spans[0].text
@@ -873,10 +871,9 @@ def _get_latitude_longitude_from_wiki_page(wiki_page_name):
         return (None, None)
 
 
-def _get_date_from_wiki_page(wiki_page_name):
-    soup = load_wiki_page(wiki_page_name)
+def _get_date_from_wiki_soup(wiki_soup):
     date_tr = [
-        i for i in soup.fetch(u'tr')
+        i for i in wiki_soup.fetch(u'tr')
         if u'Established' in unicode(i) or u'Designated' in unicode(i)
     ]
     date = None
@@ -910,7 +907,7 @@ def _get_date_from_wiki_page(wiki_page_name):
                 logger.warning(
                     u'Couldn\'t parse "{date}" as date on page'.format(
                         date=date_string,
-                        page=wiki_page_name,
+                        page=wiki_soup.fetch(u'title')[0].text.split(' - Wikipedia')[0],
                     )
                 )
     return date
