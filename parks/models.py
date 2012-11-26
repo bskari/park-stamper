@@ -191,3 +191,35 @@ class StampToLocation(Base):
         ForeignKey('stamp_location.id'),
         nullable=False,
     )
+
+
+class OperatingHours(Base):
+    """The hours that a particular location are open for."""
+    __tablename__ = 'operating_hours'
+    id = Column(Integer, primary_key=True)
+    location_id = Column(
+        Integer,
+        ForeignKey('stamp_location.id'),
+        nullable=False,
+    )
+    day_of_week = Enum(
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        nullable=False
+    )
+    # For example, a place that is open 09:00-17:00 would have:
+    # time_open: 09:00
+    # minutes: 480
+    # A place that is open 18:00-02:00 would have:
+    # time_open: 18:00
+    # minutes: 480
+    time_open = Column(Time, nullable=False)
+    minutes= Column(Integer, nullable=False)
+
+    # This might need to be relaxed if a place closes mid day
+    UniqueConstraint('location_id', 'day_of_week')
