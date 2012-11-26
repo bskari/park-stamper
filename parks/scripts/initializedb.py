@@ -649,7 +649,7 @@ def get_nps_exclusive_areas(state_names):
             soup = load_wiki_page(wiki_page_name)
             latitude, longitude = _get_latitude_longitude_from_wiki_soup(soup)
             date = _get_date_from_wiki_soup(soup)
-            state = _get_state_from_wiki_soup(soup)
+            state = _get_state_from_wiki_soup(state_names, soup)
 
             areas.append(
                 ParkTuple(
@@ -847,7 +847,7 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
     if len(ties_for_first) > 1:
         logger.warning(''.join((
             'Unable to choose between states for ',
-            wiki_soup.fetch(u'title')[0].text.split(' - Wikipedia')[0],
+            wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0],
             ': ',
             ', '.join(ties_for_first),
             '; returning first',
@@ -907,7 +907,7 @@ def _get_date_from_wiki_soup(wiki_soup):
                 logger.warning(
                     u'Couldn\'t parse "{date}" as date on page'.format(
                         date=date_string,
-                        page=wiki_soup.fetch(u'title')[0].text.split(' - Wikipedia')[0],
+                        page=wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0],
                     )
                 )
     return date
