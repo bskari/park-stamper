@@ -5,12 +5,14 @@ from socket import inet_aton
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Date
+from sqlalchemy import Time
 from sqlalchemy import Enum
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -115,7 +117,7 @@ class Park(Base):
     longitude = Column(Float)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
     date_founded = Column(Date)
-    region = Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA')
+    region = Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA', nullable=False)
     type = Enum(get_park_types().keys(), nullable=False)
 
 
@@ -148,6 +150,8 @@ class Stamp(Base):
     location_id = Column(Integer, ForeignKey('stamp_location.id'))
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    type = Enum('normal', 'bonus', nullable=False)
+    status = Enum('normal', 'lost', 'archived', nullable=False)
 
 
 class StampCollection(Base):
