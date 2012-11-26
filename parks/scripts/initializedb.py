@@ -444,16 +444,13 @@ def get_rivers():
     return rivers
 
 
-def get_national_scenic_trails_and_national_historic_trails():
+def get_national_trails():
     """Loads the list of national scenic trails and national historic trails
     from Wikipedia.
     """
-    national_scenic_trails = []
-    national_historic_trails = []
-    for page, list in zip(
-        (u'National_Historic_Trail', u'National_Scenic_Trail'),
-        (national_scenic_trails, national_historic_trails)
-    ):
+    national_trails = []
+
+    for page in (u'National_Historic_Trail', u'National_Scenic_Trail'):
         soup = load_wiki_page(page)
         tables = soup.fetch(u'table')
         wikitables = [t for t in tables if u'wikitable' in t['class']]
@@ -465,12 +462,12 @@ def get_national_scenic_trails_and_national_historic_trails():
         for tr in trs[1:-1]:
             # The columns are trail name, year established, length authorized
             name_column, date_column, _ = tr.fetch(u'td')
-            name = name_column.fetch(u'a')[0]['title']
+            name = name_column.fetch(u'a')[0].text
 
             date_text = date_column.text
             date = parse(date_text)
 
-            list.append(
+            national_trails.append(
                 ParkTuple(
                     name=name,
                     latitude=None,
@@ -481,7 +478,7 @@ def get_national_scenic_trails_and_national_historic_trails():
                 )
             )
 
-    return (national_scenic_trails, national_historic_trails)
+    return national_trails
 
 
 def get_national_memorials():
@@ -544,7 +541,7 @@ def get_national_heritage_areas(state_names):
         if u'National Heritage Area' not in name:
             if u'Canal' in name:
                 name = name + u' National Heritage Area'
-            elif u'River' in name:
+            elif u'River' in name and u'Corridor' not in name:
                 name = name + u' Corridor'
 
         if u'Heritage' not in name and u'Corridor' not in name and u'District' not in name:
@@ -756,6 +753,46 @@ def get_other_areas():
             agency=u'NPS',
             date=parse(u'June 8, 1984'),
         ),
+        ParkTuple(
+            name=u'Western Arctic National Parklands',
+            state=u'Alaska',
+            latitude=38.989167,
+            longitude=-76.898333,
+            agency=u'NPS',
+            date=None,
+        ),
+        ParkTuple(
+            name=u'Western Historic Trails Center',
+            state=u'Iowa',
+            latitude=41.2259667,
+            longitude=-95.8982943,
+            agency=u'NPS',
+            date=None,
+        ),
+        ParkTuple(
+            name=u'Oregon Caves National Monumenti',
+            state=u'Oregon',
+            latitude=42.095556,
+            longitude=-123.405833,
+            agency=u'NPS',
+            date=parse('July 12, 1909'),
+        ),
+        ParkTuple(
+            name=u'Saint Croix National Scenic Riverway',
+            latitude=45.389167,
+            longitude=-92.6575,
+            state=u'Wisconsin',
+            agency=u'NPS',
+            date=parse('October 2, 1968'),
+        ),
+        ParkTuple(
+            name=u'Glacier Bay National Park and Preserve',
+            state=u'Alaska',
+            latitude=58.5,
+            longitude=-137,
+            agency=u'USFS',
+            date=parse('1963'),
+        ),
     )
 
 
@@ -871,7 +908,10 @@ def _get_date_from_wiki_page(wiki_page_name):
                 date = parse(year)
             except:
                 logger.warning(
-                    u'Couldn\'t parse "{date}" as date'.format(date=date_string)
+                    u'Couldn\'t parse "{date}" as date on page'.format(
+                        date=date_string,
+                        page=wiki_page_name,
+                    )
                 )
     return date
 
@@ -1182,11 +1222,6 @@ def save_parks(session, parks):
             logger.warning(
                 u'Unknown park type for {park}'.format(park=park.name)
             )
-        if park.state is None:
-            logger.error(
-                u'No state given for {park}'.format(park=park.name)
-            )
-            continue
         state = park.state
 
         url = stripped_url_from_name(park.name)
@@ -1204,15 +1239,16 @@ def save_parks(session, parks):
             url = normalized_url_from_name(park.name)
 
         # Normalize to statetable.com's naming convention
-        if (
-            re.search(u'washington.*d.*c', state.lower()) or \
-            re.search(u'district.*of.*columbia', state.lower())
-        ):
-            state = u'Washington DC'
-        # US Virgin Islands, US Minor Outlying Islands, etc. => U.S.
-        state = state.replace(u'US', u'U.S.')
-        if u'Virgin' in state:
-            state = u'U.S. Virgin Islands'
+        if state is not None:
+            if (
+                re.search(u'washington.*d.*c', state.lower()) or \
+                re.search(u'district.*of.*columbia', state.lower())
+            ):
+                state = u'Washington DC'
+            # US Virgin Islands, US Minor Outlying Islands, etc. => U.S.
+            state = state.replace(u'US', u'U.S.')
+            if u'Virgin' in state:
+                state = u'U.S. Virgin Islands'
 
         park_row = Park(
             name=park.name,
@@ -1261,8 +1297,7 @@ def main(argv=sys.argv):
     memorials = get_national_memorials()
     heritage_areas = get_national_heritage_areas([s.name for s in states])
     nps_exclusives = get_nps_exclusive_areas([s.name for s in states])
-    national_scenic_trails, national_historic_trails = \
-        get_national_scenic_trails_and_national_historic_trails()
+    national_trails = get_national_trails()
     other_areas = get_other_areas()
 
     # Load data for parks
@@ -1288,8 +1323,7 @@ def main(argv=sys.argv):
             memorials,
             heritage_areas,
             nps_exclusives,
-            national_scenic_trails,
-            national_historic_trails,
+            national_trails,
             other_areas,
         ):
             for area in areas_list:
