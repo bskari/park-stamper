@@ -112,7 +112,7 @@ class Park(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
     url = Column(String(255), nullable=False, unique=True)
-    state_id = Column(Integer, ForeignKey('state.id'))
+    state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
     latitude = Column(Float)
     longitude = Column(Float)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
@@ -121,7 +121,7 @@ class Park(Base):
     type = Enum(get_park_types().keys(), nullable=False)
 
 
-    def __init__(self, name, state, url, region, type, latitude=None, longitude=None):
+    def __init__(self, name, state, url, region, type, latitude=None, longitude=None, date_founded=None):
         self.name = name
         self.url = url
         self.region = region
@@ -141,6 +141,7 @@ class Park(Base):
 
         self.latitude = latitude
         self.longitude = longitude
+        self.date_founded = date_founded
 
 
 class Stamp(Base):
