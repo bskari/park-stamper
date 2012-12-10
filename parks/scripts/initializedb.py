@@ -23,6 +23,7 @@ from parks.models import Park
 from parks.models import Stamp
 #from parks.models import StampCollection
 from parks.models import StampLocation
+from parks.models import StampToLocation
 from parks.models import State
 from parks.models import User
 #from parks.models import UserEmail
@@ -1333,10 +1334,32 @@ def save_stamps(session, stamp_texts):
 
 def save_stamp_locations(session, stamp_info_entries):
     """Creates StampLocation entries in the database."""
+    # I'm not sure about the legality of directly copying the address
+    # information, so just create dummy entries for now
+    park_id_objects = session.query(Park.id).all()
+    for park_id_object in park_id_objects:
+        stamp_location = StampLocation(park_id=park_id_object.id, address='Uncategorized')
+        session.add(stamp_location)
+
     for stamp_info in stamp_info_entries:
         guess_park = guess_canonical_park(stamp_info.park, session)
-        stamp_location = StampLocation(park_id=guess_park.id, address=stamp_info.address)
-        session.add(stamp_location)
+
+        stamp_id = session.query(
+            Stamp.id
+        ).filter(
+            Stamp.text == stamp_info.text
+        ).scalar()
+
+        stamp_location_id = session.query(
+            StampLocation.id
+        ).join(
+            Park
+        ).filter(
+            Park.id == guess_park.id
+        ).scalar()
+
+        stamp_to_location = StampToLocation(stamp_id=stamp_id, stamp_location_id=stamp_location_id)
+        session.add(stamp_to_location)
 
 
 def main(argv=sys.argv):
@@ -1397,8 +1420,8 @@ def main(argv=sys.argv):
 
         park_list = format_park_tuples(wiki_list, stamp_info_entries)
         save_parks(DBSession, park_list)
+        save_stamps(DBSession, set([stamp.text for stamp in stamp_info_entries]))
         save_stamp_locations(DBSession, stamp_info_entries)
-        save_stamps(DBSession, [stamp.text for stamp in stamp_info_entries])
 
         user = User(
             username=u'guest',
