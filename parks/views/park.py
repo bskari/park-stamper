@@ -6,14 +6,23 @@ from parks.models import DBSession
 from parks.models import Park
 from parks.models import Stamp
 from parks.models import StampCollection
+from parks.models import StampLocation
+from parks.models import StampToLocation
+from parks.models import State
 
 
 @view_config(route_name='park', renderer='park.mako')
 def park(request):
     park_url = request.matchdict['park_url']
-    park = DBSession.query(Park).filter_by(url=park_url).first()
-    if park is None:
-        return HTTPNotFound('No park found')
+    park, state = DBSession.query(
+        Park,
+        State,
+    ).join(
+        State,
+        Park.state_id == State.id
+    ).filter(
+        Park.url == park_url
+    ).first()
 
     max_time_subquery = DBSession.query(
         StampCollection.stamp_id.label('stamp_id'),
@@ -24,13 +33,17 @@ def park(request):
 
     stamps = DBSession.query(
         Stamp,
+        StampLocation,
         max_time_subquery.c.most_recent_time,
+    ).join(
+        StampToLocation,
+    ).join(
+        StampLocation,
     ).outerjoin(
         max_time_subquery,
         Stamp.id == max_time_subquery.c.stamp_id,
     ).filter(
-        Stamp.park_id == park.id,
+        StampLocation.park_id == park.id,
     ).all()
 
-    # Stamp info
-    return dict(park=park, stamps=stamps)
+    return dict(park=park, state=state, stamps=stamps)

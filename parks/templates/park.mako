@@ -1,8 +1,7 @@
 <%inherit file="base.mako"/>
 <%block name="content">
-    <p>Hello, world!</p>
     <p>${park.name}</p>
-    <p>${park.state_id}</p>
+    <p>${state.name}</p>
     <table class="table table-striped table-condensed" name="stamps">
         <thead>
             <tr>
@@ -12,17 +11,17 @@
                 <th>Last Seen</th>
             </tr>
         </thead>
-        % for stamp, most_recent_collection_time in stamps:
-            ${stamp_row(stamp, most_recent_collection_time)}
+        % for stamp, location, most_recent_collection_time in stamps:
+            ${stamp_row(stamp, location, most_recent_collection_time)}
         % endfor
     </table>
 </%block>
 
-<%def name="stamp_row(stamp, most_recent_collection_time)">
+<%def name="stamp_row(stamp, location, most_recent_collection_time)">
     <tr>
         <th width="200px" style="text-align: center;">${stamp.text.replace('\n', '<br />') | n}</th>
-        <th>${blank_if_none(stamp.location)}</th>
-        <th>${blank_if_none(stamp.latitude)} ${blank_if_none(stamp.longitude)}</th>
+        <th>${blank_if_none(location.address)}</th>
+        <th>${blank_if_none(location.latitude)} ${blank_if_none(location.longitude)}</th>
 
         % if most_recent_collection_time is not None:
             <th>${most_recent_collection_time.strftime('%Y-%m-%d')}</th>
