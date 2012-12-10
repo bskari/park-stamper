@@ -49,9 +49,9 @@ def main(request):
             ),
             (
                 'grand-tetons.jpg',
-                'Grand Tetons',
-                'Grand Tetons National Park, Jackson, Wyoming',
-                'grand-tetons',
+                'Grand Teton',
+                'Grand Teton National Park, Jackson, Wyoming',
+                'grand-teton',
             ),
         ]
     ]

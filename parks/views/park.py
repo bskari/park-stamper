@@ -14,7 +14,7 @@ from parks.models import State
 @view_config(route_name='park', renderer='park.mako')
 def park(request):
     park_url = request.matchdict['park_url']
-    park, state = DBSession.query(
+    results = DBSession.query(
         Park,
         State,
     ).join(
@@ -22,7 +22,14 @@ def park(request):
         Park.state_id == State.id
     ).filter(
         Park.url == park_url
-    ).first()
+    ).all()
+
+    if len(results) == 0:
+        return HTTPNotFound('No park found')
+    if len(results) != 1:
+        return HTTPNotFound('Internal error: multiple parks found')
+    park, state = results[0]
+
 
     max_time_subquery = DBSession.query(
         StampCollection.stamp_id.label('stamp_id'),

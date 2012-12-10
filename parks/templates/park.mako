@@ -6,13 +6,17 @@
 </%block>
 
 <%block name="content">
-    <p>${park.name}</p>
-    <p>${state.name}</p>
+    <div id="park-name">
+        <h1>${park.name}</h1>
+    </div>
+    <div id="state">
+        <h2>${state.name}</h2>
+    </div>
     <div id="stamp-info">
         <table class="table table-striped table-condensed" name="stamps">
             <thead>
                 <tr>
-                    <th>Text</th>
+                    <th class="stamp-text">Text</th>
                     <th>Location</th>
                     <th>GPS Coordinates</th>
                     <th>Last Seen</th>

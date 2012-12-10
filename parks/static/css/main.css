@@ -4,10 +4,16 @@ really know what I'm doing. */
 body {
     padding-top: 60px;
 }
-
 body .backwards {
     unicode-bidi: bidi-override;
     direction: rtl;
+}
+
+.table thead th {
+    font-weight: bold;
+}
+.table th {
+    font-weight: normal;
 }
 
 .footer {
