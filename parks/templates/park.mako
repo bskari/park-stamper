@@ -1,25 +1,39 @@
 <%inherit file="base.mako"/>
+<%namespace file="/base.mako" name="base" />
+
+<%block name="stylesheets">
+<link rel="stylesheet" href="${base.css_url('park.css')}" />
+</%block>
+
 <%block name="content">
     <p>${park.name}</p>
     <p>${state.name}</p>
-    <table class="table table-striped table-condensed" name="stamps">
-        <thead>
-            <tr>
-                <th>Text</th>
-                <th>Location</th>
-                <th>GPS Coordinates</th>
-                <th>Last Seen</th>
-            </tr>
-        </thead>
-        % for stamp, location, most_recent_collection_time in stamps:
-            ${stamp_row(stamp, location, most_recent_collection_time)}
-        % endfor
-    </table>
+    <div id="stamp-info">
+        <table class="table table-striped table-condensed" name="stamps">
+            <thead>
+                <tr>
+                    <th>Text</th>
+                    <th>Location</th>
+                    <th>GPS Coordinates</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            % for stamp, location, most_recent_collection_time in stamps:
+                ${stamp_row(stamp, location, most_recent_collection_time)}
+            % endfor
+        </table>
+    </div>
 </%block>
 
 <%def name="stamp_row(stamp, location, most_recent_collection_time)">
     <tr>
-        <th width="200px" style="text-align: center;">${stamp.text.replace('\n', '<br />') | n}</th>
+        ## This is a huge potential XSS attack. I'm not sure how to do this
+        ## correctly, so... let's do a poor man's check.
+        % if '<' not in stamp.text:
+            <th class="stamp-text">${stamp.text.replace('\n', '<br />') | n}</th>
+        % else:
+            <th class="stamp-text">${stamp.text}</th>
+        % endif
         <th>${blank_if_none(location.address)}</th>
         <th>${blank_if_none(location.latitude)} ${blank_if_none(location.longitude)}</th>
 

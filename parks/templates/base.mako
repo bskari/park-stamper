@@ -6,7 +6,8 @@
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
-        <link rel="stylesheet" href="/static/css/main.css" />
+        <link rel="stylesheet" href="${css_url('main.css')}" />
+        <%block name="stylesheets" />
     </head>
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top">
@@ -72,4 +73,8 @@
             </p>
         </div>
     </footer>
+</%def>
+
+<%def name="css_url(string)">
+/static/css/${string}
 </%def>
