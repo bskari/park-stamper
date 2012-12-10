@@ -61,13 +61,12 @@ def usage(argv):
 
 
 def remove_whitespace(s):
-    s = re.sub(r'[\t]+', ' ', s)
-    s = re.sub('[ ]+', ' ', s)
+    s = re.sub(r'[ \t]+', ' ', s)
     return s
 
 
 def remove_newlines(s):
-    return re.sub('\n', ' ', s)
+    return re.sub(r'\n', ' ', s)
 
 
 def levenshtein(s1, s2, cutoff=None):
@@ -907,7 +906,7 @@ def _get_date_from_wiki_soup(wiki_soup):
                 logger.warning(
                     u'Couldn\'t parse "{date}" as date on page'.format(
                         date=date_string,
-                        page=wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0],
+                        page=wiki_soup.fetch(u'title')[0].text,
                     )
                 )
     return date
@@ -993,64 +992,87 @@ def load_park_stamps_csv(csv_reader):
 
     rows = []
 
-    StampTuple = namedtuple(u'StampTuple', ['park', u'text', u'address'])
+    StampTuple = namedtuple(u'StampTuple', [u'park', u'text', u'address', u'state'])
+    state = u'Alabama' # Prime the loop, this is the first alphavetic state
 
     for row in csv_reader:
         # The list toggles between retired and active stamps - ignore retired ones
-        if u'LOST/STOLEN/RETIRED STAMPS' in row[c['park']]:
+        if u'RETIRED' in row[c[u'park']]:
             lost_stamps = True
             continue
         # Good rows start with the name of a state in the park column
-        elif lost_stamps and not row[c['update']] and row[c['park']] and not row[c['stamp']]:
+        elif lost_stamps and row[c[u'update']].strip() == '' and row[c['park']] and row[c[u'stamp']].strip() == '':
             lost_stamps = False
+            if row[c[u'park']] is not None:
+                # The master list has "George Washington Memorial Parkway" on
+                # on its own (ugh, this thing is terribly formatted) so if a
+                # state has a space and doesn't start with New Mexico, assume
+                # it's just bad formatting
+                if u' ' in row[c[u'park']] and u'New' not in row[c[u'park']]:
+                    logger.warning(u'Assuming that {entry} is not a state'.format(entry=row[c[u'park']]))
+                    continue
+                state = row[c[u'park']].strip()
+                # Some states list which region they're in, so remove that
+                state = re.sub(r'\(.*\)', u'', state).strip()
+            continue
+        if lost_stamps:
+            continue
+        if state == 'Other':
+            # Entries under this heading are things from things like National
+            # Parks Travelers Club, so just ignore them
             continue
 
         # The Excel document sometimes merged the park cells and had the same
         # listing for a few stamps in a row
-        if row[c['park']]:
-            current_park = remove_newlines(remove_whitespace(row[c['park']]))
-            current_park = current_park.decode(u'utf-8')
+        if row[c[u'park']] == '':
+            continue
 
-        if current_park and row[c['stamp']]:
-            stamp = remove_whitespace(row[c['stamp']])
-            address = row[c['address']]
-            address = address.decode(u'utf-8')
+        current_park = remove_whitespace(remove_newlines(row[c[u'park']]))
+        current_park = current_park.decode(u'utf-8')
+        current_park = current_park.strip()
+        # Some parks have dashes, while their identical counterparts in other
+        # regions don't, so just remove dashes
+        if '-' in current_park:
+            current_park = current_park.replace('-', ' ')
 
-            # The Excel document sometimes would have trailing blank lines, remove them
-            while len(stamp) > 0 and stamp[-1] == u'\n':
-                stamp = stamp[:-1]
+        if current_park.strip() == '' or row[c[u'stamp']] == '':
+            continue
 
-            if (
-                # Anything that doesn't have exactly 2 lines deserves a second look
-                stamp.count('\n') != 1
-                # Anything that says bonus, we ignore for now
-                or bonus_re.search(stamp)
-                # The stampers have their own custom ones; skip them
-                or stamper_re.search(stamp) or stamper_re.search(current_park)
-            ):
-                if not isinstance(stamp, unicode):
-                    stamp = unicode(stamp, errors='ignore')
+        stamp = remove_whitespace(row[c[u'stamp']]).strip()
+        address = row[c[u'address']]
+        address = address.decode(u'utf-8')
 
-                if bonus_re.search(stamp):
-                    reason = 'it is a bonus stamp'
-                elif stamp.count('\n') != 1:
-                    reason = u''.join((
-                        u'there are ',
-                        unicode(stamp.count(u'\n')),
-                        u' newlines',
-                    ))
-                else:
-                    reason = ' it is a custom stamp'
+        if (
+            # Anything that doesn't have exactly 2 lines deserves a second look
+            stamp.count('\n') != 1
+            # Anything that says bonus, we ignore for now
+            or bonus_re.search(stamp)
+            # The stampers have their own custom ones; skip them
+            or stamper_re.search(stamp) or stamper_re.search(current_park)
+        ):
+            if not isinstance(stamp, unicode):
+                stamp = unicode(stamp, errors='ignore')
 
-                logger.warning(
-                    u'Skipping stamp "{stamp}" because {reason}'.format(
-                        stamp=stamp.replace(u'\n', u';'),
-                        reason=reason,
-                    )
+            if bonus_re.search(stamp):
+                reason = u'it is a bonus stamp'
+            elif stamp.count('\n') != 1:
+                reason = u''.join((
+                    u'there are ',
+                    unicode(stamp.count(u'\n')),
+                    u' newlines',
+                ))
+            else:
+                reason = u'it is a custom stamp'
+
+            logger.warning(
+                u'Skipping stamp "{stamp}" because {reason}'.format(
+                    stamp=stamp.replace(u'\n', u';'),
+                    reason=reason,
                 )
-                continue
+            )
+            continue
 
-            rows.append(StampTuple(current_park, stamp, address))
+        rows.append(StampTuple(current_park, stamp, address, state))
 
     return rows
 
@@ -1170,6 +1192,48 @@ def save_states(states, session):
         session.add(state)
 
 
+def format_park_tuples(wiki_list, master_list_stamp_entries):
+    """Returns a list of ParkTuples with data loaded from the master list and
+    Wikipedia.
+    """
+    # We want to have data for as many of the entries from the master list
+    # as possible
+    names_from_wiki = set([p.name for p in wiki_list])
+    wiki_dict = dict([(p.name, p) for p in wiki_list])
+    park_list = []
+    unique_park_list = set()
+    for entry in master_list_stamp_entries:
+        if entry.park not in unique_park_list:
+            unique_park_list.add(entry.park)
+            if entry.park in names_from_wiki:
+                if wiki_dict[entry.park] is not None and wiki_dict[entry.park].state != entry.state:
+                    logger.warning(u'State disagrees for {name}'.format(name=entry.park))
+                park_list.append(
+                    ParkTuple(
+                        name=entry.park,
+                        state=entry.state,
+                        latitude=wiki_dict[entry.park].latitude,
+                        longitude=wiki_dict[entry.park].longitude,
+                        agency='NPS',
+                        date=wiki_dict[entry.park].date,
+                    )
+                )
+            else:
+                logger.warning(u'No wiki entry for {name}'.format(name=entry.park))
+                park_list.append(
+                    ParkTuple(
+                        name=entry.park,
+                        state=entry.state,
+                        latitude=None,
+                        longitude=None,
+                        agency=None,
+                        date=None,
+                    )
+                )
+
+    return park_list
+
+
 def save_parks(session, parks):
     def normalized_url_from_name(name):
         url = name.lower()
@@ -1253,6 +1317,9 @@ def save_parks(session, parks):
             type=park_type,
             region=get_region_from_state(state),
             state=state,
+            latitude=park.latitude,
+            longitude=park.longitude,
+            date_founded=park.date,
         )
         session.add(park_row)
 
@@ -1308,7 +1375,7 @@ def main(argv=sys.argv):
         # We have to set these, because some areas belong to more than one
         # designation, e.g. Aniakchak National Monument and Preserve
         names = set()
-        unique_list = []
+        wiki_list = []
         for areas_list in (
             parks,
             monuments,
@@ -1325,10 +1392,11 @@ def main(argv=sys.argv):
         ):
             for area in areas_list:
                 if area.name not in names:
-                    unique_list.append(area)
+                    wiki_list.append(area)
                     names.add(area.name)
 
-        save_parks(DBSession, unique_list)
+        park_list = format_park_tuples(wiki_list, stamp_info_entries)
+        save_parks(DBSession, park_list)
         save_stamp_locations(DBSession, stamp_info_entries)
         save_stamps(DBSession, [stamp.text for stamp in stamp_info_entries])
 
