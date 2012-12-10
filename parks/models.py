@@ -148,7 +148,6 @@ class Stamp(Base):
     """A passport park stamp."""
     __tablename__ = 'stamp'
     id = Column(Integer, primary_key=True)
-    location_id = Column(Integer, ForeignKey('stamp_location.id'))
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
     type = Enum('normal', 'bonus', nullable=False)
