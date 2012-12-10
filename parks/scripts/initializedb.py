@@ -1002,42 +1002,41 @@ def load_park_stamps_csv(csv_reader):
             lost_stamps = True
             continue
         # Good rows start with the name of a state in the park column
-        elif lost_stamps and row[c[u'update']].strip() == '' and row[c['park']] and row[c[u'stamp']].strip() == '':
+        elif lost_stamps and row[c[u'update']].strip() == '' and row[c['park']] != ''  and row[c[u'stamp']].strip() == '':
             lost_stamps = False
-            if row[c[u'park']] is not None:
-                # The master list has "George Washington Memorial Parkway" on
-                # on its own (ugh, this thing is terribly formatted) so if a
-                # state has a space and doesn't start with New Mexico, assume
-                # it's just bad formatting
-                if u' ' in row[c[u'park']] and u'New' not in row[c[u'park']]:
-                    logger.warning(u'Assuming that {entry} is not a state'.format(entry=row[c[u'park']]))
-                    continue
-                state = row[c[u'park']].strip()
-                # Some states list which region they're in, so remove that
-                state = re.sub(r'\(.*\)', u'', state).strip()
+            # The master list has "George Washington Memorial Parkway" on its
+            # own (ugh, this thing is terribly formatted) so if a state has a
+            # space and doesn't start with "New", assume it's just bad formatting
+            if u' ' in row[c[u'park']] and u'New' not in row[c[u'park']]:
+                logger.warning(u'Assuming that {entry} is not a state'.format(entry=row[c[u'park']]))
+                continue
+            state = row[c[u'park']].strip()
+            # Some states list which region they're in, so remove that
+            state = re.sub(r'\(.*\)', u'', state).strip()
             continue
         if lost_stamps:
             continue
+
         if state == 'Other':
             # Entries under this heading are things from things like National
             # Parks Travelers Club, so just ignore them
             continue
 
-        # The Excel document sometimes merged the park cells and had the same
-        # listing for a few stamps in a row
-        if row[c[u'park']] == '':
-            continue
+        # The Excel document merges the park cells and had the same park for a
+        # few stamps in a row
+        if row[c[u'park']] != '':
+            new_park = remove_whitespace(remove_newlines(row[c[u'park']]))
+            new_park = new_park.decode(u'utf-8')
+            new_park = new_park.strip()
+            # Some parks have dashes, while their identical counterparts in other
+            # regions don't, so just remove dashes
+            if '-' in new_park:
+                new_park = new_park.replace('-', ' ')
 
-        current_park = remove_whitespace(remove_newlines(row[c[u'park']]))
-        current_park = current_park.decode(u'utf-8')
-        current_park = current_park.strip()
-        # Some parks have dashes, while their identical counterparts in other
-        # regions don't, so just remove dashes
-        if '-' in current_park:
-            current_park = current_park.replace('-', ' ')
+            if new_park.strip() == '' or row[c[u'stamp']] == '':
+                continue
 
-        if current_park.strip() == '' or row[c[u'stamp']] == '':
-            continue
+            current_park = new_park
 
         stamp = remove_whitespace(row[c[u'stamp']]).strip()
         address = row[c[u'address']]
