@@ -1030,8 +1030,14 @@ def load_park_stamps_csv(csv_reader):
             new_park = new_park.strip()
             # Some parks have dashes, while their identical counterparts in other
             # regions don't, so just remove dashes
-            if '-' in new_park:
-                new_park = new_park.replace('-', ' ')
+            new_park = new_park.replace('-', ' ')
+            # Try to make some things consistent I guess
+            new_park = new_park.replace('&', 'and')
+            # Some parks have abbreviations because, according to the list,
+            # that's the exact wording on the pamphlet. That's dumb.
+            new_park = new_park.replace('NHA', 'National Heritage Area')
+            new_park = new_park.replace('NHT', 'National Historic Trail')
+            new_park = new_park.replace('NHP', 'National Historical Park')
 
             if new_park.strip() == '' or row[c[u'stamp']] == '':
                 continue
@@ -1077,7 +1083,7 @@ def load_park_stamps_csv(csv_reader):
     return rows
 
 
-def get_region_from_state(state):
+def get_region_from_state(state, session):
     mapping = {
         u'AL': u'SE',
         u'AK': u'PNWA',
@@ -1090,6 +1096,7 @@ def get_region_from_state(state):
         u'DE': u'MA',
         u'FL': u'SE',
         u'GA': u'SE',
+        u'GU': u'W', # Guam
         u'HI': u'W',
         u'ID': u'PNWA',
         u'IL': u'MW',
@@ -1133,6 +1140,13 @@ def get_region_from_state(state):
     }
     if mapping.has_key(state):
         return mapping[state]
+    abbreviations = session.query(
+        State.abbreviation
+    ).filter(
+        State.name == state
+    ).all()
+    if len(abbreviations) == 1 and mapping.has_key(abbreviations[0].abbreviation):
+        return mapping[abbreviations[0].abbreviation]
     return None
 
 
@@ -1150,9 +1164,18 @@ def guess_park_type(park_name):
         if u'River' in park_name:
             return u'NR'
         if u'Memorial' in park_name:
-            return u'NM'
+            return u'N MEM'
+        # Dont just check for 'Monument' because 'National Monument and Preserve'
+        # is a separate type
+        if u'Volcanic Monument' in park_name:
+            return 'NM'
+        if 'Washington Monument' in park_name:
+            return 'NM'
 
-    return best_match[0]
+    if best_match[0] == '':
+        return None
+    else:
+        return best_match[0]
 
 
 def load_states(filename=None):
@@ -1315,7 +1338,7 @@ def save_parks(session, parks):
             name=park.name,
             url=url,
             type=park_type,
-            region=get_region_from_state(state),
+            region=get_region_from_state(state, session),
             state=state,
             latitude=park.latitude,
             longitude=park.longitude,
@@ -1327,7 +1350,7 @@ def save_parks(session, parks):
 def save_stamps(session, stamp_texts):
     """Creates Stamp entries in the database."""
     for text in set(stamp_texts):
-        stamp = Stamp(text=text)
+        stamp = Stamp(text=text, type='normal', status='active')
         session.add(stamp)
 
 
@@ -1375,16 +1398,16 @@ def main(argv=sys.argv):
 
     # Load the canonical park list from Wikipedia
     parks = get_national_parks()
-    monuments = get_national_monuments()
-    lakeshores, seashores = get_national_lakeshores_and_seashores()
-    grasslands = get_national_grasslands()
-    marine_sanctuaries = get_national_marine_sanctuaries([s.name for s in states])
-    rivers = get_rivers()
-    memorials = get_national_memorials()
-    heritage_areas = get_national_heritage_areas([s.name for s in states])
-    nps_exclusives = get_nps_exclusive_areas([s.name for s in states])
-    national_trails = get_national_trails()
-    other_areas = get_other_areas()
+    #monuments = get_national_monuments()
+    #lakeshores, seashores = get_national_lakeshores_and_seashores()
+    #grasslands = get_national_grasslands()
+    #marine_sanctuaries = get_national_marine_sanctuaries([s.name for s in states])
+    #rivers = get_rivers()
+    #memorials = get_national_memorials()
+    #heritage_areas = get_national_heritage_areas([s.name for s in states])
+    #nps_exclusives = get_nps_exclusive_areas([s.name for s in states])
+    #national_trails = get_national_trails()
+    #other_areas = get_other_areas()
 
     # Load data for parks
     with open(u'parks/scripts/initialize_db/master_list.csv', u'rb') as f:
@@ -1400,17 +1423,17 @@ def main(argv=sys.argv):
         wiki_list = []
         for areas_list in (
             parks,
-            monuments,
-            lakeshores,
-            seashores,
-            grasslands,
-            marine_sanctuaries,
-            rivers,
-            memorials,
-            heritage_areas,
-            nps_exclusives,
-            national_trails,
-            other_areas,
+            #monuments,
+            #lakeshores,
+            #seashores,
+            #grasslands,
+            #marine_sanctuaries,
+            #rivers,
+            #memorials,
+            #heritage_areas,
+            #nps_exclusives,
+            #national_trails,
+            #other_areas,
         ):
             for area in areas_list:
                 if area.name not in names:

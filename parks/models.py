@@ -74,6 +74,8 @@ def get_park_types():
         ('NB', 'National Battlefield'),
         ('NBP', 'National Battlefield Park'),
         ('NBS', 'National Battlefied Site'),
+        ('NHA', 'National Heritage Area'), # Not in the stamp book
+        ('NHC', 'National Heritage Corridor'), # Not in the stamp book
         ('NHP', 'National Historical Park'),
         ('NHP & EP', 'National Historical Park and Ecological Preserve'),
         ('NHP & PRES', 'National Historical Park and Preserve'),
@@ -82,7 +84,7 @@ def get_park_types():
         ('NHT', 'National Historic Trail'),
         ('NL', 'National Lakeshore'),
         ('NM', 'National Monument'),
-        ('NM & PRES', 'National Monument & Preserve'),
+        ('NM & PRES', 'National Monument and Preserve'),
         ('NMP', 'National Military Park'),
         ('N MEM', 'National Memorial'),
         ('NP', 'National Park'),
@@ -93,7 +95,7 @@ def get_park_types():
         ('NRA', 'National Recreation Area'),
         ('NRR', 'National Recreation River'),
         ('NRRA', 'National River and Recreation Area'),
-        ('N RES', 'Nation Reserve'),
+        ('N RES', 'National Reserve'),
         ('NS', 'National Seashore'),
         ('NSR', 'National Scenic River or Riverway'),
         ('NST', 'National Scenic Trail'),
@@ -117,14 +119,12 @@ class Park(Base):
     longitude = Column(Float)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
     date_founded = Column(Date)
-    region = Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA', nullable=False)
-    type = Enum(get_park_types().keys(), nullable=False)
+    region = Column(Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA'), nullable=False)
+    type = Column(Enum(*get_park_types().keys()))
 
 
     def __init__(self, name, state, url, region, type, latitude=None, longitude=None, date_founded=None):
         self.name = name
-        self.url = url
-        self.region = region
 
         if isinstance(state, int):
             self.state_id = state
@@ -139,6 +139,9 @@ class Park(Base):
                 )
             ).scalar()
 
+        self.url = url
+        self.region = region
+        self.type = type
         self.latitude = latitude
         self.longitude = longitude
         self.date_founded = date_founded
@@ -150,8 +153,8 @@ class Stamp(Base):
     id = Column(Integer, primary_key=True)
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
-    type = Enum('normal', 'bonus', nullable=False)
-    status = Enum('normal', 'lost', 'archived', nullable=False)
+    type = Column(Enum('normal', 'bonus'), nullable=False)
+    status = Column(Enum('active', 'lost', 'archived'), nullable=False)
 
 
 class StampCollection(Base):
@@ -202,14 +205,16 @@ class OperatingHours(Base):
         ForeignKey('stamp_location.id'),
         nullable=False,
     )
-    day_of_week = Enum(
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
+    day_of_week = Column(
+        Enum(
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+        ),
         nullable=False
     )
     # For example, a place that is open 09:00-17:00 would have:
