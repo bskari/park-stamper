@@ -195,7 +195,7 @@ def get_national_parks():
         # 44°21′N68°13′W / 44.35°N 68.21°W /44.35; -68.21 (Acadia)
         float_text = gps_text.split(u'/')[-1]
         latitude = float(float_text.split(u';')[0])
-        longitude = float(re.search(r'(-\d+\.\d+)', float_text).group())
+        longitude = float(re.search(r'([-]?\d+\.\d+)', float_text.split(';')[1]).group())
 
         date = parse(date_column.fetch(u'span')[-1].text, fuzzy=True)
 
@@ -862,7 +862,7 @@ def _get_latitude_longitude_from_wiki_soup(wiki_soup):
     if len(geo_decimal_spans) == 0:
         return (None, None)
     geo_dec_text = geo_decimal_spans[0].text
-    latitude_text, longitude_text = re.findall('(\d+(?:\.\d+)?)', geo_dec_text)
+    latitude_text, longitude_text = re.findall('([-]?\d+(?:\.\d+)?)', geo_dec_text)
     try:
         latitude = float(latitude_text)
         longitude = float(longitude_text)
@@ -994,7 +994,7 @@ def load_park_stamps_csv(csv_reader):
     rows = []
 
     StampTuple = namedtuple(u'StampTuple', [u'park', u'text', u'address', u'state'])
-    state = u'Alabama' # Prime the loop, this is the first alphavetic state
+    state = u'Alabama' # Prime the loop, this is the first alphabetic state
 
     for row in csv_reader:
         # The list toggles between retired and active stamps - ignore retired ones
