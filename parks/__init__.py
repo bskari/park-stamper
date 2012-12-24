@@ -1,7 +1,9 @@
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.events import BeforeRender
+from pyramid.events import NewRequest
 from pyramid.security import authenticated_userid
 from pyramid_beaker import session_factory_from_settings
 from sqlalchemy import engine_from_config
@@ -37,6 +39,7 @@ def main(global_config, **settings):
 
     # Rendering policies
     config.add_subscriber(add_renderer_globals, BeforeRender)
+    config.add_subscriber(csrf_validation_event, NewRequest)
 
     # Routes
     add_routes(config)
@@ -51,4 +54,17 @@ def main(global_config, **settings):
 
 def add_renderer_globals(event):
     """Update the render dictionary with globals for every page."""
-    event['user_id'] = authenticated_userid(event['request'])
+    request = event['request']
+    event['user_id'] = authenticated_userid(request)
+    event['csrf_token'] = request.session.get_csrf_token()
+
+
+def csrf_validation_event(event):
+    """Checks CSRF tokens on all POST requests and aborts the request if
+    validation fails.
+    """
+    request = event.request
+    csrf_token = request.params.get('csrf_token')
+    if (request.method == 'POST' or request.is_xhr) and \
+        (csrf_token != unicode(request.session.get_csrf_token())):
+            raise HTTPUnauthorized

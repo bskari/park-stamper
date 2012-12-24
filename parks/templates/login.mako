@@ -7,6 +7,7 @@
 
 <%block name="content">
     <form action="${url}" method="post">
+        <input type="hidden" name="csrf_token" value="${csrf_token}">
         <input type="hidden" name="came_from" value="${came_from}">
         <label for="login">
             Username or email address
