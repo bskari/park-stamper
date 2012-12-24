@@ -45,7 +45,7 @@ class DumbLogger(object):
         print(string)
         self.file.flush()
 
-logger = DumbLogger(u'initializedb.log')
+logger = None
 
 
 ParkTuple = namedtuple(
@@ -1455,6 +1455,10 @@ def save_stamp_locations(session, stamp_info_entries):
 def main(argv=sys.argv):
     if len(argv) != 2:
         usage(argv)
+
+    global logger
+    logger = DumbLogger(u'initializedb.log')
+
     config_uri = argv[1]
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
