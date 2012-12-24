@@ -22,31 +22,35 @@
                     <div class="nav-collapse collapse">
                         <ul class="nav">
                             <li><a href="/">Home</a></li>
-                            ##<li class="dropdown">
-                            ##    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                            ##    <ul class="dropdown-menu">
-                            ##        <li><a href="#">Action</a></li>
-                            ##        <li class="divider"></li>
-                            ##        <li class="nav-header">Nav header</li>
-                            ##        <li><a href="#">Separated</a></li>
-                            ##    </ul>
-                            ##</li>
                         </ul>
                         <ul class="nav actions">
-                            <li><a data-target="#login-modal" data-link="modal" href="/login">Log In</a>
-                            <li><a data-target="#signup-modal" data-link="modal" href="/login">Sign Up</a>
+                            % if user_id:
+                                <li><a href="${request.application_url}/logout">Log Out</a></li>
+                            % else:
+                                <li><a href="${request.application_url}/login">Log In</a></li>
+                                <li><a href="${request.application_url}/signup">Sign Up</a></li>
+                            % endif
                         </ul>
-                        ##<form class="navbar-form pull-right">
-                        ##    <input class="span3" type="text" placeholder="Email">
-                        ##    <input class="span3" type="password" placeholder="Password">
-                        ##    <button type="submit" class="btn">Sign in</button>
-                        ##</form>
                     </div><!--/.nav-collapse -->
                 </div>
             </div>
         </div>
 
         <div class="container">
+            ## Error and warning alerts
+            % if error:
+                <div class="alert alert-error">
+                    <button type="button" class="close" data-dismiss="alert">&times</button>
+                    ${error}
+                </div>
+            % endif
+            % if warning:
+                <div class="alert">
+                    <button type="button" class="close" data-dismiss="alert">&times</button>
+                    ${warning}
+                </div>
+            % endif
+
             <%block name="content" />
         </div>
 
