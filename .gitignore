@@ -7,3 +7,4 @@ Parks.egg-info
 
 # This is downloaded automatically from Wikipedia
 parks/scripts/initialize_db/*.html
+parks/scripts/initialize_db/*.html.soup.pickle

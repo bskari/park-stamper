@@ -120,10 +120,55 @@ def save_page_to_file(soup, filename):
     with open(filename, u'w') as f:
         f.write(str(soup))
 
+    # Try to save the pickled file too
+    pickle = None
+    try:
+        # Use Python's __import__ function to ignore Pyflakes warnings
+        pickle = __import__('cpickle')
+    except:
+        try:
+            # Fall back to slower, regular pickle
+            pickle = __import__('pickle')
+        except:
+            pass
+    if pickle is not None:
+        pickle_filename = filename + '.soup.pickle'
+        # Pickle sometimes blows up with stack overflow, so... do this in a
+        # try/except block
+        try:
+            with open(pickle_filename, u'w') as f:
+                pickle.dump(soup, f)
+        except:
+            pass
+
 
 def load_page_from_file(filename):
     with open(filename, u'r') as f:
         soup = BeautifulSoup(f.read())
+    return soup
+
+
+def load_page_from_pickle_file(filename):
+    pickle_filename = filename + '.soup.pickle'
+    # Only try to load the pickle if it's newer than the Wikipedia file
+    import os
+    wiki_stats = os.stats(filename)
+    pickle_stats = os.stats(pickle_filename)
+    if pickle_stats.st_ctime < wiki_stats.st_ctime:
+        os.unlink(pickle_filename)
+        soup = load_page_from_file(filename)
+        save_page_to_file(soup, filename)
+        return soup
+
+    try:
+        # Use Python's __import__ function to ignore Pyflakes warnings
+        pickle = __import__('cpickle')
+    except:
+        # Fall back to slower, regular pickle
+        pickle = __import__('pickle')
+
+    with open(pickle_filename, u'r') as f:
+        soup = pickle.load(f)
     return soup
 
 
@@ -152,18 +197,22 @@ def load_wiki_page(wiki_page_name):
             u'.html',
         )
     )
+
     try:
-        soup = load_page_from_file(filename)
+        soup = load_page_from_pickle_file(filename)
     except:
-        soup = load_page_from_url(
-            u''.join(
-                (
-                    u'http://en.wikipedia.org/wiki/',
-                    wiki_page_name,
+        try:
+            soup = load_page_from_file(filename)
+        except:
+            soup = load_page_from_url(
+                u''.join(
+                    (
+                        u'http://en.wikipedia.org/wiki/',
+                        wiki_page_name,
+                    )
                 )
             )
-        )
-        save_page_to_file(soup, filename)
+            save_page_to_file(soup, filename)
     return soup
 
 
@@ -194,8 +243,9 @@ def get_national_parks():
         # gps_text looks like:
         # 44°21′N68°13′W / 44.35°N 68.21°W /44.35; -68.21 (Acadia)
         float_text = gps_text.split(u'/')[-1]
-        latitude = float(float_text.split(u';')[0])
-        longitude = float(re.search(r'([-]?\d+\.\d+)', float_text.split(';')[1]).group())
+        latitude_text, longitude_text = re.findall(r'([-]?\d+(?:\.\d+)?)', float_text)
+        latitude = float(latitude_text)
+        longitude = float(longitude_text)
 
         date = parse(date_column.fetch(u'span')[-1].text, fuzzy=True)
 
@@ -240,9 +290,9 @@ def get_national_monuments():
         # 44°21′N68°13′W / 44.35°N 68.21°W /44.35; -68.21 (Acadia)
         float_text = gps_text.split(u'/')[-1]
         try:
-            latitude = float(float_text.split(u';')[0])
-            # There's some weird Unicode crap in the above, so I can't just split by u' u'
-            longitude = float(re.search(r'((?:-)?\d+(?:\.\d+)?)', float_text).group())
+            latitude_text, longitude_text = re.findall(r'([-]?\d+(?:\.\d+)?)', float_text)
+            latitude = float(latitude_text)
+            longitude = float(longitude_text)
         except:
             latitude = longitude = None
             logger.warning(
@@ -293,9 +343,9 @@ def get_national_lakeshores_and_seashores():
             # gps_text looks like:
             # 44°21′N68°13′W / 44.35°N 68.21°W /44.35; -68.21 (Acadia)
             float_text = gps_text.split(u'/')[-1]
-            latitude = float(float_text.split(u';')[0])
-            # There's some weird Unicode crap in the above, so I can't just split by u' u'
-            longitude = float(re.search(r'((?:-)?\d+(?:\.\d+)?)', float_text).group())
+            latitude_text, longitude_text = re.findall(r'([-]?\d+(?:\.\d+)?)', float_text)
+            latitude = float(latitude_text)
+            longitude = float(longitude_text)
 
             date = parse(date_column.fetch(u'span')[-1].text, fuzzy=True)
 
@@ -316,30 +366,31 @@ def get_national_lakeshores_and_seashores():
 def get_national_grasslands():
     """Loads the list of national grasslands from Wikipedia."""
     soup = load_wiki_page(u'United_States_National_Grassland')
-    ul_lists = soup.fetch(u'ul')
+    tables = soup.fetch(u'table')
     # There's a list for TOC, a list of national grasslands, a list of prairie
     # reserves, a list of "See also" stuff, and a ton of other crap
-    grassland_list = ul_lists[1]
+    grassland_table = tables[1]
 
     grasslands = []
 
-    for li in grassland_list.fetch(u'li'):
-        # Most are formatted as follows:
-        # Little Missouri National Grassland -- western North Dakota, blah blah...
-        name = li.fetch(u'a')[0].text
-        # Texas Panhandle => Texas
-        state_name = li.fetch(u'a')[1].text.replace(u' Panhandle', u'')
-        # Fannin County => Texas
-        if state_name == u'Fannin County':
-            state_name = u'Texas'
+    for tr in grassland_table.fetch(u'tr')[1:]: # Skip the header
+        name = tr.fetch(u'th')[0].text
+        # Photo, Location, Administered by, Area, Description
+        _, location_td, _, _, _ = tr.fetch(u'td')
+        # Some entries have multiple states, e.g. "Oklahoma, Texas"
+        state = location_td.text.split(',')[0]
+        geo_text = location_td.fetch('span', {'class': 'geo'})[0].text
+        latitude_text, longitude_text = re.findall(r'([-]?\d+(?:\.\d+)?)', geo_text)
+        latitude = float(latitude_text)
+        longitude = float(longitude_text)
 
         grasslands.append(
             ParkTuple(
                 name=name,
-                state=state_name,
+                state=state,
                 agency=u'NFS',
-                latitude=None,
-                longitude=None,
+                latitude=latitude,
+                longitude=longitude,
                 date=None,
             )
         )
@@ -850,8 +901,9 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
             wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0],
             ': ',
             ', '.join(ties_for_first),
-            '; returning first',
+            '; returning None',
         )))
+        return None
 
     return most_common_state
 
@@ -862,7 +914,7 @@ def _get_latitude_longitude_from_wiki_soup(wiki_soup):
     if len(geo_decimal_spans) == 0:
         return (None, None)
     geo_dec_text = geo_decimal_spans[0].text
-    latitude_text, longitude_text = re.findall('([-]?\d+(?:\.\d+)?)', geo_dec_text)
+    latitude_text, longitude_text = re.findall(r'([-]?\d+(?:\.\d+)?)', geo_dec_text)
     try:
         latitude = float(latitude_text)
         longitude = float(longitude_text)
@@ -1125,12 +1177,14 @@ def get_region_from_state(state, session):
         u'OK': u'SW',
         u'OR': u'PNWA',
         u'PA': u'MA',
+        u'PR': u'W', # TODO(bskari|2012-12-22) I don't know if this is the right region for Puerto Rico
         u'RI': u'NA',
         u'SC': u'SE',
         u'SD': u'RM',
         u'TN': u'SE',
         u'TX': u'SW',
         u'UT': u'RM',
+        u'VI': u'W', # TODO(bskari|2012-12-22) I don't know if this is the right region for the Virgin Islands
         u'VT': u'NA',
         u'VA': u'MA',
         u'WA': u'PNWA',
@@ -1147,6 +1201,11 @@ def get_region_from_state(state, session):
     ).all()
     if len(abbreviations) == 1 and mapping.has_key(abbreviations[0].abbreviation):
         return mapping[abbreviations[0].abbreviation]
+    logger.warning(
+        u"Couldn't find region for state {state}".format(
+            state=state,
+        )
+    )
     return None
 
 
@@ -1229,12 +1288,21 @@ def format_park_tuples(wiki_list, master_list_stamp_entries):
         if entry.park not in unique_park_list:
             unique_park_list.add(entry.park)
             if entry.park in names_from_wiki:
-                if wiki_dict[entry.park] is not None and wiki_dict[entry.park].state != entry.state:
-                    logger.warning(u'State disagrees for {name}'.format(name=entry.park))
+                state = entry.state
+                if wiki_dict[entry.park].state is not None and wiki_dict[entry.park].state != entry.state:
+                    # Go with the wiki, because... Yellowstone's in Wyoming,
+                    # not Montana!
+                    state = wiki_dict[entry.park].state
+                    logger.warning(
+                        u'State disagrees for {name}, choosing {state}'.format(
+                            name=entry.park,
+                            state=state,
+                        )
+                    )
                 park_list.append(
                     ParkTuple(
                         name=entry.park,
-                        state=entry.state,
+                        state=state,
                         latitude=wiki_dict[entry.park].latitude,
                         longitude=wiki_dict[entry.park].longitude,
                         agency='NPS',
@@ -1398,16 +1466,16 @@ def main(argv=sys.argv):
 
     # Load the canonical park list from Wikipedia
     parks = get_national_parks()
-    #monuments = get_national_monuments()
-    #lakeshores, seashores = get_national_lakeshores_and_seashores()
-    #grasslands = get_national_grasslands()
-    #marine_sanctuaries = get_national_marine_sanctuaries([s.name for s in states])
-    #rivers = get_rivers()
-    #memorials = get_national_memorials()
-    #heritage_areas = get_national_heritage_areas([s.name for s in states])
-    #nps_exclusives = get_nps_exclusive_areas([s.name for s in states])
-    #national_trails = get_national_trails()
-    #other_areas = get_other_areas()
+    monuments = get_national_monuments()
+    lakeshores, seashores = get_national_lakeshores_and_seashores()
+    grasslands = get_national_grasslands()
+    marine_sanctuaries = get_national_marine_sanctuaries([s.name for s in states])
+    rivers = get_rivers()
+    memorials = get_national_memorials()
+    heritage_areas = get_national_heritage_areas([s.name for s in states])
+    nps_exclusives = get_nps_exclusive_areas([s.name for s in states])
+    national_trails = get_national_trails()
+    other_areas = get_other_areas()
 
     # Load data for parks
     with open(u'parks/scripts/initialize_db/master_list.csv', u'rb') as f:
@@ -1417,32 +1485,36 @@ def main(argv=sys.argv):
     with transaction.manager:
         save_states(states, DBSession)
 
-        # We have to set these, because some areas belong to more than one
-        # designation, e.g. Aniakchak National Monument and Preserve
-        names = set()
-        wiki_list = []
-        for areas_list in (
-            parks,
-            #monuments,
-            #lakeshores,
-            #seashores,
-            #grasslands,
-            #marine_sanctuaries,
-            #rivers,
-            #memorials,
-            #heritage_areas,
-            #nps_exclusives,
-            #national_trails,
-            #other_areas,
-        ):
-            for area in areas_list:
-                if area.name not in names:
-                    wiki_list.append(area)
-                    names.add(area.name)
+    # We have to set these, because some areas belong to more than one
+    # designation, e.g. Aniakchak National Monument and Preserve
+    names = set()
+    wiki_list = []
+    for areas_list in (
+        parks,
+        monuments,
+        lakeshores,
+        seashores,
+        grasslands,
+        marine_sanctuaries,
+        rivers,
+        memorials,
+        heritage_areas,
+        nps_exclusives,
+        national_trails,
+        other_areas,
+    ):
+        for area in areas_list:
+            if area.name not in names:
+                wiki_list.append(area)
+                names.add(area.name)
 
-        park_list = format_park_tuples(wiki_list, stamp_info_entries)
+    park_list = format_park_tuples(wiki_list, stamp_info_entries)
+
+    with transaction.manager:
         save_parks(DBSession, park_list)
+    with transaction.manager:
         save_stamps(DBSession, set([stamp.text for stamp in stamp_info_entries]))
+    with transaction.manager:
         save_stamp_locations(DBSession, stamp_info_entries)
 
         user = User(
