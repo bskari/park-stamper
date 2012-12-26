@@ -8,11 +8,11 @@ from pyramid.security import authenticated_userid
 from pyramid_beaker import session_factory_from_settings
 from sqlalchemy import engine_from_config
 
+from parks.logic.security import group_finder
 from parks.models import DBSession
 from parks.models import Base
 from parks.routes import add_routes
 from parks.routes import add_static_views
-from parks.security import group_finder
 
 
 def main(global_config, **settings):
@@ -25,7 +25,7 @@ def main(global_config, **settings):
 
     config = Configurator(
         settings=settings,
-        root_factory='parks.security.RootFactory',
+        root_factory='parks.logic.security.RootFactory',
     )
 
     # Authentication
