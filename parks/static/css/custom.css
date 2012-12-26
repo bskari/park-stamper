@@ -9,6 +9,14 @@ body .backwards {
     direction: rtl;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', Georgia, Times, serif;
+}
+
+p, div {
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
 .table thead th {
     font-weight: bold;
 }

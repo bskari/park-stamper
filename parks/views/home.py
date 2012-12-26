@@ -3,8 +3,8 @@ from collections import namedtuple
 from pyramid.view import view_config
 
 
-@view_config(route_name='main', renderer='home.mako')
-def main(request):
+@view_config(route_name='home', renderer='home.mako')
+def home(request):
     CarouselInformation = namedtuple(
         'CarouselInformation',
         ['img_url', 'header', 'caption', 'url']

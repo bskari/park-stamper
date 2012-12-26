@@ -4,7 +4,7 @@ Centralized here to make testing easier.
 """
 
 def add_routes(config):
-    config.add_route('main', '/')
+    config.add_route('home', '/')
     config.add_route('park', '/park/{park_url}')
     config.add_route('all-parks', '/all-parks')
     config.add_route('login', '/login')

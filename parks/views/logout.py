@@ -7,6 +7,6 @@ from pyramid.view import view_config
 def logout(request):
     headers = forget(request)
     return HTTPFound(
-        location=request.route_url('main'),
+        location=request.route_url('home'),
         headers=headers,
     )

@@ -6,7 +6,9 @@
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
-        <link rel="stylesheet" href="${css_url('main.css')}" />
+        <link rel="stylesheet" href="${css_url('custom.css')}" />
+        <link href="http://fonts.googleapis.com/css?family=Merriweather:bold" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" type="text/css">
         <%block name="stylesheets" />
     </head>
     <body>
@@ -25,10 +27,10 @@
                         </ul>
                         <ul class="nav actions">
                             % if user_id:
-                                <li><a href="${request.application_url}/logout">Log Out</a></li>
+                                <li><a href="${request.application_url}/logout">Log out</a></li>
                             % else:
-                                <li><a href="${request.application_url}/login">Log In</a></li>
-                                <li><a href="${request.application_url}/signup">Sign Up</a></li>
+                                <li><a href="${request.application_url}/login">Log in</a></li>
+                                <li><a href="${request.application_url}/signup">Sign up</a></li>
                             % endif
                         </ul>
                     </div><!--/.nav-collapse -->

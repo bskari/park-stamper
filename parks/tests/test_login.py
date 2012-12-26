@@ -51,7 +51,7 @@ class LoginUnitTest(IntegrationTestBase):
         """
         # Check the came_from parameter
         request = testing.DummyRequest()
-        original_url = request.route_url('main')
+        original_url = request.route_url('home')
         request.params = dict(
             login=self.username,
             password=self.password,
@@ -76,7 +76,7 @@ class LoginUnitTest(IntegrationTestBase):
 
     def test_successful_login(self):
         request = testing.DummyRequest()
-        original_url = request.route_url('main')
+        original_url = request.route_url('home')
         request.params = {
             'login': self.username,
             'password': self.password,
@@ -88,7 +88,7 @@ class LoginUnitTest(IntegrationTestBase):
 
     def test_failed_login(self):
         request = testing.DummyRequest()
-        original_url = request.route_url('main')
+        original_url = request.route_url('home')
         request.params = {
             'login': 'invalid user',
             'password': 'invalid password',

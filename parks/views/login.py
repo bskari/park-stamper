@@ -14,7 +14,7 @@ def login(request):
     came_from = request.params.get('came_from', referrer)
     if came_from == login_url:
         # Never use the login form itself as came_from
-        came_from = request.route_url('main')
+        came_from = request.route_url('home')
     login = ''
     render_dict = {}
 
