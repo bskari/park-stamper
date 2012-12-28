@@ -5,7 +5,7 @@
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
-        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" />
         <link rel="stylesheet" href="${css_url('custom.css')}" />
         <link href="http://fonts.googleapis.com/css?family=Merriweather:bold" rel="stylesheet" type="text/css">
         <link href="http://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" type="text/css">
@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="container-narrow">
             ## Error and warning alerts
             % if error:
                 <div class="alert alert-error">
@@ -61,6 +61,7 @@
         ## JS placed at the bottom for faster loading
         <script src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.2.min.js" type="text/javascript"></script>
         <script src="/static/bootstrap/js/bootstrap.js"></script>
+        <%block name="javascript" />
     </body>
 </html>
 
@@ -81,6 +82,5 @@
     </footer>
 </%def>
 
-<%def name="css_url(string)">
-/static/css/${string}
-</%def>
+<%def name="css_url(string)">/static/css/${string}</%def>
+<%def name="js_url(string)">/static/js/${string}</%def>

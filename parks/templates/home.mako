@@ -1,24 +1,10 @@
 <%inherit file="base.mako"/>
+<%namespace file="/base.mako" name="base" />
+
 <%block name="content">
 
-    <div class="row">
-        <div class="span12" style="text-align: center;">
-            <h2>Keep track of all your NPS passport stamps in one place</h2>
-        </div>
-        <div class="row">
-            <div class="span4">
-                <strong>Track your progress</strong>
-                <p>Register which stamps you have collected. Make sure you don't miss any, and keep track of new ones.</p>
-            </div>
-            <div class="span4">
-                <strong>Stay up to date</strong>
-                <p>Old stamps are continually being retired, and new stamps are being released. Keep track of the newest stamps to keep your collection up to date.</p>
-            </div>
-            <div class="span4">
-                <strong>Share with friends</strong>
-                <p>Show how many stamps you've collected. Update stamps listings instantly. Tell others when new stamps are added or old ones are removed.</p>
-            </div>
-        </div>
+    <div class="span12" style="text-align: center;">
+        <h1>Track your NPS passport stamps</h1>
     </div>
 
     <div class="row">
@@ -52,4 +38,33 @@
             <div>Some text</div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="span4">
+            <div class="inner">
+                <strong>Track your progress</strong>
+                <p>Register which stamps you have collected. Make sure you don't miss any, and keep track of new ones.</p>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="inner">
+                <strong>Stay up to date</strong>
+                <p>Old stamps are continually being retired, and new stamps are being released. Keep track of the newest stamps to keep your collection up to date.</p>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="inner">
+                <strong>Share with friends</strong>
+                <p>Show how many stamps you've collected. Update stamps listings instantly. Tell others when new stamps are added or old ones are removed.</p>
+            </div>
+        </div>
+    </div>
+
+</%block>
+
+<%block name="javascript">
+    <script type="text/javascript" src="${base.js_url('jquery.backstretch.min.js')}"></script>
+    <script type="text/javascript">
+        $.backstretch("static/images/winter.jpg");
+    </script>
 </%block>

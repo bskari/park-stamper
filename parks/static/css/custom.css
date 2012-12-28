@@ -9,12 +9,31 @@ body .backwards {
     direction: rtl;
 }
 
+.container-narrow {
+    background: url('/static/images/cream_dust_transparent.png') repeat 0 0;
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 30px;
+}
+
+h1 {
+    text-shadow: 1px 1px 1px #ccc;
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Merriweather', Georgia, Times, serif;
 }
 
 p, div {
     font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
+[class*="span"] {
+    /* Override Bootstrap */
+    margin-left: 0;
+}
+[class*="span"] .inner {
+    margin-left: 20px;
 }
 
 .table thead th {
@@ -31,7 +50,6 @@ p, div {
     border-top: 1px solid #e3e3e3;
     background-color: #f5f5f5;
 }
-
 .footer p {
     margin-bottom: 0;
     color: #333;
@@ -45,7 +63,6 @@ p, div {
     display: inline;
     padding: 0 2px;
 }
-
 .footer-links li:first-child {
     padding-left: 0;
 }
