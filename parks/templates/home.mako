@@ -61,10 +61,3 @@
     </div>
 
 </%block>
-
-<%block name="javascript">
-    <script type="text/javascript" src="${base.js_url('jquery.backstretch.min.js')}"></script>
-    <script type="text/javascript">
-        $.backstretch("static/images/winter.jpg");
-    </script>
-</%block>

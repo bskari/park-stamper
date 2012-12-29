@@ -59,9 +59,18 @@
         ${footer()}
 
         ## JS placed at the bottom for faster loading
-        <script src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.2.min.js" type="text/javascript"></script>
-        <script src="/static/bootstrap/js/bootstrap.js"></script>
-        <%block name="javascript" />
+        <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
+        <script type="text/javascript" src="/static/js/lib/closure-library/closure/goog/base.js"></script>
+        <script type="text/javascript" src="/static/js/deps.js"></script>
+        <script type="text/javascript" src="/static/js/lib/jquery.backstretch.min.js"></script>
+        <%block name="javascript_includes" />
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $.backstretch("static/images/winter.jpg");
+                <%block name="inline_javascript" />
+            });
+        </script>
     </body>
 </html>
 
@@ -83,4 +92,4 @@
 </%def>
 
 <%def name="css_url(string)">/static/css/${string}</%def>
-<%def name="js_url(string)">/static/js/${string}</%def>
+<%def name="js_url(string)">/static/js/src/${string}</%def>

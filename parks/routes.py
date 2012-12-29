@@ -4,11 +4,12 @@ Centralized here to make testing easier.
 """
 
 def add_routes(config):
-    config.add_route('home', '/')
-    config.add_route('park', '/park/{park_url}')
     config.add_route('all-parks', '/all-parks')
+    config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('nearby', '/nearby')
+    config.add_route('park', '/park/{park_url}')
 
 def add_static_views(config):
     config.add_static_view('static', 'static', cache_max_age=3600)

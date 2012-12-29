@@ -9,5 +9,8 @@ Parks.egg-info
 parks/scripts/initialize_db/*.html
 parks/scripts/initialize_db/*.html.soup.pickle
 
+# Created automatically by Closure
+parks/static/js/deps.js
+
 # Beaker session stuff
 data
