@@ -10,9 +10,32 @@
 </%block>
 
 <%block name="inline_javascript">
-    parkstamper.nearby.init($('#location'));
+    var parameters = {
+        'table': $('#stamp-info .table'),
+        'loadingElement': $('#loading-stamps'),
+        'nearbyUrl': 'nearby.json',
+        'csrfToken': '${csrf_token}'
+    };
+    parkStamper.nearby.init(parameters);
 </%block>
 
 <%block name="content">
-    <div id="location"></div>
+    <div id="stamp-info">
+        <table class="table table-striped table-condensed">
+            <thead>
+                <tr>
+                    <th>Park</th>
+                    <th class="stamp-text">Text</th>
+                    <th>Location</th>
+                    <th>GPS Coordinates</th>
+                    <th>Distance</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+        </table>
+        <div id="loading-stamps">
+            <hr />
+            <p>Loading, please wait</p>
+        </div>
+    </div>
 </%block>
