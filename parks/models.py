@@ -9,6 +9,7 @@ from sqlalchemy import Time
 from sqlalchemy import Enum
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
+from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import or_
 from sqlalchemy import String
@@ -176,6 +177,11 @@ class StampLocation(Base):
     address = Column(String(255))
     latitude = Column(Float)
     longitude = Column(Float)
+
+# Index by longitude first because the US is more wide than it is tall.
+# I don't know if that will even matter, considering that longitude is
+# probably going to be unique anyway.
+Index('idx_longitude_latitude', StampLocation.longitude, StampLocation.latitude)
 
 
 class StampToLocation(Base):
