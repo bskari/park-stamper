@@ -5,6 +5,10 @@
 <link rel="stylesheet" href="${base.css_url('home.css')}" />
 </%block>
 
+<%block name="inline_javascript">
+$('$park-carousel').carousel({'interval': 5000, 'cycle': true});
+</%block>
+
 <%block name="content">
 
     <div class="span12" style="text-align: center;">
