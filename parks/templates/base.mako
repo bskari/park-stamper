@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <div class="container-narrow">
+        <div id="content" class="container-narrow">
             ## Error and warning alerts
             % if error:
                 <div class="alert alert-error">

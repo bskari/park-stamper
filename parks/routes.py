@@ -9,6 +9,7 @@ def add_routes(config):
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('nearby', '/nearby')
+    config.add_route('nearby_json', '/nearby.json')
     config.add_route('park', '/park/{park_url}')
 
 def add_static_views(config):

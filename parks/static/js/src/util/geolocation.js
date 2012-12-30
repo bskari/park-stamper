@@ -1,8 +1,8 @@
-/*
-Geolocation using the HTML5 API with fallback to Google's Ajax geolocation API.
-*/
+/**
+ * Geolocation using the HTML5 API with fallback to Google's Ajax geolocation API.
+ */
 
-goog.provide('parkstamper.util.geolocation.requestLocation');
+goog.provide('parkStamper.util.geolocation.requestLocation');
 
 /**
  * Grabs the user's location asynchronously and calls the callback function
@@ -14,7 +14,7 @@ goog.provide('parkstamper.util.geolocation.requestLocation');
  *  }
  * }
  */
-parkstamper.util.geolocation.requestLocation = function(callback, errorCallback) {
+parkStamper.util.geolocation.requestLocation = function(callback, errorCallback) {
     "use strict;";
     if (navigator && navigator.geolocation) {
         // HTML5 geolocation
