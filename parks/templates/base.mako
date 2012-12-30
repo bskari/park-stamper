@@ -10,6 +10,11 @@
         <link href="http://fonts.googleapis.com/css?family=Merriweather:bold" rel="stylesheet" type="text/css">
         <link href="http://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" type="text/css">
         <%block name="stylesheets" />
+        <title>
+            <%block name="title">
+                Park Stamper
+            </%block>
+        </title>
     </head>
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top">

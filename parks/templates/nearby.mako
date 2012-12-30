@@ -1,6 +1,10 @@
 <%inherit file="base.mako"/>
 <%namespace file="/base.mako" name="base"/>
 
+<%block name="title">
+Nearby stamps - Park Stamper
+</%block>
+
 <%block name="stylesheets">
     <link rel="stylesheet" href="${base.css_url('nearby.css')}" />
 </%block>
