@@ -759,7 +759,7 @@ def get_other_areas():
             latitude=71.298611,
             longitude=-156.753333,
             agency=u'NPS',
-            date=parse(u'February 1999'),
+            date=parse(u'February 1, 1999'),
         ),
         ParkTuple(
             name=u'Land Between the Lakes National Recreation Area',
