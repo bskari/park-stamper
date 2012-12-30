@@ -1,4 +1,5 @@
 import datetime
+from pyramid.url import route_url
 from pyramid.view import view_config
 
 
@@ -21,7 +22,7 @@ def nearby_json(request):
         stamps=[
             dict(
                 park='Yellowstone',
-                url='yellowstone',
+                url=route_url('park', request, park_url='yellowstone'),
                 text='Test Data\nYellowstone National Park',
                 location='Visitor Center',
                 coordinates=dict(latitude=37.774, longitude=-122.419),
@@ -30,7 +31,7 @@ def nearby_json(request):
             ),
             dict(
                 park='Yellowstone',
-                url='yellowstone',
+                url=route_url('park', request, park_url='yellowstone'),
                 text='Test Data 2\nYellowstone National Park',
                 location='Visitor Center',
                 coordinates=dict(latitude=37.774, longitude=-122.419),

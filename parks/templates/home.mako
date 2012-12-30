@@ -1,6 +1,10 @@
 <%inherit file="base.mako"/>
 <%namespace file="/base.mako" name="base" />
 
+<%block name="stylesheets">
+<link rel="stylesheet" href="${base.css_url('home.css')}" />
+</%block>
+
 <%block name="content">
 
     <div class="span12" style="text-align: center;">
