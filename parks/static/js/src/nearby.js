@@ -40,6 +40,9 @@ parkStamper.nearby.nearbySuccessCallback = function(data, textStatus, jqXHR) {
     if (data.success === true) {
 
         function makeCell(message) {
+            if (message === 'null') {
+                message = '';
+            }
             return $('<td>' + message + '</td>');
         }
 

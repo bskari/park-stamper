@@ -1,6 +1,9 @@
 from sqlalchemy import func
 
+from parks.logic.math_logic import latitude_to_miles
+from parks.logic.math_logic import longitude_to_miles
 from parks.models import DBSession
+from parks.models import Park
 from parks.models import Stamp
 from parks.models import StampCollection
 from parks.models import StampLocation
@@ -29,3 +32,28 @@ def get_stamps_by_park_id(park_id):
     ).filter(
         StampLocation.park_id == park_id,
     ).all()
+
+
+def get_nearby_stamps(latitude, longitude, distance_miles):
+    lower_latitude = latitude - (distance_miles / latitude_to_miles())
+    upper_latitude = latitude + (distance_miles / latitude_to_miles())
+    lower_longitude = longitude - (distance_miles / longitude_to_miles(longitude))
+    upper_longitude = longitude + (distance_miles / longitude_to_miles(longitude))
+
+    stamps = DBSession.query(
+        StampLocation,
+        Stamp,
+        Park
+    ).join(
+        StampToLocation
+    ).join(
+        Stamp
+    ).join(
+        Park
+    ).filter(
+        StampLocation.latitude.between(lower_latitude, upper_latitude)
+    ).filter(
+        StampLocation.longitude.between(lower_longitude, upper_longitude)
+    ).all()
+
+    return stamps

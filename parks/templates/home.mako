@@ -6,16 +6,21 @@
 </%block>
 
 <%block name="inline_javascript">
-$('$park-carousel').carousel({'interval': 5000, 'cycle': true});
+$('#park-carousel').carousel({'interval': 5000, 'cycle': true});
 </%block>
 
 <%block name="content">
 
-    <div class="span12" style="text-align: center;">
-        <h1>Track your NPS passport stamps</h1>
+    <div class="row">
+        <div class="span12" style="text-align: center;">
+            <h1>Track and find your NPS passport stamps</h1>
+            <a class="btn btn-large btn-success" href="${urls['nearby']}">
+                Find nearby stamps now!
+            </a>
+        </div>
     </div>
 
-    <div class="row">
+    <div class="row" style="margin-top: 20px;">
         <div class="span9">
             <div id="park-carousel" class="carousel slide" style="width: 640px; margin-left: auto; margin-right: auto;">
                 <div class="carousel-inner">

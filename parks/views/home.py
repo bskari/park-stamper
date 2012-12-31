@@ -57,4 +57,5 @@ def home(request):
     ]
     return dict(
         carousel_information=carousel_information,
+        urls=dict(nearby=request.route_url('nearby')),
     )
