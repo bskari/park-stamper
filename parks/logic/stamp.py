@@ -1,6 +1,7 @@
 from sqlalchemy import func
 
 from parks.logic.math_logic import latitude_to_miles
+from parks.logic.math_logic import latitude_longitude_distance
 from parks.logic.math_logic import longitude_to_miles
 from parks.models import DBSession
 from parks.models import Park
@@ -55,5 +56,17 @@ def get_nearby_stamps(latitude, longitude, distance_miles):
     ).filter(
         StampLocation.longitude.between(lower_longitude, upper_longitude)
     ).all()
+
+    # We're doing square distance calculation in SQL so that we can use
+    # indexes, so we might include some stamps that aren't within the radius
+    # that we need to post-filter
+    stamps = [
+        s for s in stamps if latitude_longitude_distance(
+            latitude,
+            longitude,
+            s.StampLocation.latitude,
+            s.StampLocation.longitude
+        ) < distance_miles
+    ]
 
     return stamps

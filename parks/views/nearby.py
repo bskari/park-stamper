@@ -68,7 +68,11 @@ def nearby_json(request):
             park=s.Park.name,
             url=request.route_url('park', park_url=s.Park.url),
             text=s.Stamp.text,
-            location=s.StampLocation.description,
+            location=(
+                s.StampLocation.description
+                if s.StampLocation.description is not None
+                else 'Unknown'
+            ),
             coordinates=dict(
                 latitude=s.StampLocation.latitude,
                 longitude=s.StampLocation.longitude,
