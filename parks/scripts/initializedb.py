@@ -1426,9 +1426,14 @@ def save_stamp_locations(session, stamp_info_entries):
     """Creates StampLocation entries in the database."""
     # I'm not sure about the legality of directly copying the address
     # information, so just create dummy entries for now
-    park_id_objects = session.query(Park.id).all()
+    park_id_objects = session.query(Park.id, Park.latitude, Park.longitude).all()
     for park_id_object in park_id_objects:
-        stamp_location = StampLocation(park_id=park_id_object.id, address='Uncategorized')
+        stamp_location = StampLocation(
+            park_id=park_id_object.id,
+            address='Uncategorized',
+            latitude=park_id_object.latitude,
+            longitude=park_id_object.longitude,
+        )
         session.add(stamp_location)
 
     for stamp_info in stamp_info_entries:
