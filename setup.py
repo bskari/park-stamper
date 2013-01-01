@@ -8,6 +8,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'BeautifulSoup',
+    'mock',
     'py-bcrypt',
     'pyramid',
     'pyramid_debugtoolbar',

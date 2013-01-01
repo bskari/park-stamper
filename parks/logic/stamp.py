@@ -1,3 +1,4 @@
+from sqlalchemy import asc
 from sqlalchemy import func
 
 from parks.logic.math_logic import latitude_to_miles
@@ -55,6 +56,11 @@ def get_nearby_stamps(latitude, longitude, distance_miles):
         StampLocation.latitude.between(lower_latitude, upper_latitude)
     ).filter(
         StampLocation.longitude.between(lower_longitude, upper_longitude)
+    ).order_by(
+        asc(
+            (latitude - StampLocation.latitude) * (latitude - StampLocation.latitude) +
+            (longitude - StampLocation.longitude) * (longitude - StampLocation.longitude)
+        )
     ).all()
 
     # We're doing square distance calculation in SQL so that we can use

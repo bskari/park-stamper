@@ -49,7 +49,7 @@ Nearby stamps - Park Stamper
                         <th class="stamp-text">Text</th>
                         <th>Location</th>
                         <th>GPS Coordinates</th>
-                        <th>Distance</th>
+                        <th>Direction</th>
                         <th>Last Seen</th>
                     </tr>
                 </thead>

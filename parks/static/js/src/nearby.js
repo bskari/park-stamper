@@ -6,11 +6,12 @@ goog.require('parkStamper.util.message.popError');
 
 /**
  * Initialization function.
- * @param {Object} Initialization parameters:
- *  tableBody - jQuery tbody to add the stamp rows to
- *  loadingElement - jQuery element to hide after data are loaded
- *  nearbyUrl - string URL to load the stamp data from
- *  csrfToken - string
+ * @param {{tableBody: Object, loadingElement: Object, nearbyUrl: string,
+ *  csrfToken: string}} Initialization parameters.
+ *   tableBody - jQuery tbody to add the stamp rows to
+ *   loadingElement - jQuery element to hide after data are loaded
+ *   nearbyUrl - string URL to load the stamp data from
+ *   csrfToken - string
  */
 parkStamper.nearby.init = function(parameters) {
     'use strict';
@@ -30,7 +31,7 @@ parkStamper.nearby.init = function(parameters) {
 
 /**
  * Callback function to send position information back from.
- * @param {Object} position
+ * @param {{coords: {latitude: number, longitude: number}}} position
  */
 parkStamper.nearby.geoLocationCallback = function(position) {
     'use strict';
@@ -73,13 +74,37 @@ parkStamper.nearby.loadNearbyStampInformation = function() {
 
 /**
  * Success callback for Ajax request for nearby stamp information.
- * @param {Object} data Stamp information.
+ * @param {{
+ *  park: string,
+ *  url: string,
+ *  text: string,
+ *  location: string,
+ *  coordinates: {latitude: number, longitude: number},
+ *  distance: number,
+ *  last_seen: string,
+ *  direction: string
+ * }} data Stamp information.
  * @param {string} textStatus Status of the Ajax request.
  */
 parkStamper.nearby.createStampRows = function(data, textStatus) {
     'use strict';
     function makeCell(message) {
+        'use strict';
         return $('<td>' + message + '</td>');
+    }
+    /**
+     * Rounds a number to a certain number of digits.
+     * @param {number} number The number to round.
+     * @param {number} digits The number of digits to round to (defaults to 1).
+     */
+    function round(number, digits) {
+        'use strict';
+        var undefined;
+        if (digits === undefined) {
+            digits = 1;
+        }
+        var power = Math.pow(10, digits);
+        return Math.round(number * power) / power;
     }
 
     if (data.success === true) {
@@ -88,15 +113,15 @@ parkStamper.nearby.createStampRows = function(data, textStatus) {
             var stamp = data.stamps[stampIndex];
             var row = $('<tr></tr>');
 
-            var stampText = stamp['text'].replace('\n', '<br />');
+            var stampText = stamp.text.replace('\n', '<br />');
 
             // Park, Text, Location, GPS, Distance, Last Seen
-            row.append(makeCell('<a href=' + stamp['url'] + '>' + stamp['park']));
+            row.append(makeCell('<a href=' + stamp.url + '>' + stamp.park));
             row.append(makeCell(stampText));
-            row.append(makeCell(stamp['location']));
-            row.append(makeCell(stamp['coordinates']['latitude'] + ' ' + stamp['coordinates']['longitude']));
-            row.append(makeCell(stamp['distance']));
-            row.append(makeCell(stamp['last_seen']));
+            row.append(makeCell(stamp.location));
+            row.append(makeCell(stamp.coordinates.latitude + ' ' + stamp.coordinates.longitude));
+            row.append(makeCell(round(stamp.distance, 3) + ' miles ' + stamp.direction));
+            row.append(makeCell(stamp.last_seen));
             parkStamper.nearby.tableBody.append(row);
         }
         parkStamper.nearby.loadingElement.hide();

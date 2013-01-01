@@ -1,8 +1,9 @@
 from math import pi
-from math import tan
+from math import atan
 from pyramid.view import view_config
 
-from parks.logic.stamp import get_nearby_stamps
+from parks.logic.math_logic import latitude_longitude_distance
+import parks.logic.stamp
 
 
 @view_config(route_name='nearby', renderer='nearby.mako')
@@ -31,7 +32,7 @@ def nearby_json(request):
             error='Radius is too large'
         )
 
-    nearby_stamps = get_nearby_stamps(latitude, longitude, distance)
+    nearby_stamps = parks.logic.stamp.get_nearby_stamps(latitude, longitude, distance)
 
     def direction(
         source_latitude,
@@ -39,29 +40,49 @@ def nearby_json(request):
         destination_latitude,
         destination_longitude,
     ):
-        x = destination_longitude - source_longitude
-        y = destination_latitude - source_latitude
-        angle = tan(y / x) * pi
-        if angle < 0:
-            angle += 360
-        if angle <= 22.5:
-            return 'n'
-        elif 22.5 < angle <= 67.5:
-            return 'ne'
-        elif 67.5 < angle <= 112.5:
-            return 'e'
-        elif 112.5 < angle <= 157.5:
-            return 'se'
-        elif 157.5 < angle <= 202.5:
-            return 's'
-        elif 202.5 < angle <= 247.5:
-            return 'sw'
-        elif 247.5 < angle <= 292.5:
-            return 'w'
-        elif 292.5 < angle <= 337.5:
-            return 'nw'
+        x = float(destination_longitude - source_longitude)
+        y = float(destination_latitude - source_latitude)
+        if y == 0:
+            y = 0.00000001
+        angle = abs(atan(x / y) * 180 / pi)
+
+        if destination_latitude >= source_latitude:
+            above = True
         else:
-            return 'n'
+            above = False
+
+        if destination_longitude >= source_longitude:
+            right = True
+        else:
+            right = False
+
+        if above and right: # Quadrant I
+            pass
+        elif not above and right: # Quadrant II
+            angle = 180 - angle
+        elif not above and not right: # Quadrant III
+            angle += 180
+        else: # Quadrant IV
+            angle = 360 - angle
+
+        if angle <= 22.5:
+            return 'north'
+        elif 22.5 < angle <= 67.5:
+            return 'northeast'
+        elif 67.5 < angle <= 112.5:
+            return 'east'
+        elif 112.5 < angle <= 157.5:
+            return 'southeast'
+        elif 157.5 < angle <= 202.5:
+            return 'south'
+        elif 202.5 < angle <= 247.5:
+            return 'southwest'
+        elif 247.5 < angle <= 292.5:
+            return 'west'
+        elif 292.5 < angle <= 337.5:
+            return 'northwest'
+        else:
+            return 'north'
 
     stamp_info = [
         dict(
@@ -77,7 +98,12 @@ def nearby_json(request):
                 latitude=s.StampLocation.latitude,
                 longitude=s.StampLocation.longitude,
             ),
-            distance=0.0, #TODO
+            distance=latitude_longitude_distance(
+                latitude,
+                longitude,
+                s.StampLocation.latitude,
+                s.StampLocation.longitude,
+            ),
             last_seen='never', #TODO
             direction=direction(
                 latitude,
