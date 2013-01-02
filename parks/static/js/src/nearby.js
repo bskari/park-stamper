@@ -21,7 +21,13 @@ parkStamper.nearby.init = function(parameters) {
     parkStamper.nearby.csrfToken = parameters.csrfToken;
     parkStamper.nearby.distance = parameters.distance;
 
-    parkStamper.util.geolocation.requestLocation(parkStamper.nearby.geoLocationCallback);
+    parkStamper.util.geolocation.requestLocation(
+        parkStamper.nearby.geoLocationCallback,
+        function() {
+            parkStamper.util.message.popError('Unable to determine your position, sorry!');
+            parkStamper.nearby.loadingElement.hide();
+        }
+    );
 
     // Disable the distance selector while we're waiting on stamp data
     parkStamper.nearby.distance.attr('disabled', '');
