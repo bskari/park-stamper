@@ -25,10 +25,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="#">Park Stamper</a>
+                    <a class="brand" href="${request.application_url}">Park Stamper</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
-                            <li><a href="/">Home</a></li>
+                            <li><a href="${request.application_url}/all-parks">All parks</a></li>
+                            <li><a href="${request.application_url}/nearby">Nearby stamps</a></li>
                         </ul>
                         <ul class="nav actions">
                             % if user_id:
@@ -72,7 +73,9 @@
         <%block name="javascript_includes" />
         <script type="text/javascript">
             $(document).ready(function() {
-                $.backstretch("static/images/winter.jpg");
+                $.backstretch('static/images/winter.jpg');
+                var email = '(gro.' + 'irzks' + '@nodnzrb)';
+                document.getElementById('email-span').innerHTML = email.replace(/z/g, 'a');
                 <%block name="inline_javascript" />
             });
         </script>
@@ -83,13 +86,7 @@
     <footer class="footer">
         <div class="container">
             <p>Built by <a href="http://www.skari.org">Brandon Skari</a>
-                <span class="backwards">
-                    <script type="text/javascript">
-                        <!--
-                        var email = ('(gro.' + 'irzks' + '@nodnzrb)');
-                        document.write(email.replace(/z/g, 'a'));
-                        //-->
-                    </script>
+                <span id="email-span" class="backwards">
                 </span>
             </p>
         </div>

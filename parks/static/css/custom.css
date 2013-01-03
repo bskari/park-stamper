@@ -9,6 +9,10 @@ body .backwards {
     direction: rtl;
 }
 
+.navbar .nav.actions {
+    float: right;
+}
+
 .container-narrow {
     background: url('/static/images/cream_dust_transparent.png') repeat 0 0;
     margin: 0 auto;
