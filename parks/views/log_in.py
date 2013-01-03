@@ -6,10 +6,10 @@ from pyramid.view import forbidden_view_config
 from parks.logic.security import check_login_and_get_username
 
 
-@view_config(route_name='login', renderer='login.mako')
-@forbidden_view_config(renderer='login.mako')
-def login(request):
-    login_url = request.route_url('login')
+@view_config(route_name='log-in', renderer='log_in.mako')
+@forbidden_view_config(renderer='log_in.mako')
+def log_in(request):
+    login_url = request.route_url('log-in')
     referrer = request.url
     came_from = request.params.get('came_from', referrer)
     if came_from == login_url:
@@ -33,7 +33,7 @@ def login(request):
             render_dict.update(error='Invalid username or password.')
 
     render_dict.update(
-        url=request.application_url + '/login',
+        url=request.route_url('log-in'),
         came_from=came_from,
         login=login,
     )

@@ -33,10 +33,10 @@
                         </ul>
                         <ul class="nav actions">
                             % if user_id:
-                                <li><a href="${request.application_url}/logout">Log out</a></li>
+                                <li><a href="${request.application_url}/log-out">Log out</a></li>
                             % else:
-                                <li><a href="${request.application_url}/login">Log in</a></li>
-                                <li><a href="${request.application_url}/signup">Sign up</a></li>
+                                <li><a href="${request.application_url}/log-in">Log in</a></li>
+                                <li><a href="${request.application_url}/sign_up">Sign up</a></li>
                             % endif
                         </ul>
                     </div><!--/.nav-collapse -->
