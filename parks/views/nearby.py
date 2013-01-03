@@ -11,7 +11,7 @@ def nearby(request):
     return dict(csrf_token=request.session.get_csrf_token())
 
 
-@view_config(route_name='nearby_json', renderer='json')
+@view_config(route_name='nearby-json', renderer='json')
 def nearby_json(request):
     latitude = request.GET.get('latitude', None)
     longitude = request.GET.get('longitude', None)

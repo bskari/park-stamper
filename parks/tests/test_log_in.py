@@ -4,11 +4,11 @@ from transaction import manager
 
 from parks.models import User
 from parks.tests.integration_test_base import IntegrationTestBase
-from parks.views.login import login
+from parks.views.log_in import log_in
 
-class LoginUnitTest(IntegrationTestBase):
+class LogInUnitTest(IntegrationTestBase):
     def setUp(self):
-        super(LoginUnitTest, self).setUp()
+        super(LogInUnitTest, self).setUp()
         self.username = 'guest'
         self.password = 'password'
         with manager:
@@ -19,20 +19,20 @@ class LoginUnitTest(IntegrationTestBase):
             )
             self.session.add(model)
 
-    def test_came_from_is_never_login(self):
-        """We should never be redirected back to the login page."""
+    def test_came_from_is_never_log_in(self):
+        """We should never be redirected back to the log_in page."""
         # Came from is set using the came_from parameter, or by the referrer
         # Check the came_from parameter
         request = testing.DummyRequest()
-        login_url = request.route_url('login')
+        log_in_url = request.route_url('log-in')
         request.params = dict(
             login=self.username,
             password=self.password,
-            came_from=login_url,
+            came_from=log_in_url,
         )
-        page = login(request)
+        page = log_in(request)
         self.assertIn('came_from', page.keys())
-        self.assertNotEqual(page['came_from'], login_url)
+        self.assertNotEqual(page['came_from'], log_in_url)
 
         # Check the referrer URL
         request = testing.DummyRequest()
@@ -40,10 +40,10 @@ class LoginUnitTest(IntegrationTestBase):
             login=self.username,
             password=self.password,
         )
-        request.referrer = login_url
-        page = login(request)
+        request.referrer = log_in_url
+        page = log_in(request)
         self.assertIn('came_from', page.keys())
-        self.assertNotEqual(page['came_from'], login_url)
+        self.assertNotEqual(page['came_from'], log_in_url)
 
     def test_came_from(self):
         """Login should redirect the user back to where they came from, using
@@ -57,7 +57,7 @@ class LoginUnitTest(IntegrationTestBase):
             password=self.password,
             came_from=original_url,
         )
-        page = login(request)
+        page = log_in(request)
         self.assertIn('came_from', page.keys())
         self.assertEqual(page['came_from'], original_url)
 
@@ -68,13 +68,13 @@ class LoginUnitTest(IntegrationTestBase):
             password=self.password,
         )
         request.referrer = original_url
-        page = login(request)
+        page = log_in(request)
         self.assertIn('came_from', page.keys())
         # The trailing slash is getting stripped for some reason, so strip it
         # here when we check for it
         self.assertEqual(page['came_from'], original_url[:-1])
 
-    def test_successful_login(self):
+    def test_successful_log_in(self):
         request = testing.DummyRequest()
         original_url = request.route_url('home')
         request.params = {
@@ -83,10 +83,10 @@ class LoginUnitTest(IntegrationTestBase):
             'came_from': original_url,
             'form.submitted': 'Log In',
         }
-        response = login(request)
+        response = log_in(request)
         self.assertIsInstance(response, HTTPFound)
 
-    def test_failed_login(self):
+    def test_failed_log_in(self):
         request = testing.DummyRequest()
         original_url = request.route_url('home')
         request.params = {
@@ -95,5 +95,5 @@ class LoginUnitTest(IntegrationTestBase):
             'came_from': original_url,
             'form.submitted': 'Log In',
         }
-        response = login(request)
+        response = log_in(request)
         self.assertIn('error', response.keys())
