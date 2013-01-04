@@ -114,7 +114,17 @@ parkStamper.nearby.createStampRows = function(data, textStatus) {
     }
 
     if (data.success === true) {
-
+        if (data.stamps.length === 0) {
+            var errorMessage = "Looks like there aren't any stamps within " +
+                parkStamper.nearby.distance.val() +
+                ' miles of you.';
+            if (parkStamper.nearby.distance.val() < 100) {
+                errorMessage += ' Try increasing the search distance.';
+            } else {
+                errorMessage += ' Want to see a list of <a href="/all-parks">all parks</a> instead?';
+            }
+            parkStamper.util.message.popError(errorMessage);
+        }
         for (var stampIndex in data.stamps) {
             var stamp = data.stamps[stampIndex];
             var row = $('<tr></tr>');

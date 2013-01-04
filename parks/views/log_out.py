@@ -3,7 +3,7 @@ from pyramid.security import forget
 from pyramid.view import view_config
 
 
-@view_config(route_name='logout')
+@view_config(route_name='log-out')
 def logout(request):
     headers = forget(request)
     return HTTPFound(

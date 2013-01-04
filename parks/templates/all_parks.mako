@@ -6,7 +6,7 @@ All parks - Park Stamper
 </%block>
 
 <%block name="stylesheets">
-<link rel="stylesheet" href="${base.css_url('parks.css')}" />
+##<link rel="stylesheet" href="${base.css_url('all_parks.css')}" />
 </%block>
 
 <%block name="content">
