@@ -73,7 +73,7 @@
         <%block name="javascript_includes" />
         <script type="text/javascript">
             $(document).ready(function() {
-                $.backstretch('static/images/winter.jpg');
+                $.backstretch('/static/images/winter.jpg');
                 var email = '(gro.' + 'irzks' + '@nodnzrb)';
                 document.getElementById('email-span').innerHTML = email.replace(/z/g, 'a');
                 <%block name="inline_javascript" />
