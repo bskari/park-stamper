@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*
-from BeautifulSoup import BeautifulSoup
 import codecs
 import csv
 import math
 from collections import namedtuple
 import os
-from dateutil.parser import parse
 import re
 import sys
 import transaction
@@ -143,6 +141,8 @@ def save_page_to_file(soup, filename):
 
 
 def load_page_from_file(filename):
+    # Import here so that I don't have to install it for Pyramid
+    from BeautifulSoup import BeautifulSoup
     with open(filename, u'r') as f:
         soup = BeautifulSoup(f.read())
     return soup
@@ -178,6 +178,8 @@ def load_page_from_url(url):
     request = urllib2.Request(url=url, headers=headers)
     response = urllib2.urlopen(request)
 
+    # Import here so that I don't have to install it for Pyramid
+    from BeautifulSoup import BeautifulSoup
     soup = BeautifulSoup(response.read())
     return soup
 
@@ -218,6 +220,7 @@ def load_wiki_page(wiki_page_name):
 
 def get_national_parks():
     """Loads the list of national parks from Wikipedia."""
+    from dateutil.parser import parse
     soup = load_wiki_page(u'List_of_national_parks_of_the_United_States')
     tables = soup.fetch(u'table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
@@ -265,6 +268,7 @@ def get_national_parks():
 
 def get_national_monuments():
     """Loads the list of national monuments from Wikipedia."""
+    from dateutil.parser import parse
     soup = load_wiki_page(u'List_of_National_Monuments_of_the_United_States')
     tables = soup.fetch(u'table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
@@ -320,6 +324,7 @@ def get_national_monuments():
 
 def get_national_lakeshores_and_seashores():
     """Loads the list of national lakeshores and seashores from Wikipedia."""
+    from dateutil.parser import parse
     soup = load_wiki_page(u'List_of_United_States_national_lakeshores_and_seashores')
     tables = soup.fetch(u'table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
@@ -500,6 +505,7 @@ def get_national_trails():
     """Loads the list of national scenic trails and national historic trails
     from Wikipedia.
     """
+    from dateutil.parser import parse
     national_trails = []
 
     for page in (u'National_Historic_Trail', u'National_Scenic_Trail'):
@@ -535,6 +541,7 @@ def get_national_trails():
 
 def get_national_memorials():
     """Loads the list of national memorials from Wikipedia."""
+    from dateutil.parser import parse
     soup = load_wiki_page(u'List_of_National_Memorials_of_the_United_States')
     tables = soup.fetch(u'table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
@@ -720,6 +727,7 @@ def get_other_areas():
     """Returns a list of areas that, for whatever reason, aren't in thr other
     lists.
     """
+    from dateutil.parser import parse
     return (
         ParkTuple(
             name=u'Sunset Crater Volcano National Monument',
@@ -924,6 +932,7 @@ def _get_latitude_longitude_from_wiki_soup(wiki_soup):
 
 
 def _get_date_from_wiki_soup(wiki_soup):
+    from dateutil.parser import parse
     date_tr = [
         i for i in wiki_soup.fetch(u'tr')
         if u'Established' in unicode(i) or u'Designated' in unicode(i)
