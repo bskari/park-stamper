@@ -9,6 +9,9 @@ def get_all_parks():
         Park.region,
         Park.latitude,
         Park.longitude,
+        Park.url,
+    ).order_by(
+        Park.name
     ).all()
 
 

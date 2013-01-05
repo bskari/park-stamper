@@ -31,7 +31,7 @@ All parks - Park Stamper
 
 <%def name="park_row(park)">
     <tr>
-        <th>${park.name}</th>
+        <th><a href="${request.route_url('park', park_url=park.url)}">${park.name}</th>
         <th>${park.region}</th>
         <th>${blank_if_none(park.latitude)} ${blank_if_none(park.longitude)}</th>
     </tr>
