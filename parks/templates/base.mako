@@ -36,7 +36,7 @@
                                 <li><a href="${request.application_url}/log-out">Log out</a></li>
                             % else:
                                 <li><a href="${request.application_url}/log-in">Log in</a></li>
-                                <li><a href="${request.application_url}/sign_up">Sign up</a></li>
+                                <li><a href="${request.application_url}/sign-up">Sign up</a></li>
                             % endif
                         </ul>
                     </div><!--/.nav-collapse -->

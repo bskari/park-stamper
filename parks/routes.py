@@ -11,6 +11,7 @@ def add_routes(config):
     config.add_route('nearby', '/nearby')
     config.add_route('nearby-json', '/nearby.json')
     config.add_route('park', '/park/{park_url}')
+    config.add_route('sign-up', '/sign-up')
 
 def add_static_views(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
