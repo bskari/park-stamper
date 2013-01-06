@@ -6,7 +6,7 @@ Nearby stamps - Park Stamper
 </%block>
 
 <%block name="stylesheets">
-    <link rel="stylesheet" href="${base.css_url('nearby.css')}" />
+    <link rel="stylesheet" href="${base.css_url('nearby.css')}">
 </%block>
 
 <%block name="javascript_includes">
@@ -57,7 +57,7 @@ Nearby stamps - Park Stamper
                 </tbody>
             </table>
             <div id="loading-stamps">
-                <hr />
+                <hr>
                 <p>Loading, please wait</p>
             </div>
         </div>

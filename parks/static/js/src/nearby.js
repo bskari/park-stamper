@@ -23,8 +23,11 @@ parkStamper.nearby.init = function(parameters) {
 
     parkStamper.util.geolocation.requestLocation(
         parkStamper.nearby.geoLocationCallback,
-        function() {
+        function(error) {
             parkStamper.util.message.popError('Unable to determine your position, sorry!');
+            if (console && console.log) {
+                console.log('Geolocation failed: ' + error);
+            }
             parkStamper.nearby.loadingElement.hide();
         }
     );
