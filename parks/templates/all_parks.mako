@@ -1,12 +1,12 @@
 <%inherit file="base.mako"/>
-<%namespace file="/base.mako" name="base" />
+<%namespace file="/base.mako" name="base"/>
 
 <%block name="title">
 All parks - Park Stamper
 </%block>
 
 <%block name="stylesheets">
-##<link rel="stylesheet" href="${base.css_url('all_parks.css')}" />
+##<link rel="stylesheet" href="${base.css_url('all_parks.css')}">
 </%block>
 
 <%block name="content">

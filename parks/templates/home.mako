@@ -1,8 +1,8 @@
 <%inherit file="base.mako"/>
-<%namespace file="/base.mako" name="base" />
+<%namespace file="/base.mako" name="base"/>
 
 <%block name="stylesheets">
-<link rel="stylesheet" href="${base.css_url('home.css')}" />
+<link rel="stylesheet" href="${base.css_url('home.css')}">
 </%block>
 
 <%block name="inline_javascript">
@@ -30,12 +30,12 @@ $('#park-carousel').carousel({'interval': 5000, 'cycle': true});
                         % else:
                             <div class="item">
                         % endif
-                            <img src="${img_url}">
+                            <img src="${img_url}" alt="${caption}">
                             <a href="${url}">
-                                <div class="carousel-caption">
+                                <span class="carousel-caption">
                                     <h4>${header}</h4>
                                     <p>${caption}</p>
-                                </div>
+                                </span>
                             </a>
                         </div>
                     % endfor

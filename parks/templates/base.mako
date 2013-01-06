@@ -1,15 +1,15 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal">
+<!DOCTYPE html>
+<html>
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
-        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="${css_url('custom.css')}" />
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${css_url('custom.css')}">
         <link href="http://fonts.googleapis.com/css?family=Merriweather:bold" rel="stylesheet" type="text/css">
-        <link href="http://fonts.googleapis.com/css?family=Open Sans" rel="stylesheet" type="text/css">
-        <%block name="stylesheets" />
+        <link href="http://fonts.googleapis.com/css?family=Open%20Sans" rel="stylesheet" type="text/css">
+        <%block name="stylesheets"/>
         <title>
             <%block name="title">
                 Park Stamper
@@ -59,7 +59,7 @@
                 </div>
             % endif
 
-            <%block name="content" />
+            <%block name="content"/>
         </div>
 
         ${footer()}
@@ -70,13 +70,13 @@
         <script type="text/javascript" src="/static/js/lib/closure-library/closure/goog/base.js"></script>
         <script type="text/javascript" src="/static/js/deps.js"></script>
         <script type="text/javascript" src="/static/js/lib/jquery.backstretch.min.js"></script>
-        <%block name="javascript_includes" />
+        <%block name="javascript_includes"/>
         <script type="text/javascript">
             $(document).ready(function() {
                 $.backstretch('/static/images/winter.jpg');
                 var email = '(gro.' + 'irzks' + '@nodnzrb)';
                 document.getElementById('email-span').innerHTML = email.replace(/z/g, 'a');
-                <%block name="inline_javascript" />
+                <%block name="inline_javascript"/>
             });
         </script>
     </body>

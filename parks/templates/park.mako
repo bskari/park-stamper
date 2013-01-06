@@ -1,12 +1,12 @@
 <%inherit file="base.mako"/>
-<%namespace file="/base.mako" name="base" />
+<%namespace file="/base.mako" name="base"/>
 
 <%block name="title">
 ${park.name} - Park Stamper
 </%block>
 
 <%block name="stylesheets">
-<link rel="stylesheet" href="${base.css_url('park.css')}" />
+<link rel="stylesheet" href="${base.css_url('park.css')}">
 </%block>
 
 <%block name="content">
@@ -38,7 +38,7 @@ ${park.name} - Park Stamper
         ## This is a huge potential XSS attack. I'm not sure how to do this
         ## correctly, so... let's do a poor man's check.
         % if '<' not in stamp.text:
-            <th class="stamp-text">${stamp.text.replace('\n', '<br />') | n}</th>
+            <th class="stamp-text">${stamp.text.replace('\n', '<br>') | n}</th>
         % else:
             <th class="stamp-text">${stamp.text}</th>
         % endif
