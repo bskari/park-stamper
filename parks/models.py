@@ -1,7 +1,6 @@
 from datetime import datetime
 from bcrypt import gensalt
 from bcrypt import hashpw
-from socket import inet_aton
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Date
@@ -39,7 +38,7 @@ class User(Base):
         if isinstance(signup_ip, int):
             self.signup_ip = signup_ip
         else:
-            self.signup_ip = inet_aton(signup_ip)
+            self.signup_ip = reduce(lambda a, b: a << 8 | b, map(int, signup_ip.split('.')))
 
 
 class UserEmail(Base):
