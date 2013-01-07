@@ -28,8 +28,8 @@
                     <a class="brand" href="${request.application_url}">Park Stamper</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav">
-                            <li><a href="${request.application_url}/all-parks">All parks</a></li>
-                            <li><a href="${request.application_url}/nearby">Nearby stamps</a></li>
+                            <li id="nav-li-all-parks"><a href="${request.application_url}/all-parks">All parks</a></li>
+                            <li id="nav-li-nearby"><a href="${request.application_url}/nearby">Nearby</a></li>
                         </ul>
                         <ul class="nav actions">
                             % if user_id:
@@ -73,7 +73,14 @@
         <%block name="javascript_includes"/>
         <script type="text/javascript">
             $(document).ready(function() {
+                ## Background
                 $.backstretch('/static/images/winter.jpg');
+                ## Highlight the page in navigation
+                var navTab = document.getElementById('nav-li-' + '${request.matched_route.name}');
+                if (null != navTab) {
+                    navTab.setAttribute('class', 'active');
+                }
+                ## Email
                 var email = '(gro.' + 'irzks' + '@nodnzrb)';
                 document.getElementById('email-span').innerHTML = email.replace(/z/g, 'a');
                 <%block name="inline_javascript"/>
