@@ -76,3 +76,33 @@ def get_nearby_stamps(latitude, longitude, distance_miles):
     ]
 
     return stamps
+
+
+def stamp_exists(stamp_text):
+    stamp_text_count = DBSession.query(
+        Stamp.text
+    ).filter(
+        Stamp.text == stamp_text
+    ).count()
+
+    if stamp_text_count > 0:
+        return True
+    else:
+        return False
+
+
+def create_new_stamp(stamp_text, stamp_type):
+    stamp = Stamp(
+        text=stamp_text,
+        type=stamp_type,
+        status='active',
+    )
+    DBSession.add(stamp)
+
+    stamp_id = DBSession.query(
+        Stamp.id
+    ).filter(
+        Stamp.text == stamp_text
+    ).first()
+
+    return stamp_id

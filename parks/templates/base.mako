@@ -58,6 +58,18 @@
                     ${warning}
                 </div>
             % endif
+            % if success:
+                <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert">&times</button>
+                    ${success}
+                </div>
+            % endif
+            % if info:
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="alert">&times</button>
+                    ${info}
+                </div>
+            % endif
 
             <%block name="content"/>
         </div>
@@ -66,6 +78,7 @@
 
         ## JS placed at the bottom for faster loading
         <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js"></script>
         <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
         <script type="text/javascript" src="/static/js/lib/closure-library/closure/goog/base.js"></script>
         <script type="text/javascript" src="/static/js/deps.js"></script>
