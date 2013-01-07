@@ -7,15 +7,17 @@ Nearby stamps - Park Stamper
 
 <%block name="stylesheets">
     <link rel="stylesheet" href="${base.css_url('nearby.css')}">
+    <link rel="stylesheet" href="${base.css_lib_url('tablesorter.css')}">
 </%block>
 
 <%block name="javascript_includes">
     <script type="text/javascript" src="${base.js_url('nearby.js')}"></script>
+    <script type="text/javascript" src="${base.js_lib_url('jquery.tablesorter.min.js')}"></script>
 </%block>
 
 <%block name="inline_javascript">
     var parameters = {
-        'tableBody': $('#stamp-info table tbody'),
+        'table': $('#stamps-table'),
         'loadingElement': $('#loading-stamps'),
         'nearbyUrl': 'nearby.json',
         'distance': $('#distance'),
@@ -42,9 +44,9 @@ Nearby stamps - Park Stamper
 
     <div class="row">
         <div class="span12" id="stamp-info">
-            <table class="table table-striped table-condensed">
+            <table class="table table-striped table-condensed tablesorter" id="stamps-table">
                 <thead>
-                    <tr>
+                    <tr style="border-top: 1px solid black;">
                         <th>Park</th>
                         <th class="stamp-text">Text</th>
                         <th>Location</th>

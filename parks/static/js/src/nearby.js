@@ -6,16 +6,16 @@ goog.require('parkStamper.util.message.popError');
 
 /**
  * Initialization function.
- * @param {{tableBody: Object, loadingElement: Object, nearbyUrl: string,
+ * @param {{table: Object, loadingElement: Object, nearbyUrl: string,
  *  csrfToken: string}} Initialization parameters.
- *   tableBody - jQuery tbody to add the stamp rows to
+ *   table - jQuery table to add the stamp rows to in its tbody
  *   loadingElement - jQuery element to hide after data are loaded
  *   nearbyUrl - string URL to load the stamp data from
  *   csrfToken - string
  */
 parkStamper.nearby.init = function(parameters) {
     'use strict';
-    parkStamper.nearby.tableBody = parameters.tableBody;
+    parkStamper.nearby.table = parameters.table;
     parkStamper.nearby.loadingElement = parameters.loadingElement;
     parkStamper.nearby.nearbyUrl = parameters.nearbyUrl;
     parkStamper.nearby.csrfToken = parameters.csrfToken;
@@ -59,9 +59,10 @@ parkStamper.nearby.loadNearbyStampInformation = function() {
     parkStamper.nearby.distance.attr('disabled', '');
     parkStamper.nearby.loadingElement.show();
     // Clear out the old data
-    parkStamper.nearby.tableBody.find('tr').remove();
+    var tbody = parkStamper.nearby.table.find('tbody');
+    tbody.find('tr').remove();
     // Hide it so that we can animate it appearing
-    parkStamper.nearby.tableBody.hide();
+    tbody.hide();
 
     var data = {
         'latitude': parkStamper.nearby.latitude,
@@ -128,6 +129,7 @@ parkStamper.nearby.createStampRows = function(data, textStatus) {
             }
             parkStamper.util.message.popError(errorMessage);
         }
+        var tbody = parkStamper.nearby.table.find('tbody');
         for (var stampIndex in data.stamps) {
             var stamp = data.stamps[stampIndex];
             var row = $('<tr></tr>');
@@ -141,10 +143,12 @@ parkStamper.nearby.createStampRows = function(data, textStatus) {
             row.append(makeCell(stamp.coordinates.latitude + ' ' + stamp.coordinates.longitude));
             row.append(makeCell(round(stamp.distance, 3) + ' miles ' + stamp.direction));
             row.append(makeCell(stamp.last_seen));
-            parkStamper.nearby.tableBody.append(row);
+            tbody.append(row);
         }
+        // Turn on sorting
+        parkStamper.nearby.table.tablesorter();
         parkStamper.nearby.loadingElement.hide();
-        parkStamper.nearby.tableBody.show(1000);
+        tbody.show(1000);
 
         // Reenable the distance selector
         parkStamper.nearby.distance.removeAttr('disabled');

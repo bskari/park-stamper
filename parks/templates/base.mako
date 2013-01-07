@@ -101,4 +101,6 @@
 </%def>
 
 <%def name="css_url(string)">/static/css/${string}</%def>
+<%def name="css_lib_url(string)">/static/css/lib/${string}</%def>
 <%def name="js_url(string)">/static/js/src/${string}</%def>
+<%def name="js_lib_url(string)">/static/js/lib/${string}</%def>
