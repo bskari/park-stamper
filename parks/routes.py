@@ -13,6 +13,7 @@ def add_routes(config):
     config.add_route('new-stamp', '/new-stamp')
     config.add_route('park', '/park/{park_url}')
     config.add_route('sign-up', '/sign-up')
+    config.add_route('stamp-locations-json', '/stamp-locations.json')
 
 def add_static_views(config):
     config.add_static_view('static', 'static', cache_max_age=3600)

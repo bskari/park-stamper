@@ -17,8 +17,9 @@ New Stamp - Park Stamper
 <%block name="inline_javascript">
     var parameters = {
         parkInputElement: $('#park'),
+        stampLocationSelect: $('#location'),
         parks: '${parks_json_string | n}',
-##parks: '["Yellowstone National Park", "Yosemite National Park"]',
+        stampLocationsUrl: "${request.route_url('stamp-locations-json')}",
         csrfToken: '${csrf_token}'
     };
     parkStamper.newStamp.init(parameters);

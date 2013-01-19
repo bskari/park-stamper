@@ -32,6 +32,20 @@ def new_stamp(request):
     return render_dict
 
 
+@view_config(route_name='stamp-locations-json', renderer='json')
+def stamp_locations(request):
+    park = request.GET.get('park', None)
+    if park is None:
+        return dict(success=False, error='No park provided')
+    return dict(
+        success=True,
+        stampLocations=[
+            dict(location='North Visitor Center', id=100),
+            dict(location='South Visitor Center', id=101),
+        ],
+    )
+
+
 def save_stamp(location, text):
     if stamp.stamp_exists(text):
         #TODO(bskari|2013-01-06) Make this click here go somewhere
