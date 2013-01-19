@@ -15,6 +15,16 @@ def get_all_parks():
     ).all()
 
 
+def get_all_park_names():
+    parks = DBSession.query(
+        Park.name
+    ).order_by(
+        Park.name
+    ).all()
+
+    return [i.name for i in parks]
+
+
 def get_park_and_state_by_url(park_url):
     return DBSession.query(
         Park,

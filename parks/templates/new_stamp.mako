@@ -6,7 +6,22 @@ New Stamp - Park Stamper
 </%block>
 
 <%block name="stylesheets">
-##<link rel="stylesheet" href="${base.css_url('park.css')}">
+##<link rel="stylesheet" href="${base.css_url('new_stamp.css')}">
+    <link rel="stylesheet" href="${base.css_lib_url('jquery-ui.css')}">
+</%block>
+
+<%block name="javascript_includes">
+    <script type="text/javascript" src="${base.js_url('new_stamp.js')}"></script>
+</%block>
+
+<%block name="inline_javascript">
+    var parameters = {
+        parkInputElement: $('#park'),
+        parks: '${parks_json_string | n}',
+##parks: '["Yellowstone National Park", "Yosemite National Park"]',
+        csrfToken: '${csrf_token}'
+    };
+    parkStamper.newStamp.init(parameters);
 </%block>
 
 <%block name="content">
