@@ -84,16 +84,19 @@ parkStamper.nearby.loadNearbyStampInformation = function() {
 
 /**
  * Success callback for Ajax request for nearby stamp information.
- * @param {{
- *  park: string,
- *  url: string,
- *  text: string,
- *  location: string,
- *  coordinates: {latitude: number, longitude: number},
- *  distance: number,
- *  last_seen: string,
- *  direction: string
- * }} data Stamp information.
+ * @param {
+ *  success: boolean,
+ *  stamp: {
+ *   park: string,
+ *   url: string,
+ *   text: string,
+ *   location: string,
+ *   coordinates: {latitude: number, longitude: number},
+ *   distance: number,
+ *   last_seen: string,
+ *   direction: string
+ *  }
+ * } data Stamp information.
  * @param {string} textStatus Status of the Ajax request.
  */
 parkStamper.nearby.createStampRows = function(data, textStatus) {

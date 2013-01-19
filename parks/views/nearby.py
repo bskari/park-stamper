@@ -104,7 +104,7 @@ def nearby_json(request):
                 s.StampLocation.latitude,
                 s.StampLocation.longitude,
             ),
-            last_seen='never', #TODO
+            last_seen='never', #TODO(bskari|2013-01-19)
             direction=direction(
                 latitude,
                 longitude,
