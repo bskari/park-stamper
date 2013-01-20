@@ -103,6 +103,6 @@ def create_new_stamp(stamp_text, stamp_type):
         Stamp.id
     ).filter(
         Stamp.text == stamp_text
-    ).first()
+    ).one()
 
-    return stamp_id
+    return stamp_id[0]

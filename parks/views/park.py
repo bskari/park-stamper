@@ -17,4 +17,16 @@ def park(request):
 
     stamps = get_stamps_by_park_id(park.id)
 
-    return dict(park=park, state=state, stamps=stamps)
+    render_context = dict()
+
+    # When a new stamp is created, we POST to a certain URL and then return
+    # HTTPFound to direct the user here. There's no way that I've figured out
+    # to set the message from there, so just do it here.
+    if request.referrer == request.route_url('new-stamp'):
+        render_context.update(
+            success='Great! Thanks for the update! Here are the other stamps'
+                ' from that park.'
+        )
+
+    render_context.update(park=park, state=state, stamps=stamps)
+    return render_context

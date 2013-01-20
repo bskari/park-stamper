@@ -24,30 +24,64 @@ parkStamper.newStamp.init = function(parameters) {
     parkStamper.newStamp.stampLocationsUrl = parameters.stampLocationsUrl;
     parkStamper.newStamp.csrfToken = parameters.csrfToken;
 
+    // The template should have this disabled by default, but if a user clicks
+    // the back button, their browser will remember its enabled state, so make
+    // sure that it's always disabled. Well, unless the park input is already
+    // populated; then we just need to populate the stamp locations.
+    if (parkStamper.newStamp.parkInput[0].value === '') {
+        parkStamper.newStamp.stampLocationSelect.attr('disabled', '');
+    } else {
+        parkStamper.newStamp.updateStampLocations(
+            parkStamper.newStamp.parkInput[0].value
+        );
+    }
+
     // TODO(bskari|2013-01-18) This should be loaded asynchronously to speed
     // initial page loading
     var parks = JSON.parse(parameters.parks);
     parkStamper.newStamp.parkInput.autocomplete({
         source: parks,
-        delay: 100
+        delay: 100,
+        minLength: 3,
+        select: function(_, ui) {
+            parkStamper.newStamp.updateStampLocations(ui.item.value);
+        }
     });
 
+    // We need to call back on both select and change, because the user might
+    // not use the autocomplete form
     parkStamper.newStamp.parkInput.change(function(eventObject) {
-        var data = {
-            park: eventObject.target.value,
-            csrf_token: parkStamper.newStamp.csrfToken
-        }
-        $.ajax(
-            parkStamper.newStamp.stampLocationsUrl,
-            {
-                data: data,
-                datatype: 'json',
-                success: parkStamper.newStamp.populateStampLocations,
-                error: parkStamper.newStamp.stampLocationErrorCallback
-            }
-        );
+        parkStamper.newStamp.updateStampLocations(eventObject.target.value);
     });
 };
+
+
+/**
+ * Sends a request for the stamp locations at a given park.
+ * @param {string} parkName Canonical name of the park.
+ */
+parkStamper.newStamp.updateStampLocations = function(parkName) {
+    // There are multiple callbacks that might call this with the same value;
+    // if we've already updated a park name, just ignore it
+    if (parkStamper.newStamp.updateStampLocations.lastUpdateName === parkName) {
+        return;
+    }
+    parkStamper.newStamp.updateStampLocations.lastUpdateName = parkName;
+
+    var data = {
+        park: parkName,
+        csrf_token: parkStamper.newStamp.csrfToken
+    };
+    $.ajax(
+        parkStamper.newStamp.stampLocationsUrl,
+        {
+            data: data,
+            datatype: 'json',
+            success: parkStamper.newStamp.populateStampLocations,
+            error: parkStamper.newStamp.stampLocationErrorCallback
+        }
+    );
+}
 
 
 /**
@@ -84,8 +118,15 @@ parkStamper.newStamp.populateStampLocations = function(data, textStatus) {
 
         parkStamper.newStamp.stampLocationSelect.removeAttr('disabled');
     } else {
+        var undefined;
+        var message;
+        if (undefined !== data.error) {
+            message = data.error;
+        } else {
+            message = textStatus;
+        }
         parkStamper.util.message.popError(
-            'Unable to load stamp locations: ' + textStatus
+            'Unable to load stamp locations: ' + message
         );
     }
 };

@@ -25,6 +25,26 @@ def get_all_park_names():
     return [i.name for i in parks]
 
 
+def get_park_by_id(id):
+    park = DBSession.query(
+        Park
+    ).filter(
+        Park.id == id
+    ).one()
+
+    return park
+
+
+def get_park_by_name(name):
+    park = DBSession.query(
+        Park
+    ).filter(
+        Park.name == name
+    ).one()
+
+    return park
+
+
 def get_park_and_state_by_url(park_url):
     return DBSession.query(
         Park,
