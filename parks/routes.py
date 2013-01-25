@@ -11,6 +11,7 @@ def add_routes(config):
     config.add_route('nearby', '/nearby')
     config.add_route('nearby-json', '/nearby.json')
     config.add_route('new-stamp', '/new-stamp')
+    config.add_route('new-stamp-location', '/new-stamp-location')
     config.add_route('park', '/park/{park_url}')
     config.add_route('sign-up', '/sign-up')
     config.add_route('stamp-locations-json', '/stamp-locations.json')

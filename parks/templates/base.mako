@@ -25,26 +25,23 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="${request.application_url}">Park Stamper</a>
+                    <a class="brand" href="${request.route_url('home')}">Park Stamper</a>
                     <div class="nav-collapse">
                         <ul class="nav">
                             <li id="nav-li-all-parks">
-                                <a href="${request.application_url}/all-parks">All parks</a>
+                                <a href="${request.route_url('all-parks')}">All parks</a>
                             </li>
                             <li id="nav-li-nearby">
-                                <a href="${request.application_url}/nearby">Nearby</a>
+                                <a href="${request.route_url('nearby')}">Nearby</a>
                             </li>
                             <li class="dropdown" id="nav-li-new-menu">
                                 <a id="new-menu" href="#nav-li-new-menu" role="button" class="dropdown-toggle" data-toggle="dropdown">New<b class="caret"></b></a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="new-menu">
                                     <li>
-                                        <a href="${request.route_url('new-stamp')}">New stamp</a>
+                                        <a href="${request.route_url('new-stamp')}">Stamp</a>
                                     </li>
                                     <li>
-                                        <a href="${request.route_url('new-stamp')}">New stamp</a>
-                                    </li>
-                                    <li>
-                                        <a href="${request.route_url('new-stamp')}">New stamp</a>
+                                        <a href="${request.route_url('new-stamp-location')}">Location</a>
                                     </li>
                                 </ul>
                             </li>
@@ -52,14 +49,14 @@
                         <ul class="nav actions">
                             % if user_id:
                                 <li>
-                                    <a href="${request.application_url}/log-out">Log out</a>
+                                    <a href="${request.route_url('log-out')}">Log out</a>
                                 </li>
                             % else:
                                 <li>
-                                    <a href="${request.application_url}/log-in">Log in</a>
+                                    <a href="${request.route_url('log-in')}">Log in</a>
                                 </li>
                                 <li>
-                                    <a href="${request.application_url}/sign-up">Sign up</a>
+                                    <a href="${request.route_url('sign-up')}">Sign up</a>
                                 </li>
                             % endif
                         </ul>

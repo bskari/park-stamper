@@ -30,3 +30,39 @@ def add_stamp_to_location(stamp_id, stamp_location_id):
     )
 
     DBSession.add(stamp_to_location)
+
+
+def stamp_location_exists(park_id, description):
+    description_count = DBSession.query(
+        StampLocation.park_id
+    ).filter(
+        StampLocation.park_id == park_id
+    ).filter(
+        StampLocation.description == description
+    ).count()
+
+    if description_count > 0:
+        return True
+    else:
+        return False
+
+
+def create_new_stamp_location(park_id, description, address, latitude, longitude):
+    stamp_location = StampLocation(
+        park_id=park_id,
+        description=description,
+        address=address,
+        latitude=latitude,
+        longitude=longitude,
+    )
+    DBSession.add(stamp_location)
+
+    stamp_location_id = DBSession.query(
+        StampLocation.id
+    ).filter(
+        StampLocation.park_id == park_id
+    ).filter(
+        StampLocation.description == description
+    ).one()
+
+    return stamp_location_id[0]
