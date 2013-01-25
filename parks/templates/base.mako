@@ -26,7 +26,7 @@
                         <span class="icon-bar"></span>
                     </a>
                     <a class="brand" href="${request.application_url}">Park Stamper</a>
-                    <div class="nav-collapse collapse">
+                    <div class="nav-collapse">
                         <ul class="nav">
                             <li id="nav-li-all-parks">
                                 <a href="${request.application_url}/all-parks">All parks</a>
