@@ -1439,7 +1439,7 @@ def save_stamp_locations(session, stamp_info_entries):
     for park_id_object in park_id_objects:
         stamp_location = StampLocation(
             park_id=park_id_object.id,
-            address='Uncategorized',
+            description='Uncategorized',
             latitude=park_id_object.latitude,
             longitude=park_id_object.longitude,
         )

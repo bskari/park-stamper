@@ -172,7 +172,7 @@ class StampLocation(Base):
     __tablename__ = 'stamp_location'
     id = Column(Integer, primary_key=True)
     park_id = Column(Integer, ForeignKey('park.id'), nullable=False)
-    description = Column(String(255))
+    description = Column(String(255), nullable=False)
     address = Column(String(255))
     latitude = Column(Float)
     longitude = Column(Float)

@@ -1,3 +1,17 @@
+#stamp-location-info th.stamp-location-description {
+    width: 40%;
+}
+#stamp-location-info th.stamp-location-address {
+    width: 30%;
+}
+#stamp-location-info th.stamp-location {
+    width: 20%;
+}
+#stamp-location-info th.stamp-location-count {
+    width: 10%;
+    text-align: center;
+}
+
 #stamp-info th.stamp-text {
     width: 350px;
     text-align: center;

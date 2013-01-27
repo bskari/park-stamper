@@ -1,3 +1,5 @@
+from sqlalchemy import func
+
 from parks.models import DBSession
 from parks.models import StampLocation
 from parks.models import StampToLocation
@@ -14,8 +16,19 @@ def get_stamp_location_by_id(stamp_location_id):
 
 
 def get_stamp_locations_by_park_id(park_id):
+    stamp_count_subquery = DBSession.query(
+        StampToLocation.stamp_location_id,
+        func.count(StampToLocation.stamp_id).label('stamp_count'),
+    ).group_by(
+        StampToLocation.stamp_location_id
+    ).subquery()
+
     stamp_locations = DBSession.query(
-        StampLocation
+        StampLocation,
+        stamp_count_subquery.c.stamp_count,
+    ).outerjoin(
+        stamp_count_subquery,
+        StampLocation.id == stamp_count_subquery.c.stamp_location_id,
     ).filter(
         StampLocation.park_id == park_id
     ).all()
