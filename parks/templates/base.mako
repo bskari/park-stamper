@@ -123,6 +123,8 @@
     </body>
 </html>
 
+<%def name="title_string(string)">${string} - Park Stamper</%def>
+
 <%def name="footer()">
     <footer class="footer">
         <div class="container">

@@ -2,7 +2,7 @@
 <%namespace file="/base.mako" name="base"/>
 
 <%block name="title">
-All parks - Park Stamper
+${base.title_string('All parks')}
 </%block>
 
 <%block name="stylesheets">
