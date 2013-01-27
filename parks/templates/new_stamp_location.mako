@@ -41,19 +41,19 @@ ${base.title_string('New stamp location')}
         <br>
 
         <label for="address">
-            Address
+            Address (optional)
         </label>
         <input type="text" name="address" id="address">
         <br>
 
         <label for="latitude">
-            Latitude
+            Latitude (optional)
         </label>
         <input type="number" name="latitude" id="latitude">
         <br>
 
         <label for="longitude">
-            Longitude
+            Longitude (optional)
         </label>
         <input type="number" name="longitude" id="longitude">
         <br>
