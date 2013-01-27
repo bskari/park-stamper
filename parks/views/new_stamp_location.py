@@ -15,8 +15,8 @@ def new_stamp_location(request):
         park_name = request.params.get('park', None)
         description = request.params.get('description', None)
         address = request.params.get('address', None)
-        latitude = request.params.get('address', None)
-        longitude = request.params.get('address', None)
+        latitude = request.params.get('latitude', None)
+        longitude = request.params.get('longitude', None)
         if park_name is None or description is None:
             render_dict.update(
                 error='There was an error submitting that information.'
@@ -24,7 +24,7 @@ def new_stamp_location(request):
         else:
             try:
                 park = park_logic.get_park_by_name(park_name)
-                create_stamp_location(
+                stamp_location_id = create_stamp_location(
                     park_id=park.id,
                     description=description,
                     address=address,
@@ -32,7 +32,11 @@ def new_stamp_location(request):
                     longitude=longitude,
                 )
                 return HTTPFound(
-                    location=request.route_url('park', park_url=park.url),
+                    location=request.route_url(
+                        'stamp-location',
+                        park=park.url,
+                        id=stamp_location_id,
+                    ),
                 )
             except ValueError, e:
                 render_dict.update(error=str(e))
@@ -63,10 +67,11 @@ def create_stamp_location(park_id, description, address, latitude, longitude):
             for s in address, latitude, longitude
         ]
 
-        stamp_location_logic.create_new_stamp_location(
+        id_ = stamp_location_logic.create_new_stamp_location(
             park_id=park_id,
             description=description,
             address=address,
             latitude=latitude,
             longitude=longitude,
         )
+        return id_

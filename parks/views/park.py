@@ -29,11 +29,6 @@ def park(request):
             success='Great! Thanks for the update! Here are the other stamps'
                 ' from that park.'
         )
-    elif request.referrer == request.route_url('new-stamp-location'):
-        # TODO(bskari|2013-01-26) Make this link go somewhere
-        render_context.update(
-            success='Nice! Would you like to add some stamps to that location?'
-        )
 
     render_context.update(
         park=park,
