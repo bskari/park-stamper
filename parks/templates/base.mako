@@ -108,7 +108,11 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 ## Background
-                $.backstretch('/static/images/winter.jpg');
+                // Loading this seemed slow on mobile 3G, so skip it. Or maybe
+                // my phone's browser is just slow. Whatever.
+                if (!/Android|webOS|iPhone|BlackBerry/i.test(navigator.userAgent)) {
+                    $.backstretch('/static/images/winter.jpg');
+                }
                 ## Highlight the page in navigation
                 var navTab = document.getElementById('nav-li-' + '${request.matched_route.name}');
                 if (null != navTab) {
