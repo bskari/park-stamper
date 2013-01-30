@@ -1,6 +1,7 @@
 from datetime import datetime
 from bcrypt import gensalt
 from bcrypt import hashpw
+from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Date
@@ -116,7 +117,9 @@ class Park(Base):
     url = Column(String(255), nullable=False, unique=True)
     state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
     latitude = Column(Float)
+    CheckConstraint('latitude >= -90 and latitude <= 90')
     longitude = Column(Float)
+    CheckConstraint('longitude >= -90 and longitude <= 90')
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
     date_founded = Column(Date)
     region = Column(Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA'), nullable=False)
@@ -175,7 +178,9 @@ class StampLocation(Base):
     description = Column(String(255), nullable=False)
     address = Column(String(255))
     latitude = Column(Float)
+    CheckConstraint('latitude >= -90 and latitude <= 90')
     longitude = Column(Float)
+    CheckConstraint('longitude >= -180 and longitude <= 180')
 
 # Index by longitude first because the US is more wide than it is tall.
 # I don't know if that will even matter, considering that longitude is

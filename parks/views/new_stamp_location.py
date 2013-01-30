@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
+import json
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
-import json
+import re
 from transaction import manager
 
 from parks.logic import park as park_logic
@@ -66,6 +68,27 @@ def create_stamp_location(park_id, description, address, latitude, longitude):
             None if s == '' else s
             for s in address, latitude, longitude
         ]
+
+        # Basic validation
+        if latitude is not None:
+            # Remove non-numerical stuff from strings like '34.5° N'
+            latitude = re.sub(r'[^\d\.-]', '', latitude)
+            latitude = float(latitude)
+            if latitude > 90.0 or latitude < -90.0:
+                raise ValueError('Latitude needs to be between -90 and 90.')
+        if longitude is not None:
+            # Remove non-numerical stuff from strings like '80.4° W'
+            longitude = re.sub(r'[^\d\.-]', '', longitude)
+            longitude = float(longitude)
+            if longitude > 180.0 or longitude < -180.0:
+                raise ValueError('Longitude needs to be between -180 and 180.')
+        # Soooo... all of the parks that I scraped off of Wikipedia have
+        # latitudes between 17.74694 and 71.29861, and longitudes between
+        # -164.167 and -64.62 (as of 2012-01-27). However, many GPS units
+        # report longitude as degrees west, which is negative. So, if somebody
+        # types in a negative value, let's just negate it.
+        if longitude > 0.0:
+            longitude = -longitude
 
         id_ = stamp_location_logic.create_new_stamp_location(
             park_id=park_id,
