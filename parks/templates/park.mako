@@ -2,7 +2,7 @@
 <%namespace file="/base.mako" name="base"/>
 
 <%block name="title">
-${base.title_string(${park.name})}
+${base.title_string(park.name)}
 </%block>
 
 <%block name="stylesheets">
