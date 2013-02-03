@@ -26,7 +26,7 @@ class SecurityTestCase(IntegrationTestBase):
             self.session.add(user)
             self.user_id = self.session.query(User.id).first().id
             user_email = UserEmail(
-                user=self.user_id, 
+                user=self.user_id,
                 email=self.email,
             )
             self.session.add(user_email)
@@ -51,8 +51,8 @@ class SecurityTestCase(IntegrationTestBase):
         # Right now, group finder just returns the 'user' group if a user is
         # logged in
         group = group_finder(self.user_id, request)
-        self.assertEqual('group:users', group)
-        
+        self.assertEqual(['group:users'], group)
+
         group = group_finder(None, request)
         self.assertIs(group, None)
 

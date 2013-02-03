@@ -1,16 +1,12 @@
 from collections import namedtuple
 from mock import patch
 from pyramid.testing import DummyRequest
-from transaction import manager
 
 import parks.logic.stamp
+from parks.models import Park
 from parks.models import Stamp
 from parks.models import StampLocation
-from parks.models import StampToLocation
-from parks.models import State
-from parks.models import Park
 from parks.tests.integration_test_base import IntegrationTestBase
-from parks.views.nearby import nearby
 from parks.views.nearby import nearby_json
 
 
