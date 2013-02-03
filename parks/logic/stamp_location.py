@@ -64,13 +64,26 @@ def stamp_location_exists(park_id, description):
         return False
 
 
-def create_new_stamp_location(park_id, description, address, latitude, longitude):
+def create_new_stamp_location(
+    park_id,
+    description,
+    address,
+    latitude,
+    longitude,
+    added_by_user_id,
+):
+    # The model allows for nulls here because my initial database population
+    # script doesn't have a user, so just enforce this rule here
+    if added_by_user_id is None:
+        raise ValueError('added_by_user should not be None')
+
     stamp_location = StampLocation(
         park_id=park_id,
         description=description,
         address=address,
         latitude=latitude,
         longitude=longitude,
+        added_by_user_id=added_by_user_id,
     )
     DBSession.add(stamp_location)
 

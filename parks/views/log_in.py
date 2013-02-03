@@ -1,4 +1,5 @@
 from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid
 from pyramid.security import remember
 from pyramid.view import view_config
 from pyramid.view import forbidden_view_config
@@ -31,6 +32,13 @@ def log_in(request):
             )
         else:
             render_dict.update(error='Invalid username or password.')
+
+    if render_dict.get('error', None) is None:
+        username = authenticated_userid(request)
+        if username is not None:
+            render_dict.update(error="Sorry, you don't have permission to use this page.")
+        elif referrer != request.route_url('log-in'):
+            render_dict.update(info='Please log in to use this page.')
 
     render_dict.update(
         url=request.route_url('log-in'),

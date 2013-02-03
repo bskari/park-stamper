@@ -11,22 +11,22 @@ from parks.models import UserEmail
 class RootFactory(object):
     __acl__ = [
         (Allow, Everyone, 'view'),
-        (Allow, 'groups:users', 'edit'),
+        (Allow, 'group:users', 'edit'),
     ]
 
     def __init__(self, request):
         pass
 
 
-def group_finder(user_id, request):
+def group_finder(username, request):
     """Returns a list of group identifiers that the user belongs to, or None
     if the user doesn't belong to any groups.
     
     Right now, I don't have any group specific privileges, so just return that
     the user is a member of the 'users' group.
     """
-    if user_id is not None:
-        return 'group:users'
+    if username is not None:
+        return ['group:users']
     else:
         return None
 

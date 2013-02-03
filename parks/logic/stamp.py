@@ -91,11 +91,17 @@ def stamp_exists(stamp_text):
         return False
 
 
-def create_new_stamp(stamp_text, stamp_type):
+def create_new_stamp(stamp_text, stamp_type, added_by_user_id):
+    # The model allows for nulls here because my initial database population
+    # script doesn't have a user, so just enforce this rule here
+    if added_by_user_id is None:
+        raise ValueError('added_by_user should not be None')
+
     stamp = Stamp(
         text=stamp_text,
         type=stamp_type,
         status='active',
+        added_by_user_id=added_by_user_id,
     )
     DBSession.add(stamp)
 

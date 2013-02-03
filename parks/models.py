@@ -124,6 +124,7 @@ class Park(Base):
     date_founded = Column(Date)
     region = Column(Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA'), nullable=False)
     type = Column(Enum(*get_park_types().keys()))
+    added_by_user_id = Column(Integer, ForeignKey('user.id'))
 
 
     def __init__(self, name, state, url, region, type, latitude=None, longitude=None, date_founded=None):
@@ -158,6 +159,7 @@ class Stamp(Base):
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
     type = Column(Enum('normal', 'bonus'), nullable=False)
     status = Column(Enum('active', 'lost', 'archived'), nullable=False)
+    added_by_user_id = Column(Integer, ForeignKey('user.id'))
 
 
 class StampCollection(Base):
@@ -181,6 +183,8 @@ class StampLocation(Base):
     CheckConstraint('latitude >= -90 and latitude <= 90')
     longitude = Column(Float)
     CheckConstraint('longitude >= -180 and longitude <= 180')
+    added_by_user_id = Column(Integer, ForeignKey('user.id'))
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
 # Index by longitude first because the US is more wide than it is tall.
 # I don't know if that will even matter, considering that longitude is
@@ -204,6 +208,7 @@ class StampToLocation(Base):
         ForeignKey('stamp_location.id'),
         nullable=False,
     )
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
 
 class OperatingHours(Base):

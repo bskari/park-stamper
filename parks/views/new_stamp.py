@@ -1,15 +1,17 @@
 from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid
 from pyramid.view import view_config
 import json
 from sqlalchemy.orm.exc import NoResultFound
 from transaction import manager
 
 from parks.logic import park as park_logic
-from parks.logic import stamp
+from parks.logic import stamp as stamp_logic
 from parks.logic import stamp_location as stamp_location_logic
+from parks.logic import user as user_logic
 
 
-@view_config(route_name='new-stamp', renderer='new_stamp.mako')
+@view_config(route_name='new-stamp', renderer='new_stamp.mako', permission='edit')
 def new_stamp(request):
     render_dict = {}
 
@@ -23,7 +25,11 @@ def new_stamp(request):
         else:
             try:
                 location_id = int(location_id)
-                park_url = create_stamp(location_id, text)
+                park_url = create_stamp(
+                    location_id,
+                    text,
+                    authenticated_userid(request)
+                )
                 return HTTPFound(
                     location=request.route_url('park', park_url=park_url),
                 )
@@ -54,7 +60,10 @@ def stamp_locations(request):
 
     stamp_locations = stamp_location_logic.get_stamp_locations_by_park_id(park.id)
     location_and_id_list = [
-        dict(location=sl.description or sl.address, id=sl.id)
+        dict(
+            location=sl.StampLocation.description or sl.StampLocation.address,
+            id=sl.StampLocation.id
+        )
         for sl in stamp_locations
     ]
 
@@ -64,19 +73,22 @@ def stamp_locations(request):
     )
 
 
-def create_stamp(location_id, text):
+def create_stamp(location_id, text, user):
     """Creates a new stamp at the given location with the given text. On
     success, it returns the location's park's URL.
     """
     with manager:
-        if stamp.stamp_exists(text):
+        if stamp_logic.stamp_exists(text):
             #TODO(bskari|2013-01-06) Make this click here go somewhere
             raise ValueError(
                 "I already have a stamp with that text. Did you find that stamp at"
                 " another location? If so, click here to add it to that location."
             )
 
-        stamp_id = stamp.create_new_stamp(text, 'normal')
+        if isinstance(user, str) or isinstance(user, unicode):
+            user = user_logic.get_user_by_username(user).id
+
+        stamp_id = stamp_logic.create_new_stamp(text, 'normal', user)
         stamp_location_logic.add_stamp_to_location(stamp_id, location_id)
 
         location = stamp_location_logic.get_stamp_location_by_id(location_id)

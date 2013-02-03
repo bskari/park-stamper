@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 import json
 from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid
 from pyramid.view import view_config
 import re
 from transaction import manager
 
 from parks.logic import park as park_logic
 from parks.logic import stamp_location as stamp_location_logic
+from parks.logic import user as user_logic
 
 
-@view_config(route_name='new-stamp-location', renderer='new_stamp_location.mako')
+@view_config(route_name='new-stamp-location', renderer='new_stamp_location.mako', permission='edit')
 def new_stamp_location(request):
     render_dict = {}
 
@@ -32,6 +34,7 @@ def new_stamp_location(request):
                     address=address,
                     latitude=latitude,
                     longitude=longitude,
+                    added_by_user=authenticated_userid(request)
                 )
                 return HTTPFound(
                     location=request.route_url(
@@ -54,7 +57,14 @@ def new_stamp_location(request):
     return render_dict
 
 
-def create_stamp_location(park_id, description, address, latitude, longitude):
+def create_stamp_location(
+    park_id,
+    description,
+    address,
+    latitude,
+    longitude,
+    added_by_user,
+):
     """Creates a new stamp location at the park."""
     with manager:
         if stamp_location_logic.stamp_location_exists(park_id, description):
@@ -90,11 +100,15 @@ def create_stamp_location(park_id, description, address, latitude, longitude):
         if longitude > 0.0:
             longitude = -longitude
 
+        if isinstance(added_by_user, str) or isinstance(added_by_user, unicode):
+            added_by_user = user_logic.get_user_by_username(added_by_user).id
+
         id_ = stamp_location_logic.create_new_stamp_location(
             park_id=park_id,
             description=description,
             address=address,
             latitude=latitude,
             longitude=longitude,
+            added_by_user_id=added_by_user,
         )
         return id_
