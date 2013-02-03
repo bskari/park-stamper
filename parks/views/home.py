@@ -1,21 +1,32 @@
 from collections import namedtuple
-
 from pyramid.view import view_config
+
+from parks.logic import user as user_logic
 
 
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
+    carousel_information = _get_static_carousel_information(request)
+    recent = user_logic.get_recent_user_collections(5)
+    return dict(
+        carousel_information=carousel_information,
+        urls=dict(nearby=request.route_url('nearby')),
+        recent=recent,
+    )
+
+
+def _get_static_carousel_information(request):
     CarouselInformation = namedtuple(
         'CarouselInformation',
         ['img_url', 'header', 'caption', 'url']
     )
     carousel_information = [
         CarouselInformation(
+            # TODO(bskari|2012-11-04) Load recent photos or something
             request.static_url('Parks:images/home/parks/' + image),
             header,
             caption,
             request.route_url('park', park_url=url),
-        # TODO(bskari|2012-11-04) Load recent photos or something
         ) for image, header, caption, url in [
             (
                 'delicate-arch.jpg',
@@ -55,7 +66,4 @@ def home(request):
             ),
         ]
     ]
-    return dict(
-        carousel_information=carousel_information,
-        urls=dict(nearby=request.route_url('nearby')),
-    )
+    return carousel_information

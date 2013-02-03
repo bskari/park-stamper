@@ -45,10 +45,12 @@ $('#park-carousel').carousel({'interval': 5000, 'cycle': true});
             </div>
         </div>
         <div class="span3">
-            <h3>Recent</h3>
-            <div>Some text</div>
-            <div>Some text</div>
-            <div>Some text</div>
+            <h3>Recent activity</h3>
+            <ul class="recent-activity-list">
+                % for item in recent:
+                    ${recent_activity_li(item)}
+                % endfor
+            </ul>
         </div>
     </div>
 
@@ -74,3 +76,17 @@ $('#park-carousel').carousel({'interval': 5000, 'cycle': true});
     </div>
 
 </%block>
+
+
+<%def name="recent_activity_li(recent_item)">
+    <li class="recent-activity">
+        <a class="url" href="${recent_item.username}">
+            ## TODO(bskari|2013-02-02) Link to user profile
+            ${recent_item.username}
+        </a>
+        collected a stamp from
+        <a class="url" href="${request.route_url('park', park_url=recent_item.park_url)}">
+            ${recent_item.park_name}
+        </a>
+    </li>
+</%def>

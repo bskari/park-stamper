@@ -166,8 +166,13 @@ class StampCollection(Base):
     """A user has recorded a collection of a stamp."""
     __tablename__ = 'stamp_collection'
     id = Column(Integer, primary_key=True)
-    stamp_id = Column(Integer, ForeignKey('stamp.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
+    # I could just record the StampToLocation id, but then I would have to
+    # use a flag for 'active' so that I could remove StampToLocation entries
+    # when stamps are lost or removed from a location. Recording the stamp_id
+    # and park_id seems like a cleaner plan.
+    stamp_id = Column(Integer, ForeignKey('stamp.id'), nullable=False)
+    park_id = Column(Integer, ForeignKey('park.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     time_collected = Column(DateTime, nullable=False, default=datetime.utcnow())
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
