@@ -45,6 +45,7 @@ class StampLocationUnitTest(IntegrationTestBase):
 
         request = testing.DummyRequest(referrer='')
         request.matchdict['id'] = '1'
+        request.matchdict['park'] = yellowstone_url
 
         page = stamp_location(request)
         expected_keys = set(('stamps', 'stamp_location', 'park'))
