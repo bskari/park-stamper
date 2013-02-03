@@ -42,16 +42,29 @@ def get_nearby_stamps(latitude, longitude, distance_miles):
     lower_longitude = longitude - (distance_miles / longitude_to_miles(longitude))
     upper_longitude = longitude + (distance_miles / longitude_to_miles(longitude))
 
+    max_time_subquery = DBSession.query(
+        StampCollection.stamp_id.label('stamp_id'),
+        func.max(StampCollection.time_collected).label('most_recent_time'),
+    ).join(
+        Stamp
+    ).group_by(
+        StampCollection.stamp_id
+    ).subquery()
+
     stamps = DBSession.query(
         StampLocation,
         Stamp,
-        Park
+        Park,
+        max_time_subquery.c.most_recent_time.label('last_seen'),
     ).join(
         StampToLocation
     ).join(
         Stamp
     ).join(
         Park
+    ).outerjoin(
+        max_time_subquery,
+        max_time_subquery.c.stamp_id == Stamp.id
     ).filter(
         StampLocation.latitude.between(lower_latitude, upper_latitude)
     ).filter(

@@ -2,8 +2,9 @@ from math import pi
 from math import atan
 from pyramid.view import view_config
 
-from parks.logic.math_logic import latitude_longitude_distance
-import parks.logic.stamp
+from parks.logic import date as date_logic
+from parks.logic import math_logic
+from parks.logic import stamp as stamp_logic
 
 
 @view_config(route_name='nearby', renderer='nearby.mako')
@@ -32,7 +33,7 @@ def nearby_json(request):
             error='Radius is too large'
         )
 
-    nearby_stamps = parks.logic.stamp.get_nearby_stamps(latitude, longitude, distance)
+    nearby_stamps = stamp_logic.get_nearby_stamps(latitude, longitude, distance)
 
     def direction(
         source_latitude,
@@ -98,13 +99,13 @@ def nearby_json(request):
                 latitude=s.StampLocation.latitude,
                 longitude=s.StampLocation.longitude,
             ),
-            distance=latitude_longitude_distance(
+            distance=math_logic.latitude_longitude_distance(
                 latitude,
                 longitude,
                 s.StampLocation.latitude,
                 s.StampLocation.longitude,
             ),
-            last_seen='never', #TODO(bskari|2013-01-19)
+            last_seen=date_logic.format_date(s.last_seen),
             direction=direction(
                 latitude,
                 longitude,
