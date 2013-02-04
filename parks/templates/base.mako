@@ -43,6 +43,9 @@
                                     <li>
                                         <a href="${request.route_url('new-stamp-location')}">Location</a>
                                     </li>
+                                    <li>
+                                        <a href="${request.route_url('add-stamp-to-location')}">Add stamp to location</a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

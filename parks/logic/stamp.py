@@ -125,3 +125,19 @@ def create_new_stamp(stamp_text, stamp_type, added_by_user_id):
     ).one()
 
     return stamp_id[0]
+
+
+def get_stamps_beginning_with_string(text, limit=None):
+    """Returns stamps with text that start with the substring."""
+    if limit is None:
+        limit = 10
+
+    stamps = DBSession.query(
+        Stamp
+    ).filter(
+        Stamp.text.like(text + '%')
+    ).limit(
+        limit
+    ).all()
+
+    return stamps

@@ -4,6 +4,7 @@ Centralized here to make testing easier.
 """
 
 def add_routes(config):
+    config.add_route('add-stamp-to-location', '/add-stamp-to-location')
     config.add_route('all-parks', '/all-parks')
     config.add_route('home', '/')
     config.add_route('log-in', '/log-in')
@@ -17,6 +18,7 @@ def add_routes(config):
     # Park here is for SEO value only and is ignored
     config.add_route('stamp-location', '/stamp-location/{id}/{park}')
     config.add_route('stamp-locations-json', '/stamp-locations.json')
+    config.add_route('stamps-substring-json', '/stamps-substring-json')
 
 def add_static_views(config):
     config.add_static_view('static', 'static', cache_max_age=3600)
