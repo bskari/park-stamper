@@ -34,7 +34,7 @@ def new_stamp_location(request):
                     address=address,
                     latitude=latitude,
                     longitude=longitude,
-                    added_by_user=authenticated_userid(request)
+                    added_by_user=authenticated_userid(request),
                 )
                 return HTTPFound(
                     location=request.route_url(

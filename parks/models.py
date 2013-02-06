@@ -213,6 +213,7 @@ class StampToLocation(Base):
         ForeignKey('stamp_location.id'),
         nullable=False,
     )
+    UniqueConstraint('stamp_id', 'stamp_location_id')
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
 
 

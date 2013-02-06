@@ -66,6 +66,7 @@ def stamp_locations(request):
         )
         for sl in stamp_locations
     ]
+    location_and_id_list.sort(key=lambda loc_and_id: loc_and_id['location'])
 
     return dict(
         success=True,

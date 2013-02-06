@@ -16,9 +16,11 @@ ${base.title_string('Add stamp to location')}
 
 <%block name="inline_javascript">
     var parameters = {
-        parkInputElement: $('#park'),
-        stampInputElement: $('#stamp'),
-        stampLocationSelect: $('#location'),
+        parkInput: "#park",
+        stampLocationSelect: "#location",
+        stampInput: "#stamp-text",
+        stampSelect: "#stamp",
+## Use ' instead of " because the JSON returned by Pyramid uses "
         parks: '${parks_json_string | n}',
         stampLocationsUrl: "${stamp_locations_url}",
         stampsUrl: "${stamps_url}",
@@ -48,11 +50,13 @@ ${base.title_string('Add stamp to location')}
         <br>
 
         <label for="stamp">
-            Stamp text
+            Stamp
         </label>
-        <input type="text" name="stamp" id="stamp">
+        <input type="text" name="stamp-text" id="stamp-text" placeholder="Start typing stamp here">
+        <br>
+        <select name="stamp" id="stamp"></select>
         <br>
 
-        <input type="submit" name="form.submitted" value="Add Location" class="btn">
+        <input type="submit" name="form.submitted" value="Add Stamp to Location" class="btn">
     </form>
 </%block>

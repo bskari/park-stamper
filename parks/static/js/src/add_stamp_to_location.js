@@ -6,9 +6,10 @@ goog.require('parkStamper.util.message.popError');
 /**
  * Initialization function.
  * @param {
- *  parkInputElement: Object,
- *  stampInputElement: Object,
- *  stampLocationSelect: Object,
+ *  parkInput: string
+ *  stampLocationSelect: string,
+ *  stampInput: string,
+ *  stampSelect: string,
  *  parks: string,
  *  stampLocationsUrl: string,
  *  stampsUrl: string,
@@ -16,7 +17,8 @@ goog.require('parkStamper.util.message.popError');
  */
 parkStamper.addStampToLocation.init = function(parameters) {
     'use strict';
-    parkStamper.addStampToLocation.stampLocationSelect = parameters.stampLocationSelect;
+    parkStamper.addStampToLocation.stampLocationSelect = $(parameters.stampLocationSelect);
+    parkStamper.addStampToLocation.stampSelect = $(parameters.stampSelect);
     parkStamper.addStampToLocation.stampLocationsUrl = parameters.stampLocationsUrl;
     parkStamper.addStampToLocation.stampsUrl = parameters.stampsUrl;
     parkStamper.addStampToLocation.csrfToken = parameters.csrfToken;
@@ -25,18 +27,28 @@ parkStamper.addStampToLocation.init = function(parameters) {
     // the back button, their browser will remember its enabled state, so make
     // sure that it's always disabled. Well, unless the park input is already
     // populated; then we just need to populate the stamp locations.
-    if (parameters.parkInputElement[0].value === '') {
+    var parkInputElement = $(parameters.parkInput);
+    if (parkInputElement[0].value === '') {
         parkStamper.addStampToLocation.stampLocationSelect.attr('disabled', '');
     } else {
         parkStamper.addStampToLocation.updateStampLocations(
-            parameters.parkInputElement[0].value
+            parkInputElement[0].value
+        );
+    }
+
+    var stampInputElement = $(parameters.stampInput);
+    if (stampInputElement[0].value === '') {
+        parkStamper.addStampToLocation.stampSelect.attr('disabled', '');
+    } else {
+        parkStamper.addStampToLocation.updateStamps(
+            {term: stampInputElement[0].value}  // Fake jQuery UI imput
         );
     }
 
     // TODO(bskari|2013-02-03) This should be loaded asynchronously to speed
     // initial page loading
     var parks = JSON.parse(parameters.parks);
-    parameters.parkInputElement.autocomplete({
+    parkInputElement.autocomplete({
         source: parks,
         delay: 100,
         minLength: 3,
@@ -45,7 +57,10 @@ parkStamper.addStampToLocation.init = function(parameters) {
         }
     });
 
-    parameters.stampInputElement.autocomplete({
+    // I'm not using this as an autocomplete field, but rather as a delayed
+    // input that triggers population of a select element. It's a hack, but I
+    // don't know how to do this myself in a portable way in JS.
+    stampInputElement.autocomplete({
         source: parkStamper.addStampToLocation.updateStamps,
         delay: 250,
         minLength: 4
@@ -53,7 +68,7 @@ parkStamper.addStampToLocation.init = function(parameters) {
 
     // We need to call back on both select and change, because the user might
     // not use the autocomplete form
-    parameters.parkInputElement.change(function(eventObject) {
+    parkInputElement.change(function(eventObject) {
         parkStamper.addStampToLocation.updateStampLocations(eventObject.target.value);
     });
     // We don't do the same thing with #stamp because it's a jQuery UI
@@ -87,7 +102,7 @@ parkStamper.addStampToLocation.updateStampLocations = function(parkName) {
             error: parkStamper.addStampToLocation.stampLocationErrorCallback
         }
     );
-}
+};
 
 
 /**
@@ -178,7 +193,8 @@ parkStamper.addStampToLocation.stampErrorCallback = function(
 
 
 /**
- * Sends a request for the stamps starting with a given string.
+ * Sends a request for the stamps starting with a given string and updates the
+ * stamp dropdown field.
  * @param {request: {term: string}} Start of the stamp's text.
  */
 parkStamper.addStampToLocation.updateStamps = function(request, callback) {
@@ -200,22 +216,53 @@ parkStamper.addStampToLocation.updateStamps = function(request, callback) {
         {
             data: data,
             datatype: 'json',
-            success: function(data, textStatus) {
-                if (data.success === true) {
-                    callback(data.stamps);
-                } else {
-                    var undefined;
-                    parkStamper.addStampToLocation.stampErrorCallback(
-                        undefined, // jqXhr
-                        textStatus,
-                        data.error // Might be undefined; that's fine
-                    );
-                    // The jQuery UI component expects callback to be called,
-                    // even on failure
-                    callback('[]');
-                }
-            },
+            success: parkStamper.addStampToLocation.populateStampSelect,
             error: parkStamper.addStampToLocation.stampErrorCallback
         }
     );
-}
+    // The jQuery UI expects callback to be called, even though I'm not using
+    // it as an autocomplete
+    var undefined;
+    if (callback !== undefined) {
+        callback('');
+    }
+};
+
+
+/**
+ * Updates the options in the stamp select dropdown.
+ * @param {success: boolean, stamps [{text: string, id: string}]} data Stamp
+ *  information.
+ */
+parkStamper.addStampToLocation.populateStampSelect = function(data) {
+    parkStamper.addStampToLocation.stampSelect.attr('disabled', '');
+
+    function makeInput(text, value) {
+        'use strict';
+        return $('<option value="' + value + '">' + text + '</option>');
+    }
+
+    if (data.success === true) {
+        // Remove any old data
+        parkStamper.addStampToLocation.stampSelect.find('option').remove();
+
+        for (var stampIndex in data.stamps) {
+            var stamp = data.stamps[stampIndex];
+            parkStamper.addStampToLocation.stampSelect.append(
+                makeInput(stamp.text, stamp.id)
+            );
+        }
+
+        parkStamper.addStampToLocation.stampSelect.removeAttr('disabled');
+
+    } else {
+        var undefined;
+        var message;
+        if (undefined !== data.error) {
+            message = data.error;
+        } else {
+            message = textStatus;
+        }
+        parkStamper.util.message.popError('Unable to load stamps: ' + message);
+    }
+};
