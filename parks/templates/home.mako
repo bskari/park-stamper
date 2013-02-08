@@ -14,7 +14,7 @@ $('#park-carousel').carousel({'interval': 5000, 'cycle': true});
     <div class="row">
         <div class="span12" style="text-align: center;">
             <h1>Track and find your NPS passport stamps</h1>
-            <a class="btn btn-large btn-success" href="${urls['nearby']}">
+            <a class="btn btn-large btn-primary" href="${urls['nearby']}">
                 Find nearby stamps now!
             </a>
         </div>

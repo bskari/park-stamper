@@ -12,7 +12,16 @@
     text-align: center;
 }
 
-#stamp-info th.stamp-text {
+#stamp-info th.stamp-text, td.stamp-text {
     width: 350px;
+    text-align: center;
+}
+#stamp-info th.stamp-status {
+    width: 100px;
+}
+#stamp-info th.stamp-last-seen {
+    width: 100px;
+}
+#stamp-info th.stamp-actions {
     text-align: center;
 }
