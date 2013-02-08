@@ -52,7 +52,11 @@ ${base.title_string(park.name)}
 
 <%def name="stamp_location_row(stamp_location, stamp_count)">
     <tr>
-        <th class="stamp-location-description">${blank_if_none(stamp_location.description)}</th>
+        <th class="stamp-location-description">
+            <a href="${request.route_url('stamp-location', id=stamp_location.id, park=park.name)}">
+                ${stamp_location.description}
+            </a>
+        </th>
         <th class="stamp-location-address">${blank_if_none(stamp_location.address)}</th>
         <th class="stamp-location">${blank_if_none(stamp_location.latitude)} ${blank_if_none(stamp_location.longitude)}</th>
         <th class="stamp-location-count">${stamp_count}</th>

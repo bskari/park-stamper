@@ -35,6 +35,8 @@ def get_stamp_locations_by_park_id(park_id):
         StampLocation.id == stamp_count_subquery.c.stamp_location_id,
     ).filter(
         StampLocation.park_id == park_id
+    ).order_by(
+        StampLocation.description
     ).all()
 
     return stamp_locations
