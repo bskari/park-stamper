@@ -63,7 +63,15 @@ ${base.title_string(park.name)}
                 ${stamp_location.description}
             </a>
         </th>
-        <th class="stamp-location-address">${blank_if_none(stamp_location.address)}</th>
+        <th class="stamp-location-address">
+            ## This is a huge potential XSS attack. I'm not sure how to do this
+            ## correctly, so... let's do a poor man's check.
+            % if stamp_location.address is not None and '<' not in stamp_location.address:
+                ${stamp_location.address.replace('\n', '<br>') | n}</th>
+            % else:
+                ${blank_if_none(stamp_location.address)}</th>
+            %endif
+        </th>
         <th class="stamp-location">${blank_if_none(stamp_location.latitude)} ${blank_if_none(stamp_location.longitude)}</th>
         <th class="stamp-location-count">${stamp_count}</th>
     </tr>
