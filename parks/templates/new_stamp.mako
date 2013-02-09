@@ -1,5 +1,5 @@
-<%inherit file="base.mako"/>
-<%namespace file="/base.mako" name="base"/>
+<%inherit file="base_templates/base.mako"/>
+<%namespace file="/base_templates/base.mako" name="base"/>
 
 <%block name="title">
 ${base.title_string('New stamp')}
