@@ -1,4 +1,5 @@
 from collections import namedtuple
+import datetime
 from mock import patch
 from pyramid.testing import DummyRequest
 
@@ -31,8 +32,8 @@ class NearbyUnitTest(IntegrationTestBase):
     @patch.object(parks.logic.stamp, 'get_nearby_stamps')
     def test_nearby_json_directions(self, mock_get_nearby_stamps):
         NearbyStampMockTuple = namedtuple(
-            'NearbyStampMock',
-            ['StampLocation', 'Stamp', 'Park']
+            'NearbyStampMockTuple',
+            ['StampLocation', 'Stamp', 'Park', 'last_seen']
         )
         mock_get_nearby_stamps.return_value = [
             NearbyStampMockTuple(
@@ -51,7 +52,8 @@ class NearbyUnitTest(IntegrationTestBase):
                     state=1,
                     region='W',
                     type='NP',
-                )
+                ),
+                datetime.datetime.now(),
             )
         ]
 
