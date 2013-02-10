@@ -33,6 +33,8 @@ def get_stamps_by_park_id(park_id):
         Stamp.id == max_time_subquery.c.stamp_id,
     ).filter(
         StampLocation.park_id == park_id,
+    ).group_by(
+        Stamp.id
     ).all()
 
 
