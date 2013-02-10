@@ -5,11 +5,6 @@
 ${base.title_string('All parks')}
 </%block>
 
-<%!
-from parks.templates.base_templates.functions import css_url
-stylesheet_files = css_url(string='all_paks.css')
-%>
-
 <%block name="content">
     <div id="park-name">
         <h1>All parks</h1>
