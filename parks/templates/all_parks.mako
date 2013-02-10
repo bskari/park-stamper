@@ -1,5 +1,5 @@
-<%inherit file="base_templates/base.mako"/>
-<%namespace module="parks.templates.base_templates.functions" name="base"/>
+<%inherit file="base/base.mako"/>
+<%namespace module="parks.templates.base.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('All parks')}

@@ -1,8 +1,8 @@
-<%inherit file="base_templates/base.mako"/>
-<%namespace module="parks.templates.base_templates.functions" name="base"/>
+<%inherit file="base/base.mako"/>
+<%namespace module="parks.templates.base.functions" name="base"/>
 
 <%!
-from parks.templates.base_templates.functions import css_url
+from parks.templates.base.functions import css_url
 stylesheet_files = [css_url(string='home.css')]
 inline_script = "\
     $('#park-carousel').carousel({'interval': 5000, 'cycle': true});\

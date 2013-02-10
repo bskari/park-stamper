@@ -1,7 +1,7 @@
 <%! script_files = [] %>
 <%! inline_script = '' %>
 <%! stylesheet_files = [] %>
-<%namespace module="parks.templates.base_templates.functions" name="base"/>
+<%namespace module="parks.templates.base.functions" name="base"/>
 <!DOCTYPE html>
 <html>
 	<head>

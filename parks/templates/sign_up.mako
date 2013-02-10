@@ -1,5 +1,5 @@
-<%inherit file="base_templates/base.mako"/>
-<%namespace module="parks.templates.base_templates.functions" name="base"/>
+<%inherit file="base/base.mako"/>
+<%namespace module="parks.templates.base.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('Sign up')}
@@ -10,7 +10,7 @@ ${base.title_string('Sign up')}
 </%block>
 
 <%!
-from parks.templates.base_templates.functions import css_url
+from parks.templates.base.functions import css_url
 stylesheet_files = [css_url(string='park.css')]
 %>
 

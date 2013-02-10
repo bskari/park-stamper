@@ -1,20 +1,20 @@
-<%inherit file="base_templates/base.mako"/>
-<%namespace module="parks.templates.base_templates.functions" name="base"/>
+<%inherit file="base/base.mako"/>
+<%namespace module="parks.templates.base.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('Nearby stamps')}
 </%block>
 
 <%!
-from parks.templates.base_templates.functions import css_url
-from parks.templates.base_templates.functions import css_lib_url
+from parks.templates.base.functions import css_url
+from parks.templates.base.functions import css_lib_url
 stylesheet_files = [
     css_url(string='nearby.css'),
     css_lib_url(string='tablesorter.css'),
 ]
 
-from parks.templates.base_templates.functions import js_url
-from parks.templates.base_templates.functions import js_lib_url
+from parks.templates.base.functions import js_url
+from parks.templates.base.functions import js_lib_url
 script_files = [
     js_url(string='nearby.js'),
     js_lib_url(string='jquery.tablesorter.min.js'),

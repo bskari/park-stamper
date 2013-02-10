@@ -1,6 +1,6 @@
-<%inherit file="base_templates/base.mako"/>
-<%namespace module="parks.templates.base_templates.functions" name="base"/>
-<%namespace file="/base_templates/stamp_info.mako" name="stamp_info"/>
+<%inherit file="base/base.mako"/>
+<%namespace module="parks.templates.base.functions" name="base"/>
+<%namespace file="/base/stamp_info.mako" name="stamp_info"/>
 
 <%block name="title">
 % if stamp_location.description is None:
@@ -11,7 +11,7 @@
 </%block>
 
 <%!
-from parks.templates.base_templates.functions import css_url
+from parks.templates.base.functions import css_url
 stylesheet_files = [css_url(string='stamp_location.css')]
 %>
 
