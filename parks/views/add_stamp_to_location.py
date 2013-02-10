@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 
@@ -38,11 +37,8 @@ def add_stamp_to_location(request):
                 render_dict.update(error=str(e))
 
     url = request.route_url('add-stamp-to-location')
-    parks = park_logic.get_all_park_names()
-    parks_json_string = json.dumps(parks).replace("'", "\\'")
     render_dict.update(
         add_stamp_to_location_post_url=url,
-        parks_json_string=parks_json_string,
         stamp_locations_url=request.route_url('stamp-locations-json'),
         stamps_url=request.route_url('stamps-substring-json'),
     )

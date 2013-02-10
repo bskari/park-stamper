@@ -13,7 +13,7 @@ goog.require('parkStamper.util.message.popError');
  *  csrfToken: string
  * }} Initialization parameters.
  *   parkInputElement - jQuery element that the user will type park name into
- *   parks - JSON string of park names
+ *   parksJsonUrl - URL from where to load JSON string of park names
  *   stampLocationsUrl - URL to load the stamp locations from
  *   csrfToken - string
  */
@@ -36,23 +36,33 @@ parkStamper.newStamp.init = function(parameters) {
         );
     }
 
-    // TODO(bskari|2013-01-18) This should be loaded asynchronously to speed
-    // initial page loading
-    var parks = JSON.parse(parameters.parks);
-    parkStamper.newStamp.parkInput.autocomplete({
-        source: parks,
-        delay: 100,
-        minLength: 3,
-        select: function(_, ui) {
-            parkStamper.newStamp.updateStampLocations(ui.item.value);
-        }
-    });
+    $.getJSON(
+        parameters.parksJsonUrl,
+        {csrf_token: parkStamper.newStamp.csrfToken},
+        parkStamper.newStamp.loadParkJson
+    );
 
     // We need to call back on both select and change, because the user might
     // not use the autocomplete form
     parkStamper.newStamp.parkInput.change(function(eventObject) {
         parkStamper.newStamp.updateStampLocations(eventObject.target.value);
     });
+};
+
+
+parkStamper.newStamp.loadParkJson = function(data) {
+    if (data.success) {
+       parkStamper.newStamp.parkInput.autocomplete({
+            source: data.parkNames,
+            delay: 100,
+            minLength: 3,
+            select: function(_, ui) {
+                parkStamper.newStamp.updateStampLocations(ui.item.value);
+            }
+        });
+    } else {
+        parkStamper.util.message.popError('Unable to load park name suggestions');
+    }
 };
 
 

@@ -1,35 +1,38 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('Add stamp to location')}
 </%block>
 
-<%block name="stylesheets">
-##<link rel="stylesheet" href="${base.css_url('new_stamp.css')}">
-    <link rel="stylesheet" href="${base.css_lib_url('jquery-ui.css')}">
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_lib_url
+stylesheet_files = [css_lib_url(string='jquery-ui.css')]
 
-<%block name="javascript_includes">
-    <script type="text/javascript" src="${base.js_url('add_stamp_to_location.js')}"></script>
-</%block>
+from parks.templates.base_templates.functions import js_url
+script_files = [js_url(string='add_stamp_to_location.js')]
 
-<%block name="inline_javascript">
-    var parameters = {
-        parkInput: "#park",
-        stampLocationSelect: "#location",
-        stampInput: "#stamp-text",
-        stampSelect: "#stamp",
-## Use ' instead of " because the JSON returned by Pyramid uses "
-        parks: '${parks_json_string | n}',
-        stampLocationsUrl: "${stamp_locations_url}",
-        stampsUrl: "${stamps_url}",
-        csrfToken: "${csrf_token}"
-    };
-    parkStamper.addStampToLocation.init(parameters);
-</%block>
+inline_script = "\
+    var parameters = {\
+        parkInput: '#park',\
+        stampLocationSelect: '#location',\
+        stampInput: '#stamp-text',\
+        stampSelect: '#stamp',\
+        parksJsonUrl: $('#parks-json-url')[0].value,\
+        stampLocationsUrl: $('#stamp-locations-url')[0].value,\
+        stampsUrl: $('#stamps-url')[0].value,\
+        csrfToken: $('#csrf-token')[0].value\
+    };\
+    parkStamper.addStampToLocation.init(parameters);\
+";
+%>
 
 <%block name="content">
+    <input type="hidden" id="parks-json-url" value="${request.route_url('park-names-json')}">
+    <input type="hidden" id="stamp-locations-url" value="${stamp_locations_url}">
+    <input type="hidden" id="stamps-url" value="${stamps_url}">
+    <input type="hidden" id="csrf-token" value="${csrf_token}">
+
     <h1>Add stamp to location</h1>
     <p>Found a stamp at a location?</p>
 

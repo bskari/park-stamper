@@ -1,32 +1,40 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('Nearby stamps')}
 </%block>
 
-<%block name="stylesheets">
-    <link rel="stylesheet" href="${base.css_url('nearby.css')}">
-    <link rel="stylesheet" href="${base.css_lib_url('tablesorter.css')}">
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_url
+from parks.templates.base_templates.functions import css_lib_url
+stylesheet_files = [
+    css_url(string='nearby.css'),
+    css_lib_url(string='tablesorter.css'),
+]
 
-<%block name="javascript_includes">
-    <script type="text/javascript" src="${base.js_url('nearby.js')}"></script>
-    <script type="text/javascript" src="${base.js_lib_url('jquery.tablesorter.min.js')}"></script>
-</%block>
+from parks.templates.base_templates.functions import js_url
+from parks.templates.base_templates.functions import js_lib_url
+script_files = [
+    js_url(string='nearby.js'),
+    js_lib_url(string='jquery.tablesorter.min.js'),
+]
 
-<%block name="inline_javascript">
-    var parameters = {
-        'table': $('#stamps-table'),
-        'loadingElement': $('#loading-stamps'),
-        'nearbyUrl': 'nearby.json',
-        'distance': $('#distance'),
-        'csrfToken': '${csrf_token}'
-    };
-    parkStamper.nearby.init(parameters);
-</%block>
+inline_script = "\
+    var parameters = {\
+        'table': $('#stamps-table'),\
+        'loadingElement': $('#loading-stamps'),\
+        'nearbyUrl': 'nearby.json',\
+        'distance': $('#distance'),\
+        'csrfToken': $('#csrf-token')[0].value\
+    };\
+    parkStamper.nearby.init(parameters);\
+"
+%>
 
 <%block name="content">
+    <input type="hidden" id="csrf-token" value="${csrf_token}">
+
     <h1>Nearby stamps</h1>
 
     <div class="row">

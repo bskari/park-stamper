@@ -1,5 +1,5 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 <%namespace file="/base_templates/stamp_info.mako" name="stamp_info"/>
 
 <%block name="title">
@@ -10,9 +10,10 @@
 % endif
 </%block>
 
-<%block name="stylesheets">
-<link rel="stylesheet" href="${base.css_url('stamp_location.css')}">
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_url
+stylesheet_files = [css_url(string='stamp_location.css')]
+%>
 
 <%block name="content">
     <div id="description">
@@ -24,6 +25,7 @@
 
     <div class="row">
         <div id="stamp-info" class="span9">
-            ${stamp_info.stamps_table(stamps)}
+            ${stamp_info.stamps_table(stamps, request)}
         </div>
+    </div>
 </%block>

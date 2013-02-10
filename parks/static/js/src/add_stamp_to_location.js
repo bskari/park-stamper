@@ -10,7 +10,7 @@ goog.require('parkStamper.util.message.popError');
  *  stampLocationSelect: string,
  *  stampInput: string,
  *  stampSelect: string,
- *  parks: string,
+ *  parksJsonUrl: string,
  *  stampLocationsUrl: string,
  *  stampsUrl: string,
  *  csrfToken: string
@@ -27,12 +27,12 @@ parkStamper.addStampToLocation.init = function(parameters) {
     // the back button, their browser will remember its enabled state, so make
     // sure that it's always disabled. Well, unless the park input is already
     // populated; then we just need to populate the stamp locations.
-    var parkInputElement = $(parameters.parkInput);
-    if (parkInputElement[0].value === '') {
+    parkStamper.addStampToLocation.parkInputElement = $(parameters.parkInput);
+    if (parkStamper.addStampToLocation.parkInputElement[0].value === '') {
         parkStamper.addStampToLocation.stampLocationSelect.attr('disabled', '');
     } else {
         parkStamper.addStampToLocation.updateStampLocations(
-            parkInputElement[0].value
+            parkStamper.addStampToLocation.parkInputElement[0].value
         );
     }
 
@@ -45,17 +45,11 @@ parkStamper.addStampToLocation.init = function(parameters) {
         );
     }
 
-    // TODO(bskari|2013-02-03) This should be loaded asynchronously to speed
-    // initial page loading
-    var parks = JSON.parse(parameters.parks);
-    parkInputElement.autocomplete({
-        source: parks,
-        delay: 100,
-        minLength: 3,
-        select: function(_, ui) {
-            parkStamper.addStampToLocation.updateStampLocations(ui.item.value);
-        }
-    });
+    $.getJSON(
+        parameters.parksJsonUrl,
+        {csrf_token: parkStamper.addStampToLocation.csrfToken},
+        parkStamper.addStampToLocation.loadParkJson
+    );
 
     // I'm not using this as an autocomplete field, but rather as a delayed
     // input that triggers population of a select element. It's a hack, but I
@@ -68,11 +62,27 @@ parkStamper.addStampToLocation.init = function(parameters) {
 
     // We need to call back on both select and change, because the user might
     // not use the autocomplete form
-    parkInputElement.change(function(eventObject) {
+    parkStamper.addStampToLocation.parkInputElement.change(function(eventObject) {
         parkStamper.addStampToLocation.updateStampLocations(eventObject.target.value);
     });
     // We don't do the same thing with #stamp because it's a jQuery UI
     // Autocomplete element and it does its own updating
+};
+
+
+parkStamper.addStampToLocation.loadParkJson = function(data) {
+    if (data.success) {
+        parkStamper.addStampToLocation.parkInputElement.autocomplete({
+            source: data.parkNames,
+            delay: 100,
+            minLength: 3,
+            select: function(_, ui) {
+                parkStamper.addStampToLocation.updateStampLocations(ui.item.value);
+            }
+        });
+    } else {
+        parkStamper.util.message.popError('Unable to load park name suggestions');
+    }
 };
 
 

@@ -1,13 +1,13 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 
-<%block name="stylesheets">
-<link rel="stylesheet" href="${base.css_url('home.css')}">
-</%block>
-
-<%block name="inline_javascript">
-$('#park-carousel').carousel({'interval': 5000, 'cycle': true});
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_url
+stylesheet_files = [css_url(string='home.css')]
+inline_script = "\
+    $('#park-carousel').carousel({'interval': 5000, 'cycle': true});\
+"
+%>
 
 <%block name="content">
 

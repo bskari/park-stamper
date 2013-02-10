@@ -14,6 +14,3 @@ class NewStampUnitTest(IntegrationTestBase):
         # Post URL should be pointing here
         self.assertIn('url', page.keys())
         self.assertEqual(page['url'], request.route_url('new-stamp'))
-
-        # TODO(bskari|2013-02-02) Create some park data
-        self.assertIn('parks_json_string', page.keys())

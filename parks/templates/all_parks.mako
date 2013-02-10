@@ -1,13 +1,14 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('All parks')}
 </%block>
 
-<%block name="stylesheets">
-##<link rel="stylesheet" href="${base.css_url('all_parks.css')}">
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_url
+stylesheet_files = css_url(string='all_paks.css')
+%>
 
 <%block name="content">
     <div id="park-name">

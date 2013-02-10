@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config
@@ -47,11 +46,8 @@ def new_stamp_location(request):
                 render_dict.update(error=str(e))
 
     new_stamp_location_url = request.route_url('new-stamp-location')
-    parks = park_logic.get_all_park_names()
-    parks_json_string = json.dumps(parks).replace("'", "\\'")
     render_dict.update(
         url=new_stamp_location_url,
-        parks_json_string=parks_json_string,
     )
 
     return render_dict

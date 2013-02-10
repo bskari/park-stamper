@@ -37,3 +37,10 @@ def park(request):
         stamp_locations=stamp_locations,
     )
     return render_context
+
+
+@view_config(route_name='park-names-json', renderer='json')
+def park_names_json(request):
+    """Returns a JSON list of all of the park names."""
+    park_names = park_logic.get_all_park_names()
+    return dict(success=True, parkNames=park_names)

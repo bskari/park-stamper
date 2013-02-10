@@ -1,7 +1,6 @@
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config
-import json
 from sqlalchemy.orm.exc import NoResultFound
 from transaction import manager
 
@@ -37,11 +36,8 @@ def new_stamp(request):
                 render_dict.update(error=str(e))
 
     new_stamp_url = request.route_url('new-stamp')
-    parks = park_logic.get_all_park_names()
-    parks_json_string = json.dumps(parks).replace("'", "\\'")
     render_dict.update(
         url=new_stamp_url,
-        parks_json_string=parks_json_string,
     )
 
     return render_dict

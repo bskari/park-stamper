@@ -1,14 +1,15 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 <%namespace file="/base_templates/stamp_info.mako" name="stamp_info"/>
 
 <%block name="title">
 ${base.title_string(park.name)}
 </%block>
 
-<%block name="stylesheets">
-<link rel="stylesheet" href="${base.css_url('park.css')}">
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_url
+stylesheet_files = [css_url(string='park.css')]
+%>
 
 <%block name="content">
     <div id="park-name">
@@ -38,7 +39,7 @@ ${base.title_string(park.name)}
     <h3>Stamps</h3>
     <div class="row">
         <div id="stamp-info" class="span9">
-            ${stamp_info.stamps_table(stamps)}
+            ${stamp_info.stamps_table(stamps, request)}
         </div>
     </div>
 </%block>
@@ -54,9 +55,9 @@ ${base.title_string(park.name)}
             ## This is a huge potential XSS attack. I'm not sure how to do this
             ## correctly, so... let's do a poor man's check.
             % if stamp_location.address is not None and '<' not in stamp_location.address:
-                ${stamp_location.address.replace('\n', '<br>') | n}</th>
+                ${stamp_location.address.replace('\n', '<br>') | n}
             % else:
-                ${blank_if_none(stamp_location.address)}</th>
+                ${blank_if_none(stamp_location.address)}
             %endif
         </th>
         <th class="stamp-location">${blank_if_none(stamp_location.latitude)} ${blank_if_none(stamp_location.longitude)}</th>

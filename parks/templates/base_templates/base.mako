@@ -1,3 +1,7 @@
+<%! script_files = [] %>
+<%! inline_script = '' %>
+<%! stylesheet_files = [] %>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -6,10 +10,10 @@
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="${css_url('custom.css')}">
+        <link rel="stylesheet" href="${base.css_url('custom.css')}">
         <link href="http://fonts.googleapis.com/css?family=Merriweather:bold" rel="stylesheet" type="text/css">
         <link href="http://fonts.googleapis.com/css?family=Open%20Sans" rel="stylesheet" type="text/css">
-        <%block name="stylesheets"/>
+        ${insert_stylesheet_files()}
         <title>
             <%block name="title">
                 Park Stamper
@@ -63,7 +67,8 @@
                                 </li>
                             % endif
                         </ul>
-                    </div><!--/.nav-collapse -->
+                    ## close nav-collapse div
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,7 +112,7 @@
         <script type="text/javascript" src="/static/js/lib/closure-library/closure/goog/base.js"></script>
         <script type="text/javascript" src="/static/js/deps.js"></script>
         <script type="text/javascript" src="/static/js/lib/jquery.backstretch.min.js"></script>
-        <%block name="javascript_includes"/>
+        ${self.insert_script_files()}
         <script type="text/javascript">
             $(document).ready(function() {
                 ## Background
@@ -124,13 +129,11 @@
                 ## Email
                 var email = '(gro.' + 'irzks' + '@nodnzrb)';
                 document.getElementById('email-span').innerHTML = email.replace(/z/g, 'a');
-                <%block name="inline_javascript"/>
+                ${self.insert_inline_script()}
             });
         </script>
     </body>
 </html>
-
-<%def name="title_string(string)">${string} - Park Stamper</%def>
 
 <%def name="footer()">
     <footer class="footer">
@@ -143,7 +146,42 @@
     </footer>
 </%def>
 
-<%def name="css_url(string)">/static/css/${string}</%def>
-<%def name="css_lib_url(string)">/static/css/lib/${string}</%def>
-<%def name="js_url(string)">/static/js/src/${string}</%def>
-<%def name="js_lib_url(string)">/static/js/lib/${string}</%def>
+<%def name="insert_inline_script()">
+<%
+    all_inline_script = ''
+    t = self
+    ## Traverse the inheritance tree to get all the inline script definitions
+    while t:
+        all_inline_script += getattr(t.module, 'inline_script', '') + '\n'
+        t = t.inherits
+%>
+${all_inline_script | n}
+</%def>
+
+<%def name="insert_script_files()">
+<%
+    all_script_files = []
+    t = self
+    ## Traverse the inheritance tree to get all the inline script definitions
+    while t:
+        all_script_files += getattr(t.module, 'script_files', [])
+        t = t.inherits
+%>
+% for script_file in all_script_files:
+    <script src="${script_file}" type="text/javascript"></script>
+% endfor
+</%def>
+
+<%def name="insert_stylesheet_files()">
+<%
+    all_stylesheet_files = []
+    t = self
+    ## Traverse the inheritance tree to get all the inline script definitions
+    while t:
+        all_stylesheet_files += getattr(t.module, 'stylesheet_files', [])
+        t = t.inherits
+%>
+% for stylesheet_file in all_stylesheet_files:
+    <link rel="stylesheet" href="${stylesheet_file}">
+% endfor
+</%def>

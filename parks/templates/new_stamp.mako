@@ -1,31 +1,34 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('New stamp')}
 </%block>
 
-<%block name="stylesheets">
-##<link rel="stylesheet" href="${base.css_url('new_stamp.css')}">
-    <link rel="stylesheet" href="${base.css_lib_url('jquery-ui.css')}">
-</%block>
+<%!
+from parks.templates.base_templates.functions import css_lib_url
+stylesheet_files = [css_lib_url(string='jquery-ui.css')]
 
-<%block name="javascript_includes">
-    <script type="text/javascript" src="${base.js_url('new_stamp.js')}"></script>
-</%block>
+from parks.templates.base_templates.functions import js_url
+script_files = [js_url(string='new_stamp.js')]
 
-<%block name="inline_javascript">
-    var parameters = {
-        parkInputElement: $('#park'),
-        stampLocationSelect: $('#location'),
-        parks: '${parks_json_string | n}',
-        stampLocationsUrl: "${request.route_url('stamp-locations-json')}",
-        csrfToken: '${csrf_token}'
-    };
-    parkStamper.newStamp.init(parameters);
-</%block>
+inline_script = "\
+    var parameters = {\
+        parkInputElement: $('#park'),\
+        stampLocationSelect: $('#location'),\
+        parksJsonUrl: $('#parks-json-url')[0].value,\
+        stampLocationsUrl: $('#stamp-locations-url')[0].value,\
+        csrfToken: $('#csrf-token')[0].value\
+    };\
+    parkStamper.newStamp.init(parameters);\
+"
+%>
 
 <%block name="content">
+    <input type="hidden" id="parks-json-url" value="${request.route_url('park-names-json')}">
+    <input type="hidden" id="stamp-locations-url" value="${request.route_url('stamp-locations-json')}">
+    <input type="hidden" id="csrf-token" value="${csrf_token}">
+
     <h1>New stamp</h1>
     <p>Found a new stamp, eh? Tell me more!</p>
 

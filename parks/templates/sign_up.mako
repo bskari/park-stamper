@@ -1,5 +1,5 @@
 <%inherit file="base_templates/base.mako"/>
-<%namespace file="/base_templates/base.mako" name="base"/>
+<%namespace module="parks.templates.base_templates.functions" name="base"/>
 
 <%block name="title">
 ${base.title_string('Sign up')}
@@ -8,6 +8,11 @@ ${base.title_string('Sign up')}
 <%block name="stylesheets">
 <link rel="stylesheet" href="${base.css_url('park.css')}">
 </%block>
+
+<%!
+from parks.templates.base_templates.functions import css_url
+stylesheet_files = [css_url(string='park.css')]
+%>
 
 <%block name="content">
     <form action="${url}" method="post">
