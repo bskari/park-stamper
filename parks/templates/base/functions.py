@@ -21,6 +21,9 @@ def css_lib_url(context=None, string=''):
     """Generate the URL for library CSS."""
     return _return_or_write(context, '/static/css/lib/' + string)
 
+def include_css_lib(context=None, string=''):
+    return _return_or_write(context, '<link rel="stylesheet" type="text/css" href="' + css_lib_url(string=string) + '">"')
+
 def js_url(context=None, string=''):
     """Generate the URL for ParkStamper JS."""
     return _return_or_write(context, '/static/js/src/' + string)

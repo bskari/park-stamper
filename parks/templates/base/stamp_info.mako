@@ -14,19 +14,9 @@
             ${_stamp_row(stamp, most_recent_collection_time)}
         % endfor
     </table>
-</%def>
-
-<%def name="inline_script()">
-var parameters = {
-    'collectStampUrl': 'test',
-    'rowSelector': 'table[name=stamps] tbody tr',
-    'csrfToken': $('#csrf-token')[0].value
-};
-parkStamper.collectStamp.init(parameters);
-</%def>
-
-<%def name="script_files()">
-${functions.include_js('collect_stamp.js')}
+    <div id="date-picker-modal-dialog" title="Date stamp was collected">
+        <input type="text" id="date-picker">
+    </div>
 </%def>
 
 <%def name="_stamp_row(stamp, most_recent_collection_time)">
@@ -43,11 +33,13 @@ ${functions.include_js('collect_stamp.js')}
 
         <td>${stamp.status}</td>
 
-        % if most_recent_collection_time is not None:
-            <td>${most_recent_collection_time.strftime('%Y-%m-%d')}</td>
-        % else:
-            <td>Never</td>
-        % endif
+        <td>
+            % if most_recent_collection_time is not None:
+                ${most_recent_collection_time.strftime('%Y-%m-%d')}
+            % else:
+                Never
+            % endif
+        </td>
 
         <td>
             <input type="hidden" value="${stamp.id}">
@@ -62,4 +54,18 @@ ${functions.include_js('collect_stamp.js')}
             </a>
         </td>
     </tr>
+</%def>
+
+<%def name="inline_script()">
+var parameters = {
+    'collectStampUrl': 'test',
+    'rowSelector': 'table[name=stamps] tbody tr',
+    'dateModalDialogSelector': '#date-picker-modal-dialog',
+    'csrfToken': $('#csrf-token')[0].value
+};
+parkStamper.collectStamp.init(parameters);
+</%def>
+
+<%def name="script_files()">
+${functions.include_js('collect_stamp.js')}
 </%def>
