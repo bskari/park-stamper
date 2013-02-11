@@ -1,17 +1,18 @@
 <%inherit file="base/base.mako"/>
-<%namespace module="parks.templates.base.functions" name="base"/>
+<%namespace module="parks.templates.base.functions" name="functions"/>
 <%namespace file="/base/stamp_info.mako" name="stamp_info"/>
 
 <%block name="title">
-${base.title_string(park.name)}
+${functions.title_string(park.name)}
 </%block>
 
-<%!
-from parks.templates.base.functions import css_url
-stylesheet_files = [css_url(string='park.css')]
-%>
+<%def name="stylesheet_files()">
+${functions.include_css('park.css')}
+</%def>
 
 <%block name="content">
+    ${functions.hidden_value(id='csrf-token', value=csrf_token)}
+
     <div id="park-name">
         <h1>${park.name}</h1>
     </div>
