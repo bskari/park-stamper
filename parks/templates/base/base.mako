@@ -1,3 +1,6 @@
+<%! script_files = [] %>
+<%! inline_script = '' %>
+<%! stylesheet_files = [] %>
 <%namespace module="parks.templates.base.functions" name="base"/>
 <!DOCTYPE html>
 <html>
@@ -143,26 +146,66 @@
     </footer>
 </%def>
 
+
 <%def name="insert_inline_script()">
+## Iterate over the namespaces that aren't in the inheritance hierarchy
 % for ns in context.namespaces.values():
     % if hasattr(ns, 'inline_script'):
         ${ns.inline_script()}
     % endif
 % endfor
+## Iterate over files in the inheritance hierarchy
+<%
+    all_inline_script = ''
+    t = self
+    ## Traverse the inheritance tree to get all the inline script definitions
+    while t:
+        all_inline_script += getattr(t.module, 'inline_script', '') + '\n'
+        t = t.inherits
+%>
+${all_inline_script | n}
 </%def>
 
+
 <%def name="insert_script_files()">
+## Iterate over the namespaces that aren't in the inheritance hierarchy
 % for ns in context.namespaces.values():
     % if hasattr(ns, 'script_files'):
         ${ns.script_files()}
     % endif
 % endfor
+## Iterate over files in the inheritance hierarchy
+<%
+    all_script_files = []
+    t = self
+    ## Traverse the inheritance tree to get all the inline script definitions
+    while t:
+        all_script_files += getattr(t.module, 'script_files', [])
+        t = t.inherits
+%>
+% for script_file in all_script_files:
+    <script src="${script_file}" type="text/javascript"></script>
+% endfor
 </%def>
 
+
 <%def name="insert_stylesheet_files()">
+## Iterate over the namespaces that aren't in the inheritance hierarchy
 % for ns in context.namespaces.values():
     % if hasattr(ns, 'stylesheet_files'):
         ${ns.stylesheet_files()}
     % endif
+% endfor
+## Iterate over files in the inheritance hierarchy
+<%
+    all_stylesheet_files = []
+    t = self
+    ## Traverse the inheritance tree to get all the inline script definitions
+    while t:
+        all_stylesheet_files += getattr(t.module, 'stylesheet_files', [])
+        t = t.inherits
+%>
+% for stylesheet_file in all_stylesheet_files:
+    <link rel="stylesheet" href="${stylesheet_file}">
 % endfor
 </%def>
