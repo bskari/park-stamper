@@ -26,12 +26,15 @@ parkStamper.collectStamp.init = function(parameters) {
 
     parkStamper.collectStamp.dateModalDialog.dialog({
         height: 100,
-        modal: true,
         autoOpen: false
     });
-    parkStamper.collectStamp.dateModalDialog.find(
+    var datePicker = parkStamper.collectStamp.dateModalDialog.find(
         'input[type=text]'
-    ).datepicker();
+    );
+    datePicker.datepicker({
+        onSelect: parkStamper.collectStamp.sendCollectStampRequest,
+        dateFormat: 'yy-mm-dd'
+    });
 };
 
 
@@ -51,26 +54,44 @@ parkStamper.collectStamp.setUpButtons = function(_, td) {
 };
 
 
+/**
+ * Show the date picker dialog modal.
+ */
 parkStamper.collectStamp.showDatePicker = function(eventObject) {
     'use strict';
     parkStamper.collectStamp.dateModalDialog.dialog('open');
-    parkStamper.collectStamp.dateModalDialog.find('input[type=text]').datepicker();
+
+    // Save the stamp ID so that we can send it once the user selects a date
+    var cell = $(eventObject.currentTarget).parent();
+    parkStamper.collectStamp.stampId = cell.find('input[type=hidden]')[0].value;
 };
 
-foo = function() {
-    var cell = $(eventObject.currentTarget).parent();
 
-    var stampId = cell.find('input[type=hidden]')[0].value;
-    var data = {stampId: stampId};
+parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
+    'use strict';
+    var data = {
+        stampId: parkStamper.collectStamp.stampId,
+        date: dateText,
+        csrftoken: parkStamper.collectStamp.csrfToken
+    };
     // TODO make the endpoint of this POST
-    alert('POSTing ' + JSON.stringify(data) + ' to ' + parkStamper.collectStamp.collectStampUrl);
-    return;
     $.post(
         parkStamper.collectStamp.collectStampUrl,
         data,
         parkStamper.collectStamp.sendCollectStampRequestSuccess
+    ).fail(
+        function() {
+            parkStamper.util.message.popError(
+                'There was an error communicating with the server. Please try again later.'
+            );
+        }
+    ).always(
+        function() {
+            parkStamper.collectStamp.dateModalDialog.dialog('close');
+        }
     );
 };
+
 
 parkStamper.collectStamp.sendCollectStampRequestSuccess = function(
     data,
