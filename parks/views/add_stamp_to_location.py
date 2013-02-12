@@ -49,11 +49,11 @@ def add_stamp_to_location(request):
 @view_config(route_name='stamps-substring-json', renderer='json')
 def stamps_json(request):
     """Returns a JSON list of stamps that begin with the word in the
-    'stamp_text' parameter. The returned JSON includes the stamp's text and
+    'stampText' parameter. The returned JSON includes the stamp's text and
     the stamp's ID. Example:
     [{text: "Yellowstone NP Visitor Center", id: 83}]
     """
-    partial_stamp = request.GET.get('stamp_text', None)
+    partial_stamp = request.GET.get('stampText', None)
     if partial_stamp is None:
         return dict(success=False, error='No stamp text sent.')
 

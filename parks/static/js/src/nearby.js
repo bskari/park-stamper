@@ -65,18 +65,18 @@ parkStamper.nearby.loadNearbyStampInformation = function() {
     tbody.hide();
 
     var data = {
-        'latitude': parkStamper.nearby.latitude,
-        'longitude': parkStamper.nearby.longitude,
-        'distance': parkStamper.nearby.distance.val(),
-        'csrf_token': parkStamper.nearby.csrfToken
+        latitude: parkStamper.nearby.latitude,
+        longitude: parkStamper.nearby.longitude,
+        distance: parkStamper.nearby.distance.val(),
+        csrfToken: parkStamper.nearby.csrfToken
     };
     $.ajax(
         parkStamper.nearby.nearbyUrl,
         {
-            'data': data,
-            'datatype': 'json',
-            'success': parkStamper.nearby.createStampRows,
-            'error': parkStamper.nearby.nearbyErrorCallback
+            data: data,
+            datatype: 'json',
+            success: parkStamper.nearby.createStampRows,
+            error: parkStamper.nearby.nearbyErrorCallback
         }
     );
 };

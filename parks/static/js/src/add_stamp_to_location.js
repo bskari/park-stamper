@@ -47,7 +47,7 @@ parkStamper.addStampToLocation.init = function(parameters) {
 
     $.getJSON(
         parameters.parksJsonUrl,
-        {csrf_token: parkStamper.addStampToLocation.csrfToken},
+        {csrfToken: parkStamper.addStampToLocation.csrfToken},
         parkStamper.addStampToLocation.loadParkJson
     );
 
@@ -101,7 +101,7 @@ parkStamper.addStampToLocation.updateStampLocations = function(parkName) {
 
     var data = {
         park: parkName,
-        csrf_token: parkStamper.addStampToLocation.csrfToken
+        csrfToken: parkStamper.addStampToLocation.csrfToken
     };
     $.ajax(
         parkStamper.addStampToLocation.stampLocationsUrl,
@@ -218,8 +218,8 @@ parkStamper.addStampToLocation.updateStamps = function(request, callback) {
     parkStamper.addStampToLocation.updateStamps.lastUpdateName = stampText;
 
     var data = {
-        stamp_text: request.term,
-        csrf_token: parkStamper.addStampToLocation.csrfToken
+        stampText: request.term,
+        csrfToken: parkStamper.addStampToLocation.csrfToken
     };
     $.ajax(
         parkStamper.addStampToLocation.stampsUrl,

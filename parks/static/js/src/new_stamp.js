@@ -80,7 +80,7 @@ parkStamper.newStamp.updateStampLocations = function(parkName) {
 
     var data = {
         park: parkName,
-        csrf_token: parkStamper.newStamp.csrfToken
+        csrfToken: parkStamper.newStamp.csrfToken
     };
     $.ajax(
         parkStamper.newStamp.stampLocationsUrl,

@@ -64,7 +64,7 @@ def csrf_validation_event(event):
     validation fails.
     """
     request = event.request
-    csrf_token = request.params.get('csrf_token')
+    csrf_token = request.params.get('csrfToken')
     if (request.method == 'POST' or request.is_xhr) and \
         (csrf_token != unicode(request.session.get_csrf_token())):
             raise HTTPUnauthorized
