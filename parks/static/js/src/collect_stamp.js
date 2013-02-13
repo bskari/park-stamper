@@ -64,6 +64,9 @@ parkStamper.collectStamp.showDatePicker = function(eventObject) {
     // Save the stamp ID so that we can send it once the user selects a date
     var cell = $(eventObject.currentTarget).parent();
     parkStamper.collectStamp.stampId = cell.find('input[type=hidden]')[0].value;
+
+    // Save the button so we can disable it on success
+    parkStamper.collectStamp.clickedButton = $(eventObject.currentTarget);
 };
 
 
@@ -72,20 +75,28 @@ parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
     var data = {
         stampId: parkStamper.collectStamp.stampId,
         date: dateText,
-        csrftoken: parkStamper.collectStamp.csrfToken
+        csrfToken: parkStamper.collectStamp.csrfToken
     };
-    // TODO make the endpoint of this POST
-    $.post(
-        parkStamper.collectStamp.collectStampUrl,
-        data,
-        parkStamper.collectStamp.sendCollectStampRequestSuccess
-    ).fail(
-        function() {
-            parkStamper.util.message.popError(
-                'There was an error communicating with the server. Please try again later.'
-            );
-        }
-    ).always(
+
+    $.ajax({
+        type: 'POST',
+        url: parkStamper.collectStamp.collectStampUrl,
+        data: data,
+        success: parkStamper.collectStamp.sendCollectStampRequestSuccess,
+        error: function(_1, _2, errorThrown) {
+            if (errorThrown == 'Unauthorized') {
+                parkStamper.util.message.popError(
+                    'Sorry, you need to logged in collect stamps.'
+                );
+            } else {
+                parkStamper.util.message.popError(
+                    'There was an error receiving your request. Please try again later.'
+                );
+                console.log(_1 + ':' + _2 + ':' + errorThrown);
+            }
+        },
+        dataType: 'json'
+    }).always(
         function() {
             parkStamper.collectStamp.dateModalDialog.dialog('close');
         }
@@ -98,5 +109,8 @@ parkStamper.collectStamp.sendCollectStampRequestSuccess = function(
     textStatus,
     jqXHR
 ) {
-    alert('Success');
+    parkStamper.collectStamp.clickedButton.removeClass('btn-primary');
+    parkStamper.collectStamp.clickedButton.addClass('btn-disabled');
+    parkStamper.collectStamp.clickedButton.off('click');
+    parkStamper.collectStamp.clickedButton.attr('title', 'Stamp marked as collected!');
 };

@@ -58,7 +58,7 @@
 
 <%def name="inline_script()">
 var parameters = {
-    'collectStampUrl': 'test',
+    'collectStampUrl': "${request.route_url('collect-stamp')}",
     'rowSelector': 'table[name=stamps] tbody tr',
     'dateModalDialogSelector': '#date-picker-modal-dialog',
     'csrfToken': $('#csrf-token')[0].value
