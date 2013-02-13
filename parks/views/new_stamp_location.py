@@ -14,7 +14,9 @@ from parks.logic import user as user_logic
 def new_stamp_location(request):
     render_dict = {}
 
-    if 'form.submitted' in request.params:
+    # TODO(bskari|2013-02-13) Using this endpoint for both GET and POST is
+    # really ugly
+    if request.method == 'POST' and 'form.submitted' in request.params:
         park_name = request.params.get('park', None)
         description = request.params.get('description', None)
         address = request.params.get('address', None)

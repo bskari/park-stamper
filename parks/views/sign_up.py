@@ -11,7 +11,7 @@ from parks.models import UserEmail
 def sign_up(request):
     sign_up_url = request.route_url('sign-up')
     referrer = request.url
-    came_from = request.params.get('came_from', referrer)
+    came_from = request.params.get('came-from', referrer)
     if came_from == sign_up_url:
         # Never use the sign_up_url form itself as came_from
         came_from = request.route_url('home')

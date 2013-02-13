@@ -12,7 +12,7 @@ from parks.logic.security import check_login_and_get_username
 def log_in(request):
     login_url = request.route_url('log-in')
     referrer = request.url
-    came_from = request.params.get('came_from', referrer)
+    came_from = request.params.get('came-from', referrer)
     if came_from == login_url:
         # Never use the login form itself as came_from
         came_from = request.route_url('home')
