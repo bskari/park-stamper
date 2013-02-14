@@ -46,6 +46,9 @@
             <a class="btn btn-small btn-primary collect-stamp" href="#" title="Add this stamp to your collection!">
                 <i class="icon-ok icon-white"></i>
             </a>
+            <div class="loading" style="display:none;">
+                <img src="${request.static_url('Parks:images/throbber.gif')}">
+            </div>
             <a class="btn btn-small btn-primary edit-stamp" href="#" title="Edit this stamp">
                 <i class="icon-edit icon-white"></i>
             </a>
@@ -61,6 +64,7 @@ var parameters = {
     'collectStampUrl': "${request.route_url('collect-stamp')}",
     'rowSelector': 'table[name=stamps] tbody tr',
     'dateModalDialogSelector': '#date-picker-modal-dialog',
+    'loadingSelector': '.loading',
     'csrfToken': $('#csrf-token')[0].value
 };
 parkStamper.collectStamp.init(parameters);

@@ -20,6 +20,7 @@ parkStamper.collectStamp.init = function(parameters) {
     parkStamper.collectStamp.dateModalDialog = $(
         parameters.dateModalDialogSelector
     );
+    parkStamper.collectStamp.loadingSelector = parameters.loadingSelector;
     parkStamper.collectStamp.csrfToken = parameters.csrfToken;
 
     $(parameters.rowSelector).each(parkStamper.collectStamp.setUpButtons);
@@ -59,6 +60,13 @@ parkStamper.collectStamp.setUpButtons = function(_, td) {
  */
 parkStamper.collectStamp.showDatePicker = function(eventObject) {
     'use strict';
+    eventObject.preventDefault();
+
+    // Don't let the user get too click happy
+    if (parkStamper.collectStamp.sendingRequest) {
+        return;
+    }
+
     parkStamper.collectStamp.dateModalDialog.dialog('open');
 
     // Save the stamp ID so that we can send it once the user selects a date
@@ -70,8 +78,20 @@ parkStamper.collectStamp.showDatePicker = function(eventObject) {
 };
 
 
+/**
+ * Sends the stamp collection request to the server.
+ */
 parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
     'use strict';
+    parkStamper.collectStamp.sendingRequest = true;
+
+    parkStamper.collectStamp.dateModalDialog.dialog('close');
+    parkStamper.collectStamp.clickedButton.hide();
+    var throbber = parkStamper.collectStamp.clickedButton.parent().find(
+        parkStamper.collectStamp.loadingSelector
+    );
+    throbber.css('display', 'inline-block');
+
     var data = {
         stampId: parkStamper.collectStamp.stampId,
         date: dateText,
@@ -96,21 +116,29 @@ parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
             }
         },
         dataType: 'json'
-    }).always(
-        function() {
-            parkStamper.collectStamp.dateModalDialog.dialog('close');
+    }).always(function() {
+            parkStamper.collectStamp.clickedButton.show();
+            throbber.hide();
+            parkStamper.collectStamp.sendingRequest = false;
         }
     );
 };
 
 
+/**
+ * Called when the stamp collection POST request succeeds.
+ */
 parkStamper.collectStamp.sendCollectStampRequestSuccess = function(
     data,
     textStatus,
     jqXHR
 ) {
-    parkStamper.collectStamp.clickedButton.removeClass('btn-primary');
-    parkStamper.collectStamp.clickedButton.addClass('btn-disabled');
-    parkStamper.collectStamp.clickedButton.off('click');
-    parkStamper.collectStamp.clickedButton.attr('title', 'Stamp marked as collected!');
+    if (data.success === false) {
+        parkStamper.util.message.popError(data.error);
+    } else {
+        parkStamper.collectStamp.clickedButton.removeClass('btn-primary');
+        parkStamper.collectStamp.clickedButton.addClass('btn-disabled');
+        parkStamper.collectStamp.clickedButton.off('click');
+        parkStamper.collectStamp.clickedButton.attr('title', 'Stamp marked as collected!');
+    }
 };

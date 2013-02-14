@@ -4,7 +4,9 @@ from pyramid.view import view_config
 #from parks.logic import stamp_collection as stamp_collection_logic
 
 
-@view_config(route_name='collect-stamp', renderer='json', permission='edit')
+# Don't decorate this with permission='edit' because otherwise it will try to
+# redirect users to a log in page and the JS will get confused
+@view_config(route_name='collect-stamp', renderer='json')
 def collect_stamp(request):
     if request.method != 'POST':
         return dict(success=False)

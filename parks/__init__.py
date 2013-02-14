@@ -69,7 +69,7 @@ def csrf_validation_event(event):
     # dashed-names) so just try both.
     csrf_token = request.params.get('csrfToken', None)
     if csrf_token is None:
-        csrf_token = request.params.get('csrf_token', None)
+        csrf_token = request.params.get('csrf-token', None)
 
     if (request.method == 'POST' or request.is_xhr) and \
         (csrf_token != unicode(request.session.get_csrf_token())):
