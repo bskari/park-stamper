@@ -6,12 +6,15 @@ goog.require('parkStamper.util.message.popError');
 
 /**
  * Initialization function.
- * @param {{collectStampUrl: string, buttonSelector: string, csrfToken: string,
- *  dateModalDialogSelector: string}} Initialization parameters.
+ * @param {{collectStampUrl: string, rowSelector: string,
+ *  dateModalDialogSelector: string, loadingSelector: string,
+ *  parkIdSelector: string, csrfToken: string}} Initialization parameters.
  *   collectStampUrl - URL to send the stamp collection information to
  *   rowSelector- CSS selector for the stamp rows that have collection and
  *    edit buttons
- *   dateModalSelector - CSS selector for the date modal dialog
+ *   dateModalDialogSelector - CSS selector for the date modal dialog
+ *   loadingSelector - CSS selector for the date modal dialog
+ *   parkIdSelector - CSS selector for hidden input with the park's ID
  *   csrfToken - string
  */
 parkStamper.collectStamp.init = function(parameters) {
@@ -21,6 +24,7 @@ parkStamper.collectStamp.init = function(parameters) {
         parameters.dateModalDialogSelector
     );
     parkStamper.collectStamp.loadingSelector = parameters.loadingSelector;
+    parkStamper.collectStamp.parkId = $(parameters.parkIdSelector)[0].value;
     parkStamper.collectStamp.csrfToken = parameters.csrfToken;
 
     $(parameters.rowSelector).each(parkStamper.collectStamp.setUpButtons);
@@ -34,7 +38,8 @@ parkStamper.collectStamp.init = function(parameters) {
     );
     datePicker.datepicker({
         onSelect: parkStamper.collectStamp.sendCollectStampRequest,
-        dateFormat: 'yy-mm-dd'
+        dateFormat: 'yy-mm-dd',
+        maxDate: 0 // 0 => today
     });
 };
 
@@ -94,6 +99,7 @@ parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
 
     var data = {
         stampId: parkStamper.collectStamp.stampId,
+        parkId: parkStamper.collectStamp.parkId,
         date: dateText,
         csrfToken: parkStamper.collectStamp.csrfToken
     };

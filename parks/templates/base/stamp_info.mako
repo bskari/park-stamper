@@ -1,6 +1,7 @@
 <%namespace module="parks.templates.base.functions" name="functions"/>
 
-<%def name="stamps_table(stamps, request)">
+<%def name="stamps_table(stamps, park_id, request)">
+    <input type="hidden" id="park-id" value="${park_id}">
     <table class="table table-striped table-condensed" name="stamps">
         <thead>
             <tr>
@@ -65,6 +66,7 @@ var parameters = {
     'rowSelector': 'table[name=stamps] tbody tr',
     'dateModalDialogSelector': '#date-picker-modal-dialog',
     'loadingSelector': '.loading',
+    'parkIdSelector': '#park-id',
     'csrfToken': $('#csrf-token')[0].value
 };
 parkStamper.collectStamp.init(parameters);

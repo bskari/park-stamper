@@ -15,7 +15,7 @@ from parks.models import StampToLocation
 def get_stamps_by_park_id(park_id):
     max_time_subquery = DBSession.query(
         StampCollection.stamp_id.label('stamp_id'),
-        func.max(StampCollection.time_collected).label('most_recent_time'),
+        func.max(StampCollection.date_collected).label('most_recent_time'),
     ).group_by(
         StampCollection.stamp_id
     ).subquery()
@@ -46,7 +46,7 @@ def get_nearby_stamps(latitude, longitude, distance_miles):
 
     max_time_subquery = DBSession.query(
         StampCollection.stamp_id.label('stamp_id'),
-        func.max(StampCollection.time_collected).label('most_recent_time'),
+        func.max(StampCollection.date_collected).label('most_recent_time'),
     ).join(
         Stamp
     ).group_by(

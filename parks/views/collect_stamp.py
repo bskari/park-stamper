@@ -1,7 +1,8 @@
+import datetime
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config
 
-#from parks.logic import stamp_collection as stamp_collection_logic
+from parks.logic import stamp_collection as stamp_collection_logic
 
 
 # Don't decorate this with permission='edit' because otherwise it will try to
@@ -14,8 +15,27 @@ def collect_stamp(request):
     render_dict = {}
 
     stamp_id = request.params.get('stampId', None)
+    park_id = request.params.get('parkId', None)
+    date = request.params.get('date', None)
+    if date is not None:
+        try:
+            # Date is formatted like: "2013-02-13"
+            year = int(date[0:4])
+            month = int(date[5:7])
+            day = int(date[8:10])
+            date = datetime.date(year=year, month=month, day=day)
+
+            # TODO(bskari|2013-02-15) Deal with timezones.
+            if date > datetime.date.today():
+                return dict(
+                    success=False,
+                    error="You can't collect stamps in the future!",
+                )
+        except:
+            date = None
     user_id = authenticated_userid(request)
-    if stamp_id is None:
+
+    if stamp_id is None or park_id is None or date is None:
         render_dict.update(
             success=False,
             error='There was an error submitting that information.',
@@ -27,7 +47,12 @@ def collect_stamp(request):
         )
     else:
         try:
-            pass
+            stamp_collection_logic.collect_stamp(
+                user_id=user_id,
+                stamp_id=stamp_id,
+                park_id=park_id,
+                date=date
+            )
         except ValueError, e:
             render_dict.update(success=False, error=str(e))
         else:

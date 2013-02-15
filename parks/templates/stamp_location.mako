@@ -25,7 +25,7 @@ stylesheet_files = [css_url(string='stamp_location.css')]
 
     <div class="row">
         <div id="stamp-info" class="span9">
-            ${stamp_info.stamps_table(stamps, request)}
+            ${stamp_info.stamps_table(stamps, park.id, request)}
         </div>
     </div>
 </%block>

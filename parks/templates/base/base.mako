@@ -1,7 +1,7 @@
 <%! script_files = [] %>
 <%! inline_script = '' %>
 <%! stylesheet_files = [] %>
-<%namespace module="parks.templates.base.functions" name="base"/>
+<%namespace module="parks.templates.base.functions" name="functions"/>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -10,7 +10,7 @@
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="${base.css_url('custom.css')}">
+        <link rel="stylesheet" href="${functions.css_url('custom.css')}">
         <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.0/themes/redmond/jquery-ui.css">
 ##        <link href="http://fonts.googleapis.com/css?family=Merriweather:bold" rel="stylesheet" type="text/css">
 ##        <link href="http://fonts.googleapis.com/css?family=Open%20Sans" rel="stylesheet" type="text/css">
@@ -100,6 +100,8 @@
                     ${info}
                 </div>
             % endif
+
+            ${functions.hidden_value(id='csrf-token', value=csrf_token)}
 
             <%block name="content"/>
         </div>

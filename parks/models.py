@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date
 from bcrypt import gensalt
 from bcrypt import hashpw
 from sqlalchemy import CheckConstraint
@@ -30,7 +31,7 @@ class User(Base):
     username = Column(String(32), unique=True, nullable=False)
     password = Column(String(60), nullable=False) # 60 is length of bcrypt hashes
     signup_ip = Column(Integer(unsigned=True), nullable=False) # TODO(2012-10-27) support IPv6
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, username, password, signup_ip):
         self.username = username
@@ -48,7 +49,7 @@ class UserEmail(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, user, email):
         if isinstance(user, int):
@@ -120,7 +121,7 @@ class Park(Base):
     CheckConstraint('latitude >= -90 and latitude <= 90')
     longitude = Column(Float)
     CheckConstraint('longitude >= -90 and longitude <= 90')
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     date_founded = Column(Date)
     region = Column(Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA'), nullable=False)
     type = Column(Enum(*get_park_types().keys()))
@@ -156,7 +157,7 @@ class Stamp(Base):
     __tablename__ = 'stamp'
     id = Column(Integer, primary_key=True)
     text = Column(String(255), nullable=False)
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     type = Column(Enum('normal', 'bonus'), nullable=False)
     status = Column(Enum('active', 'lost', 'archived'), nullable=False)
     added_by_user_id = Column(Integer, ForeignKey('user.id'))
@@ -173,8 +174,8 @@ class StampCollection(Base):
     stamp_id = Column(Integer, ForeignKey('stamp.id'), nullable=False)
     park_id = Column(Integer, ForeignKey('park.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    time_collected = Column(DateTime, nullable=False, default=datetime.utcnow())
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    date_collected = Column(Date, nullable=False, default=date.today)
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 
 class StampLocation(Base):
@@ -189,7 +190,7 @@ class StampLocation(Base):
     longitude = Column(Float)
     CheckConstraint('longitude >= -180 and longitude <= 180')
     added_by_user_id = Column(Integer, ForeignKey('user.id'))
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 # Index by longitude first because the US is more wide than it is tall.
 # I don't know if that will even matter, considering that longitude is
@@ -214,7 +215,7 @@ class StampToLocation(Base):
         nullable=False,
     )
     UniqueConstraint('stamp_id', 'stamp_location_id')
-    time_created = Column(DateTime, nullable=False, default=datetime.utcnow())
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
 
 class OperatingHours(Base):

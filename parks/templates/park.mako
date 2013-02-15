@@ -11,8 +11,6 @@ ${functions.include_css('park.css')}
 </%def>
 
 <%block name="content">
-    ${functions.hidden_value(id='csrf-token', value=csrf_token)}
-
     <div id="park-name">
         <h1>${park.name}</h1>
     </div>
@@ -40,7 +38,7 @@ ${functions.include_css('park.css')}
     <h3>Stamps</h3>
     <div class="row">
         <div id="stamp-info" class="span9">
-            ${stamp_info.stamps_table(stamps, request)}
+            ${stamp_info.stamps_table(stamps, park.id, request)}
         </div>
     </div>
 </%block>
