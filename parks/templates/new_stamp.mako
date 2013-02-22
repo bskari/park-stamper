@@ -39,7 +39,7 @@ inline_script = "\
     <br>
 
     <form action="${url}" method="post">
-        <input type="hidden" name="csrf_token" value="${csrf_token}">
+        <input type="hidden" name="csrf-token" value="${csrf_token}">
 
         <label for="location">
             Stamp location

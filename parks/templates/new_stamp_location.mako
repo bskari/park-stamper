@@ -60,7 +60,7 @@ inline_script = "\
         <input type="number" name="longitude" id="longitude">
         <br>
 
-        <input type="hidden" name="csrf_token" value="${csrf_token}">
+        <input type="hidden" name="csrf-token" value="${csrf_token}">
 
         <input type="submit" name="form.submitted" value="Add Location" class="btn">
     </form>
