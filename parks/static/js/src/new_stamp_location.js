@@ -21,7 +21,7 @@ parkStamper.newStampLocation.init = function(parameters) {
 
     $.getJSON(
         parameters.parksJsonUrl,
-        {csrf_token: parkStamper.newStampLocation.csrfToken},
+        {csrfToken: parkStamper.newStampLocation.csrfToken},
         parkStamper.newStampLocation.loadParkJson
     );
 };
