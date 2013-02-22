@@ -13,6 +13,7 @@ import urllib2
 from pyramid.paster import get_appsettings
 from pyramid.paster import setup_logging
 from sqlalchemy import engine_from_config
+from sqlalchemy.types import String
 
 from parks.models import Base
 from parks.models import DBSession
@@ -1479,6 +1480,23 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, u'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
+    if engine.driver == 'mysqldb':
+        # MySQL does case insensitive compares for most things, but stamp text
+        # needs to be case sensitive
+        cursor = engine.raw_connection().cursor()
+        # MySQL can't do case sensitive UTF8 collation because, well, it's
+        # hard. Different countries and locales have different orderings, so
+        # the best we can do is just do binary, which is probably fine.
+        text_column = Stamp.text.property.columns[0]
+        assert isinstance(text_column.type, String)
+        cursor.execute(
+            'ALTER TABLE {table} MODIFY {column} {type} ({length}) COLLATE utf8_bin'.format(
+                table=Stamp.__tablename__,
+                column=text_column.name,
+                type='VARCHAR', # Default used by SQLAlchemy for String
+                length=text_column.type.length,
+            )
+        )
 
     states = load_states()
 
