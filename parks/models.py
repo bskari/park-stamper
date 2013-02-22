@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import date
 from bcrypt import gensalt
 from bcrypt import hashpw
+from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -30,7 +31,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(32), unique=True, nullable=False)
     password = Column(String(60), nullable=False) # 60 is length of bcrypt hashes
-    signup_ip = Column(Integer(unsigned=True), nullable=False) # TODO(2012-10-27) support IPv6
+    # We could use an unsigned integer here, but it's deprecated
+    signup_ip = Column(BigInteger, nullable=False) # TODO(2012-10-27) support IPv6
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, username, password, signup_ip):

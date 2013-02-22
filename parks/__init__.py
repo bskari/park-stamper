@@ -32,6 +32,7 @@ def main(global_config, **settings):
     authn_policy = AuthTktAuthenticationPolicy(
         'b5kUolGpl79YxIWqzaNKedhtv7yEi7c6lAcbdBYi',
         callback=group_finder,
+        hashalg='sha512',
     )
     config.set_authentication_policy(authn_policy)
     authz_policy = ACLAuthorizationPolicy()
