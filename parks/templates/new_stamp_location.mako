@@ -14,9 +14,12 @@ script_files = [js_url(string='new_stamp_location.js')]
 
 inline_script = "\
     var parameters = {\
-        parkInputElement: $('#park'),\
-        parksJsonUrl: $('#parks-json-url')[0].value,\
-        csrfToken: $('#csrf-token')[0].value\
+        parkInputSelector: '#park',\
+        parksJsonUrlSelector: '#parks-json-url',\
+        loadPositionSelector: '#load-position',\
+        latitudeSelector: '#latitude',\
+        longitudeSelector: '#longitude',\
+        csrfTokenSelector: '#csrf-token'\
     };\
     parkStamper.newStampLocation.init(parameters);\
 "
@@ -45,7 +48,8 @@ inline_script = "\
         <label for="address">
             Address (optional)
         </label>
-        <input type="text" name="address" id="address">
+        <textarea name="address" id="address">
+        </textarea>
         <br>
 
         <label for="latitude">
@@ -60,8 +64,12 @@ inline_script = "\
         <input type="number" name="longitude" id="longitude">
         <br>
 
+        <input type="submit" id="load-position" value="Fill in current location information" class="btn">
+        <br>
+        <br>
+
         <input type="hidden" name="csrf-token" value="${csrf_token}">
 
-        <input type="submit" name="form.submitted" value="Add Location" class="btn">
+        <input type="submit" name="new-stamp-location" value="Add Location" class="btn btn-primary">
     </form>
 </%block>
