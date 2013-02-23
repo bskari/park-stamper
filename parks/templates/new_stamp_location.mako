@@ -63,9 +63,12 @@ inline_script = "\
         <input type="number" name="longitude" id="longitude">
         <br>
 
-        <input type="submit" id="load-position" value="Fill in current location information" class="btn">
-        <br>
-        <br>
+        ${base.show_if_mobile(
+            request.user_agent,
+            '<input type="submit" id="load-position" value="Fill in current location information" class="btn">'
+            '<br>'
+            '<br>'
+        )}
 
         <input type="hidden" name="csrf-token" value="${csrf_token}">
 

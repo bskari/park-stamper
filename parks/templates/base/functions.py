@@ -44,3 +44,10 @@ def title_string(context=None, string=''):
 
 def blank_if_none(context=None, string=''):
     return _return_or_write(context, '' if string is None else string)
+
+def show_if_mobile(context=None, user_agent='', markup=''):
+    import re
+    mobile_regex = 'Android|webOS|iPhone|BlackBerry'
+    if re.search(mobile_regex, user_agent) is None:
+        return _return_or_write(context, '')
+    return _return_or_write(context, markup)
