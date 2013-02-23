@@ -36,6 +36,7 @@ def check_login_and_get_username(login, password):
     is a user with those credentials, returns that user's username.
     """
     possible_logins = DBSession.query(
+        User.id,
         User.username,
         User.password,
     ).outerjoin(
@@ -53,4 +54,4 @@ def check_login_and_get_username(login, password):
         return None
     login = possible_logins[0]
     if login.password == hashpw(password, login.password):
-        return login.username
+        return login.id

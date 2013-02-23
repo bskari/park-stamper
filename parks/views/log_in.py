@@ -22,9 +22,9 @@ def log_in(request):
     if 'form.submitted' in request.params:
         login = request.params.get('login', None)
         password = request.params.get('password', None)
-        username = check_login_and_get_username(login, password)
-        if username is not None:
-            headers = remember(request, login)
+        user_id = check_login_and_get_username(login, password)
+        if user_id is not None:
+            headers = remember(request, user_id)
             # Redirect back to the page the user came from
             return HTTPFound(
                 location=came_from,

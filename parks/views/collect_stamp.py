@@ -25,8 +25,9 @@ def collect_stamp(request):
             day = int(date[8:10])
             date = datetime.date(year=year, month=month, day=day)
 
-            # TODO(bskari|2013-02-15) Deal with timezones.
-            if date > datetime.date.today():
+            # Give some wiggle room for timezone concerns
+            tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+            if date > tomorrow:
                 return dict(
                     success=False,
                     error="You can't collect stamps in the future!",
