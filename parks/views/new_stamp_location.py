@@ -99,7 +99,7 @@ def create_stamp_location(
             longitude = -longitude
 
         if isinstance(added_by_user, str) or isinstance(added_by_user, unicode):
-            added_by_user = user_logic.get_user_by_username(added_by_user).id
+            added_by_user = user_logic.get_user_by_username_or_email(added_by_user).id
 
         id_ = stamp_location_logic.create_new_stamp_location(
             park_id=park_id,

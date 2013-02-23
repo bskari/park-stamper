@@ -85,7 +85,7 @@ def create_stamp(location_id, text, user):
             )
 
         if isinstance(user, str) or isinstance(user, unicode):
-            user = user_logic.get_user_by_username(user).id
+            user = user_logic.get_user_by_username_or_email(user).id
 
         stamp_id = stamp_logic.create_new_stamp(text, 'normal', user)
         stamp_location_logic.add_stamp_to_location(stamp_id, location_id)

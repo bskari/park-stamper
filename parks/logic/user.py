@@ -1,10 +1,11 @@
 from collections import namedtuple
-from sqlalchemy import distinct
+from sqlalchemy.orm.exc import NoResultFound
 
 from parks.models import DBSession
 from parks.models import Park
 from parks.models import StampCollection
 from parks.models import User
+from parks.models import UserEmail
 
 
 def get_user_by_id(user_id):
@@ -15,12 +16,29 @@ def get_user_by_id(user_id):
     ).all()
 
 
-def get_user_by_username(username):
-    return DBSession.query(
+def get_user_by_username_or_email(username_or_email):
+    user = DBSession.query(
         User,
     ).filter(
-        User.username == username
-    ).one()
+        User.username == username_or_email
+    ).all()
+
+    if len(user) == 1:
+        return user[0]
+
+    user = DBSession.query(
+        User,
+    ).join(
+        UserEmail,
+        User.id == UserEmail.user_id
+    ).filter(
+        UserEmail.email == username_or_email
+    ).all()
+
+    if len(user) == 1:
+        return user[0]
+
+    raise NoResultFound('No user with that email or username was found')
 
 
 def get_recent_user_collections(limit):
