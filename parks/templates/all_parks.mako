@@ -29,14 +29,6 @@ ${base.title_string('All parks')}
     <tr>
         <th><a href="${request.route_url('park', park_url=park.url)}">${park.name}</th>
         <th>${park.region}</th>
-        <th>${blank_if_none(park.latitude)} ${blank_if_none(park.longitude)}</th>
+        <th>${base.blank_if_none(park.latitude)} ${base.blank_if_none(park.longitude)}</th>
     </tr>
-</%def>
-
-<%def name="blank_if_none(string)">
-    % if string is None:
-        &nbsp;
-    % else:
-        ${string}
-    % endif
 </%def>

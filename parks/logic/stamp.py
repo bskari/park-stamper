@@ -38,6 +38,32 @@ def get_stamps_by_park_id(park_id):
     ).all()
 
 
+def get_stamps_by_location_id(location_id):
+    max_time_subquery = DBSession.query(
+        StampCollection.stamp_id.label('stamp_id'),
+        func.max(StampCollection.date_collected).label('most_recent_time'),
+    ).group_by(
+        StampCollection.stamp_id
+    ).subquery()
+
+    return DBSession.query(
+        Stamp,
+        StampLocation,
+        max_time_subquery.c.most_recent_time,
+    ).join(
+        StampToLocation,
+    ).join(
+        StampLocation,
+    ).outerjoin(
+        max_time_subquery,
+        Stamp.id == max_time_subquery.c.stamp_id,
+    ).filter(
+        StampLocation.id == location_id,
+    ).group_by(
+        Stamp.id
+    ).all()
+
+
 def get_nearby_stamps(latitude, longitude, distance_miles):
     lower_latitude = latitude - (distance_miles / latitude_to_miles())
     upper_latitude = latitude + (distance_miles / latitude_to_miles())

@@ -14,14 +14,15 @@ script_files = [js_url(string='add_stamp_to_location.js')]
 
 inline_script = "\
     var parameters = {\
-        parkInput: '#park',\
-        stampLocationSelect: '#location',\
-        stampInput: '#stamp-text',\
-        stampSelect: '#stamp',\
-        parksJsonUrl: $('#parks-json-url')[0].value,\
-        stampLocationsUrl: $('#stamp-locations-url')[0].value,\
-        stampsUrl: $('#stamps-url')[0].value,\
-        csrfToken: $('#csrf-token')[0].value\
+        parkInputSelector: '#park',\
+        stampLocationSelector: '#location',\
+        stampInputSelector: '#stamp-text',\
+        stampSelector: '#stamp',\
+        parksJsonUrlSelector: '#parks-json-url',\
+        stampLocationsUrlSelector: '#stamp-locations-url',\
+        stampsUrlSelector: '#stamps-url',\
+        stampLocationIdSelector: '#stamp-location-id',\
+        csrfTokenSelector: '#csrf-token'\
     };\
     parkStamper.addStampToLocation.init(parameters);\
 ";
@@ -31,6 +32,7 @@ inline_script = "\
     <input type="hidden" id="parks-json-url" value="${request.route_url('park-names-json')}">
     <input type="hidden" id="stamp-locations-url" value="${stamp_locations_url}">
     <input type="hidden" id="stamps-url" value="${stamps_url}">
+    <input type="hidden" id="stamp-location-id" value="${stamp_location_id}">
     <input type="hidden" id="csrf-token" value="${csrf_token}">
 
     <h1>Add stamp to location</h1>
@@ -39,7 +41,11 @@ inline_script = "\
     <label for="park">
         Park
     </label>
-    <input type="text" name="park" id="park">
+    % if park_name is None:
+        <input type="text" name="park" id="park">
+    % else:
+        <input type="text" name="park" id="park" value="${park_name}">
+    % endif
     <br>
 
     <form action="${add_stamp_to_location_post_url}" method="post">
@@ -55,11 +61,11 @@ inline_script = "\
         <label for="stamp">
             Stamp
         </label>
-        <input type="text" name="stamp-text" id="stamp-text" placeholder="Start typing stamp here">
+        <input type="text" name="stamp-text" id="stamp-text" placeholder="Start typing stamp text here">
         <br>
         <select name="stamp" id="stamp"></select>
         <br>
 
-        <input type="submit" name="form.submitted" value="Add Stamp to Location" class="btn">
+        <input type="submit" name="add-stamp-to-location" value="Add Stamp to Location" class="btn">
     </form>
 </%block>

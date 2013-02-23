@@ -5,48 +5,58 @@ goog.require('parkStamper.util.message.popError');
 
 /**
  * Initialization function.
- * @param {
- *  parkInput: string
- *  stampLocationSelect: string,
- *  stampInput: string,
- *  stampSelect: string,
- *  parksJsonUrl: string,
- *  stampLocationsUrl: string,
- *  stampsUrl: string,
- *  csrfToken: string
+ * @param {{
+ *  parkInputSelector: string
+ *  stampLocationSelector: string,
+ *  stampInputSelector: string,
+ *  stampSelector: string,
+ *  parksJsonUrlSelector: string,
+ *  stampLocationsUrlSelector: string,
+ *  stampsUrlSelector: string,
+ *  stampLocationIdSelector: string,
+ *  csrfTokenSelector: string
+ * }} parameters Initialization parameters.
  */
 parkStamper.addStampToLocation.init = function(parameters) {
     'use strict';
-    parkStamper.addStampToLocation.stampLocationSelect = $(parameters.stampLocationSelect);
-    parkStamper.addStampToLocation.stampSelect = $(parameters.stampSelect);
-    parkStamper.addStampToLocation.stampLocationsUrl = parameters.stampLocationsUrl;
-    parkStamper.addStampToLocation.stampsUrl = parameters.stampsUrl;
-    parkStamper.addStampToLocation.csrfToken = parameters.csrfToken;
+    parkStamper.addStampToLocation.stampLocationSelect =
+        $(parameters.stampLocationSelector);
+    parkStamper.addStampToLocation.stampSelect = $(parameters.stampSelector);
+    parkStamper.addStampToLocation.stampLocationsUrl =
+        $(parameters.stampLocationsUrlSelector)[0].value;
+    parkStamper.addStampToLocation.stampsUrl =
+        $(parameters.stampsUrlSelector)[0].value;
+    parkStamper.addStampToLocation.stampLocationId =
+        $(parameters.stampLocationIdSelector)[0].value;
+    parkStamper.addStampToLocation.csrfToken =
+        $(parameters.csrfTokenSelector)[0].value;
 
     // The template should have this disabled by default, but if a user clicks
     // the back button, their browser will remember its enabled state, so make
     // sure that it's always disabled. Well, unless the park input is already
     // populated; then we just need to populate the stamp locations.
-    parkStamper.addStampToLocation.parkInputElement = $(parameters.parkInput);
-    if (parkStamper.addStampToLocation.parkInputElement[0].value === '') {
+    parkStamper.addStampToLocation.parkInputElement =
+        $(parameters.parkInputSelector);
+    var park = parkStamper.addStampToLocation.parkInputElement[0].value;
+    if (park === '') {
         parkStamper.addStampToLocation.stampLocationSelect.attr('disabled', '');
     } else {
-        parkStamper.addStampToLocation.updateStampLocations(
-            parkStamper.addStampToLocation.parkInputElement[0].value
-        );
+        parkStamper.addStampToLocation.updateStampLocations(park);
     }
 
-    var stampInputElement = $(parameters.stampInput);
-    if (stampInputElement[0].value === '') {
+    var stampInputElement = $(parameters.stampInputSelector);
+    var stamp = stampInputElement[0].value;
+    if (stamp === '') {
         parkStamper.addStampToLocation.stampSelect.attr('disabled', '');
     } else {
         parkStamper.addStampToLocation.updateStamps(
-            {term: stampInputElement[0].value}  // Fake jQuery UI imput
+            {term: stamp}  // Fake jQuery UI input
         );
     }
 
+    var parksJsonUrl = $(parameters.parksJsonUrlSelector)[0].value;
     $.getJSON(
-        parameters.parksJsonUrl,
+        parksJsonUrl,
         {csrfToken: parkStamper.addStampToLocation.csrfToken},
         parkStamper.addStampToLocation.loadParkJson
     );
@@ -62,26 +72,35 @@ parkStamper.addStampToLocation.init = function(parameters) {
 
     // We need to call back on both select and change, because the user might
     // not use the autocomplete form
-    parkStamper.addStampToLocation.parkInputElement.change(function(eventObject) {
-        parkStamper.addStampToLocation.updateStampLocations(eventObject.target.value);
-    });
+    parkStamper.addStampToLocation.parkInputElement.change(
+        function(eventObject) {
+            parkStamper.addStampToLocation.updateStampLocations(
+                eventObject.target.value
+            );
+        }
+    );
     // We don't do the same thing with #stamp because it's a jQuery UI
     // Autocomplete element and it does its own updating
 };
 
 
 parkStamper.addStampToLocation.loadParkJson = function(data) {
+    'use strict';
     if (data.success) {
         parkStamper.addStampToLocation.parkInputElement.autocomplete({
             source: data.parkNames,
             delay: 100,
             minLength: 3,
             select: function(_, ui) {
-                parkStamper.addStampToLocation.updateStampLocations(ui.item.value);
+                parkStamper.addStampToLocation.updateStampLocations(
+                    ui.item.value
+                );
             }
         });
     } else {
-        parkStamper.util.message.popError('Unable to load park name suggestions');
+        parkStamper.util.message.popError(
+            'Unable to load park name suggestions'
+        );
     }
 };
 
@@ -94,7 +113,8 @@ parkStamper.addStampToLocation.updateStampLocations = function(parkName) {
     'use strict';
     // There are multiple callbacks that might call this with the same value;
     // if we've already updated a park name, just ignore it
-    if (parkStamper.addStampToLocation.updateStampLocations.lastUpdateName === parkName) {
+    var l = parkStamper.addStampToLocation.updateStampLocations.lastUpdateName;
+    if (l === parkName) {
         return;
     }
     parkStamper.addStampToLocation.updateStampLocations.lastUpdateName = parkName;
@@ -118,21 +138,25 @@ parkStamper.addStampToLocation.updateStampLocations = function(parkName) {
 /**
  * Loads a request for the stamp locations at a given park.
  * Success callback for Ajax request for nearby stamp information.
- * @param {
+ * @param {{
  *  success: boolean,
  *  stampLocations: {
  *   location: string,
  *   id: number
  *  }
- * } data Stamp location information.
+ * }} data Stamp location information.
  * @param {string} textStatus Status of the Ajax request.
  */
 parkStamper.addStampToLocation.populateStampLocations = function(data, textStatus) {
     'use strict';
 
-    function makeInput(text, value) {
+    function makeInput(text, value, selected) {
         'use strict';
-        return $('<option value="' + value + '">' + text + '</option>');
+        var selectedText = '';
+        if (selected === true) {
+            selectedText = 'selected';
+        }
+        return $('<option value="' + value + '" ' + selectedText + '>' + text + '</option>');
     }
 
     parkStamper.addStampToLocation.stampLocationSelect.attr('disabled', '');
@@ -143,8 +167,11 @@ parkStamper.addStampToLocation.populateStampLocations = function(data, textStatu
 
         for (var stampLocationIndex in data.stampLocations) {
             var stampLocation = data.stampLocations[stampLocationIndex];
+            var sli = parkStamper.addStampToLocation.stampLocationId;
+            var stampLocationIdString = '' + stampLocation.id;
+            var selected = (stampLocationIdString === sli);
             parkStamper.addStampToLocation.stampLocationSelect.append(
-                makeInput(stampLocation.location, stampLocation.id)
+                makeInput(stampLocation.location, stampLocation.id, selected)
             );
         }
 
@@ -176,7 +203,9 @@ parkStamper.addStampToLocation.stampLocationErrorCallback = function(
     errorThrown
 ) {
     'use strict';
-    console.log('XHR failed: ' + textStatus + ' ' + errorThrown);
+    if (console && console.log) {
+        console.log('XHR failed: ' + textStatus + ' ' + errorThrown);
+    }
     parkStamper.util.message.popError(
         'Unable to load stamp locations: ' + textStatus + ' ' + errorThrown
     );
@@ -205,7 +234,7 @@ parkStamper.addStampToLocation.stampErrorCallback = function(
 /**
  * Sends a request for the stamps starting with a given string and updates the
  * stamp dropdown field.
- * @param {request: {term: string}} Start of the stamp's text.
+ * @param {{request: {term: string}}} Start of the stamp's text.
  */
 parkStamper.addStampToLocation.updateStamps = function(request, callback) {
     'use strict';
@@ -241,10 +270,11 @@ parkStamper.addStampToLocation.updateStamps = function(request, callback) {
 
 /**
  * Updates the options in the stamp select dropdown.
- * @param {success: boolean, stamps [{text: string, id: string}]} data Stamp
+ * @param {{success: boolean, stamps [{text: string, id: string}]}} data Stamp
  *  information.
  */
 parkStamper.addStampToLocation.populateStampSelect = function(data) {
+    'use strict';
     parkStamper.addStampToLocation.stampSelect.attr('disabled', '');
 
     function makeInput(text, value) {

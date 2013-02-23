@@ -24,7 +24,7 @@ def stamp_location(request):
             )
         )
 
-    stamps = stamp_logic.get_stamps_by_park_id(park.id)
+    stamps = stamp_logic.get_stamps_by_location_id(stamp_location_id)
 
     render_context = dict()
 

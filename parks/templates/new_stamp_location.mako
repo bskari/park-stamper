@@ -48,8 +48,7 @@ inline_script = "\
         <label for="address">
             Address (optional)
         </label>
-        <textarea name="address" id="address">
-        </textarea>
+        <textarea name="address" id="address"></textarea>
         <br>
 
         <label for="latitude">

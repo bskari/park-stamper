@@ -41,3 +41,6 @@ def hidden_value(context=None, id='', value=''):
 
 def title_string(context=None, string=''):
     return _return_or_write(context, string + ' - Park Stamper')
+
+def blank_if_none(context=None, string=''):
+    return _return_or_write(context, '' if string is None else string)

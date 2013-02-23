@@ -24,7 +24,10 @@ parkStamper.collectStamp.init = function(parameters) {
         parameters.dateModalDialogSelector
     );
     parkStamper.collectStamp.loadingSelector = parameters.loadingSelector;
-    parkStamper.collectStamp.parkId = $(parameters.parkIdSelector)[0].value;
+    var parkIdInputs = $(parameters.parkIdSelector);
+    if (parkIdInputs.length !== 0) {
+        parkStamper.collectStamp.parkId = parkIdInputs[0].value;
+    }
     parkStamper.collectStamp.csrfToken = parameters.csrfToken;
 
     $(parameters.rowSelector).each(parkStamper.collectStamp.setUpButtons);
@@ -88,6 +91,19 @@ parkStamper.collectStamp.showDatePicker = function(eventObject) {
  */
 parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
     'use strict';
+
+    var undefined;
+    // This might happen if the inheriting template doesn't call the template
+    // function to create the table (and the hidden input with the park ID),
+    // but the client still manages to somehow send a stamp collection request
+    if (parkStamper.collectStamp.parkId === undefined) {
+        parkStamper.util.message.popError(
+            'There was an error on my end processing your request; sorry'
+            + ' about that.'
+        );
+        return;
+    }
+
     parkStamper.collectStamp.sendingRequest = true;
 
     parkStamper.collectStamp.dateModalDialog.dialog('close');

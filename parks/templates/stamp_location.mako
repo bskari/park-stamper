@@ -25,7 +25,17 @@ stylesheet_files = [css_url(string='stamp_location.css')]
 
     <div class="row">
         <div id="stamp-info" class="span9">
-            ${stamp_info.stamps_table(stamps, park.id, request)}
+            % if len(stamps) == 0:
+                <p>
+                    There doesn't seem to be any stamps here. Would you like to
+                    <a href="${request.route_url(
+                        'add-stamp-to-location',
+                        _query={'stamp-location-id': stamp_location.id}
+                    )}">add some stamps to this location</a>?
+                </p>
+            % else:
+                ${stamp_info.stamps_table(stamps, park.id, request)}
+            % endif
         </div>
     </div>
 </%block>
