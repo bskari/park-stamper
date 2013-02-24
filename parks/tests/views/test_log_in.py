@@ -59,7 +59,7 @@ class LogInUnitTest(IntegrationTestBase):
         )
         page = log_in(request)
         self.assertIn('came_from', page.keys())
-        self.assertEqual(page['came_from'], original_url)
+        self._assert_equal_urls(page['came_from'], original_url)
 
         # Check the referrer URL
         request = testing.DummyRequest()
@@ -97,3 +97,10 @@ class LogInUnitTest(IntegrationTestBase):
         }
         response = log_in(request)
         self.assertIn('error', response.keys())
+
+    def _assert_equal_urls(self, url1, url2):
+        self.assertTrue(
+            url1 == url2
+            or url1 + '/' == url2
+            or url1 == url2 + '/'
+        )

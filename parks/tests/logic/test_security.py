@@ -2,7 +2,7 @@ from pyramid import testing
 from transaction import manager
 
 from parks.logic.security import group_finder
-from parks.logic.security import check_login_and_get_username
+from parks.logic.security import check_login_and_get_user_id
 from parks.models import User
 from parks.models import UserEmail
 from parks.tests.integration_test_base import IntegrationTestBase
@@ -58,18 +58,24 @@ class SecurityTestCase(IntegrationTestBase):
 
         self._delete_user()
 
-    def test_check_login_and_get_username(self):
+    def test_check_login_and_get_user_id(self):
         self._create_user()
         # Email and username should both work for logging in
-        username = check_login_and_get_username(self.email, self.password)
-        self.assertEqual(self.username, username)
-        username = check_login_and_get_username(self.username, self.password)
-        self.assertEqual(self.username, username)
+        user_id = check_login_and_get_user_id(self.email, self.password)
+        self.assertEqual(self.user_id, user_id)
+        user_id = check_login_and_get_user_id(self.username, self.password)
+        self.assertEqual(self.user_id, user_id)
 
         # Failed logins
-        username = check_login_and_get_username(self.email, 'bad password')
-        self.assertIs(username, None)
-        username = check_login_and_get_username(self.username, 'bad password')
-        self.assertEqual(username, None)
+        user_id = check_login_and_get_user_id(self.email, 'bad password')
+        self.assertIs(user_id, None)
+        user_id = check_login_and_get_user_id(self.username, 'bad password')
+        self.assertEqual(user_id, None)
+        user_id = check_login_and_get_user_id('notexist', self.password)
+        self.assertIs(user_id, None)
+        user_id = check_login_and_get_user_id('not@exist.com', self.password)
+        self.assertEqual(user_id, None)
+        user_id = check_login_and_get_user_id('not@exist.com', 'bad password')
+        self.assertEqual(user_id, None)
 
         self._delete_user()

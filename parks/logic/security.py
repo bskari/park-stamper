@@ -32,7 +32,7 @@ def group_finder(username, request):
         return None
 
 
-def check_login_and_get_username(login, password):
+def check_login_and_get_user_id(login, password):
     """Checks a provided login (either username or email address) and if there
     is a user with those credentials, returns that user's username.
     """
