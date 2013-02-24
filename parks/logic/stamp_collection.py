@@ -37,6 +37,8 @@ def get_recent_collections_by_user_id(user_id, days_ago):
         StampCollection.user_id == user_id
     ).filter(
         StampCollection.date_collected >= from_date
+    ).order_by(
+        StampCollection.date_collected.desc()
     ).all()
 
     return recent

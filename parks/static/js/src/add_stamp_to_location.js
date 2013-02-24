@@ -79,8 +79,13 @@ parkStamper.addStampToLocation.init = function(parameters) {
             );
         }
     );
-    // We don't do the same thing with #stamp because it's a jQuery UI
+    // We don't do the same thing with #stamp-text because it's a jQuery UI
     // Autocomplete element and it does its own updating
+
+    parkStamper.addStampToLocation.stampSelect.multiselect({
+        selectedText: '# of # stamps selected',
+        noneSelectedText: 'Select stamps'
+    });
 };
 
 
@@ -294,6 +299,11 @@ parkStamper.addStampToLocation.populateStampSelect = function(data) {
         }
 
         parkStamper.addStampToLocation.stampSelect.removeAttr('disabled');
+        parkStamper.addStampToLocation.stampSelect.multiselect('refresh');
+        parkStamper.addStampToLocation.stampSelect.multiselect('enable');
+        parkStamper.addStampToLocation.stampSelect.multiselect('open');
+        // I've tried to do this in stylesheets, but it doesn't work
+        $('.ui-multiselect-menu').css('width', '500px');
 
     } else {
         var undefined;

@@ -13,19 +13,25 @@ def add_stamp_to_location(request):
 
     if 'add-stamp-to-location' in request.params:
         stamp_location_id = request.params.get('location', None)
-        stamp_id = request.params.get('stamp', None)
-        if stamp_location_id is None or stamp_id is None:
+        stamp_ids = request.params.getall('stamp')
+
+        if stamp_location_id is None:
             render_dict.update(
                 error='There was an error submitting that information.'
             )
+        elif len(stamp_ids) == 0:
+            render_dict.update(
+                error='Please select some stamps.'
+            )
         else:
-
             try:
                 stamp_location_id = int(stamp_location_id)
-                stamp_location_logic.add_stamp_to_location(
-                    stamp_id,
-                    stamp_location_id
-                )
+                for stamp_id in stamp_ids:
+                    stamp_id = int(stamp_id)
+                    stamp_location_logic.add_stamp_to_location(
+                        stamp_id,
+                        stamp_location_id
+                    )
                 stamp_location = stamp_location_logic.get_stamp_location_by_id(
                     stamp_location_id
                 )

@@ -7,10 +7,19 @@ ${base.title_string('Add stamp to location')}
 
 <%!
 from parks.templates.base.functions import css_lib_url
-stylesheet_files = [css_lib_url(string='jquery-ui.css')]
+from parks.templates.base.functions import css_url
+stylesheet_files = [
+    css_lib_url(string='jquery-ui.css'),
+    css_lib_url(string='jquery.multiselect.css'),
+    css_url(string='add_stamp_to_location.css'),
+]
 
+from parks.templates.base.functions import js_lib_url
 from parks.templates.base.functions import js_url
-script_files = [js_url(string='add_stamp_to_location.js')]
+script_files = [
+    js_lib_url(string='jquery.multiselect.min.js'),
+    js_url(string='add_stamp_to_location.js'),
+]
 
 inline_script = "\
     var parameters = {\
@@ -35,7 +44,7 @@ inline_script = "\
     <input type="hidden" id="stamp-location-id" value="${stamp_location_id}">
     <input type="hidden" id="csrf-token" value="${csrf_token}">
 
-    <h1>Add stamp to location</h1>
+    <h1>Add stamps to location</h1>
     <p>Found a stamp at a location?</p>
 
     <label for="park">
@@ -58,14 +67,14 @@ inline_script = "\
         </select>
         <br>
 
-        <label for="stamp">
+        <label for="stamp-text">
             Stamp
         </label>
         <input type="text" name="stamp-text" id="stamp-text" placeholder="Start typing stamp text here">
         <br>
-        <select name="stamp" id="stamp"></select>
+        <select name="stamp" id="stamp" multiple="multiple"></select>
         <br>
 
-        <input type="submit" name="add-stamp-to-location" value="Add Stamp to Location" class="btn">
+        <input type="submit" name="add-stamp-to-location" value="Add Stamps to Location" class="btn">
     </form>
 </%block>
