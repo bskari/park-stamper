@@ -27,7 +27,7 @@ ${base.title_string('All parks')}
 
 <%def name="park_row(park)">
     <tr>
-        <th><a href="${request.route_url('park', park_url=park.url)}">${park.name}</th>
+        <th><a href="${request.route_url('park', park_url=park.url)}">${park.name}</a></th>
         <th>${park.region}</th>
         <th>${base.blank_if_none(park.latitude)} ${base.blank_if_none(park.longitude)}</th>
     </tr>

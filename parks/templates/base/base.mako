@@ -57,6 +57,9 @@
                         <ul class="nav actions">
                             % if user_id:
                                 <li>
+                                    <a href="${request.route_url('profile-personal')}">Profile</a>
+                                </li>
+                                <li>
                                     <a href="${request.route_url('log-out')}">Log out</a>
                                 </li>
                             % else:

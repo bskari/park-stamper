@@ -16,6 +16,8 @@ def add_routes(config):
     config.add_route('new-stamp-location', '/new-stamp-location')
     config.add_route('park', '/park/{park_url}')
     config.add_route('park-names-json', '/park-names.json')
+    config.add_route('profile-personal', '/profile/')
+    config.add_route('profile-user', '/profile/{username}')
     config.add_route('sign-up', '/sign-up')
     # Park here is for SEO value only and is ignored
     config.add_route('stamp-location', '/stamp-location/{id}/{park}')

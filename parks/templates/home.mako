@@ -80,8 +80,7 @@ inline_script = "\
 
 <%def name="recent_activity_li(recent_item)">
     <li class="recent-activity">
-        <a class="url" href="${recent_item.username}">
-            ## TODO(bskari|2013-02-02) Link to user profile
+        <a class="url" href="${request.route_url('profile-user', username=recent_item.username)}">
             ${recent_item.username}
         </a>
         collected a stamp from

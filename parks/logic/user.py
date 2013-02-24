@@ -13,7 +13,7 @@ def get_user_by_id(user_id):
         User,
     ).filter(
         User.id == user_id
-    ).all()
+    ).one()
 
 
 def get_user_by_username_or_email(username_or_email):
