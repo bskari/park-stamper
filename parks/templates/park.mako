@@ -46,7 +46,7 @@ ${functions.include_css('park.css')}
 <%def name="stamp_location_row(stamp_location, stamp_count)">
     <tr>
         <th class="stamp-location-description">
-            <a href="${request.route_url('stamp-location', id=stamp_location.id, park=park.name)}">
+            <a href="${request.route_url('stamp-location', id=stamp_location.id, park=park.url)}">
                 ${stamp_location.description}
             </a>
         </th>
