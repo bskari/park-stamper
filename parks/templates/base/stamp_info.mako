@@ -67,6 +67,7 @@ var parameters = {
     'dateModalDialogSelector': '#date-picker-modal-dialog',
     'loadingSelector': '.loading',
     'parkIdSelector': '#park-id',
+    'collectDate': "${request.session.get('collect_date', '')}",
     'csrfToken': $('#csrf-token')[0].value
 };
 parkStamper.collectStamp.init(parameters);

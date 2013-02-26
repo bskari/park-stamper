@@ -8,13 +8,15 @@ goog.require('parkStamper.util.message.popError');
  * Initialization function.
  * @param {{collectStampUrl: string, rowSelector: string,
  *  dateModalDialogSelector: string, loadingSelector: string,
- *  parkIdSelector: string, csrfToken: string}} Initialization parameters.
+ *  parkIdSelector: string, collectDate: string, csrfToken: string}}
+ *  Initialization parameters.
  *   collectStampUrl - URL to send the stamp collection information to
  *   rowSelector- CSS selector for the stamp rows that have collection and
  *    edit buttons
  *   dateModalDialogSelector - CSS selector for the date modal dialog
  *   loadingSelector - CSS selector for the date modal dialog
  *   parkIdSelector - CSS selector for hidden input with the park's ID
+ *   collectDate - string representing last collection date
  *   csrfToken - string
  */
 parkStamper.collectStamp.init = function(parameters) {
@@ -39,11 +41,17 @@ parkStamper.collectStamp.init = function(parameters) {
     var datePicker = parkStamper.collectStamp.dateModalDialog.find(
         'input[type=text]'
     );
-    datePicker.datepicker({
+    parkStamper.collectStamp.datePicker = datePicker;
+
+    var datePickerParameters = {
         onSelect: parkStamper.collectStamp.sendCollectStampRequest,
         dateFormat: 'yy-mm-dd',
         maxDate: 0 // 0 => today
-    });
+    };
+    if (parameters.collectDate !== '') {
+        datePickerParameters['defaultDate'] = parameters.collectDate;
+    }
+    parkStamper.collectStamp.datePicker.datepicker(datePickerParameters);
 };
 
 
@@ -105,6 +113,12 @@ parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
     }
 
     parkStamper.collectStamp.sendingRequest = true;
+
+    parkStamper.collectStamp.datePicker.datepicker(
+        "option",
+        "defaultdate",
+        dateText
+    );
 
     parkStamper.collectStamp.dateModalDialog.dialog('close');
     parkStamper.collectStamp.clickedButton.hide();

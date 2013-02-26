@@ -16,13 +16,13 @@ def collect_stamp(request):
 
     stamp_id = request.params.get('stampId', None)
     park_id = request.params.get('parkId', None)
-    date = request.params.get('date', None)
-    if date is not None:
+    date_string = request.params.get('date', None)
+    if date_string is not None:
         try:
             # Date is formatted like: "2013-02-13"
-            year = int(date[0:4])
-            month = int(date[5:7])
-            day = int(date[8:10])
+            year = int(date_string[0:4])
+            month = int(date_string[5:7])
+            day = int(date_string[8:10])
             date = datetime.date(year=year, month=month, day=day)
 
             # Give some wiggle room for timezone concerns
@@ -58,5 +58,6 @@ def collect_stamp(request):
             render_dict.update(success=False, error=str(e))
         else:
             render_dict.update(success=True)
+            request.session['collect_date'] = date_string
 
     return render_dict
