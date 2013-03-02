@@ -1,4 +1,5 @@
 from collections import namedtuple
+import datetime
 from pyramid.view import view_config
 
 from parks.logic import user as user_logic
@@ -7,7 +8,8 @@ from parks.logic import user as user_logic
 @view_config(route_name='home', renderer='home.mako')
 def home(request):
     carousel_information = _get_static_carousel_information(request)
-    recent = user_logic.get_recent_user_collections(5)
+    two_weeks_ago = datetime.datetime.today() - datetime.timedelta(days=14)
+    recent = user_logic.get_recent_user_collections(5, two_weeks_ago)
     return dict(
         carousel_information=carousel_information,
         urls=dict(nearby=request.route_url('nearby')),

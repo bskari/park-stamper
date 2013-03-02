@@ -41,7 +41,7 @@ def get_user_by_username_or_email(username_or_email):
     raise NoResultFound('No user with that email or username was found')
 
 
-def get_recent_user_collections(limit):
+def get_recent_user_collections(limit, after_date=None):
     """Returns up to limit recent stamp collections."""
     if limit > 10 or limit < 0:
         raise ValueError('Too much recent activity requested')
@@ -53,7 +53,7 @@ def get_recent_user_collections(limit):
         'CollectionNamedTuple',
         ['username', 'park_name', 'park_url']
     )
-    recent_collections = DBSession.query(
+    query = DBSession.query(
         StampCollection.id,
         User,
         Park,
@@ -63,12 +63,19 @@ def get_recent_user_collections(limit):
     ).join(
         Park,
         Park.id == StampCollection.park_id
-    ).order_by(
+    )
+
+    if after_date is not None:
+        query = query.filter(StampCollection.date_collected > after_date)
+
+    query = query.order_by(
         # id and time_created should be correlated
         StampCollection.id.desc()
     ).limit(
         limit
-    ).all()
+    )
+
+    recent_collections = query.all()
 
     collections = [
         CollectionNamedTuple(
