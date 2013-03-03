@@ -179,6 +179,9 @@ class StampCollection(Base):
     date_collected = Column(Date, nullable=False, default=date.today)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
+Index('idx_user_id', StampCollection.user_id)
+Index('idx_stamp_id', StampCollection.stamp_id)
+
 
 class StampLocation(Base):
     """A location where stamps can be collected, e.g. a visitor's center."""

@@ -29,6 +29,12 @@ ${functions.title_string('Profile')}
 
             % if personal_profile:
                 <h2>Your information</h2>
+                Stamps collected: ${stamp_count}<br>
+                Parks visited: ${park_count} out of ${total_parks} total<br>
+                Parks visited by region:<br>
+                % for region, count in region_counts:
+                    ${region}: ${count}<br>
+                % endfor
             % endif
         </div>
     </div>

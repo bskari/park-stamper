@@ -1,4 +1,6 @@
 import datetime
+from sqlalchemy import distinct
+from sqlalchemy import func
 
 from parks.models import DBSession
 from parks.models import Park
@@ -42,3 +44,16 @@ def get_recent_collections_by_user_id(user_id, days_ago):
     ).all()
 
     return recent
+
+
+def count_stamp_collections_by_user_id(user_id):
+    """Returns the count of all of the unique stamps that a user has
+    collected.
+    """
+    counts = DBSession.query(
+        func.count(distinct(StampCollection.stamp_id))
+    ).filter(
+        StampCollection.user_id == user_id
+    ).one()[0]
+
+    return counts

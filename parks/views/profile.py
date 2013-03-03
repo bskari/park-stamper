@@ -1,6 +1,7 @@
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config
 
+from parks.logic import park as park_logic
 from parks.logic import stamp_collection as stamp_collection_logic
 from parks.logic import user as user_logic
 from parks.logic import user_email as user_email_logic
@@ -38,7 +39,18 @@ def profile_personal(request):
     user_id = authenticated_userid(request)
     user = user_logic.get_user_by_id(user_id)
     user_emails = user_email_logic.get_emails_by_user_id(user_id)
-    render_context.update(user=user, user_emails=user_emails)
+    stamp_count = stamp_collection_logic.count_stamp_collections_by_user_id(user_id)
+    park_count = park_logic.count_parks_visited_by_user_id(user_id)
+    total_parks = park_logic.count_parks()
+    region_counts = park_logic.count_parks_by_region_visited_by_user_id(user_id)
+    render_context.update(
+        user=user,
+        user_emails=user_emails,
+        stamp_count=stamp_count,
+        park_count=park_count,
+        total_parks=total_parks,
+        region_counts=region_counts,
+    )
 
     render_context.update(_profile_common(request, user_id))
 
