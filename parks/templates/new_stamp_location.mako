@@ -32,7 +32,7 @@ inline_script = "\
     <h1>New location</h1>
     <p>Found a place with stamps? Give me the skinny!</p>
 
-    <form action="${url}" method="post">
+    <form action="${post_url}" method="post">
         <label for="park">
             Park
         </label>

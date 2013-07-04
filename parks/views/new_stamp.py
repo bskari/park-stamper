@@ -14,35 +14,43 @@ from parks.logic import user as user_logic
 def new_stamp(request):
     render_dict = {}
 
-    # TODO(bskari|2013-02-13) Using this endpoint for both GET and POST is
-    # really ugly
-    if request.method == 'POST' and 'form.submitted' in request.params:
-        location_id = request.params.get('location', None)
-        text = request.params.get('text', None)
-        if location_id is None or text is None:
-            render_dict.update(
-                error='There was an error submitting that information.'
-            )
-        else:
-            try:
-                location_id = int(location_id)
-                park_url = create_stamp(
-                    location_id,
-                    text,
-                    authenticated_userid(request)
-                )
-                return HTTPFound(
-                    location=request.route_url('park', park_url=park_url),
-                )
-            except ValueError, e:
-                render_dict.update(error=str(e))
-
-    new_stamp_url = request.route_url('new-stamp')
+    new_stamp_url = request.route_url('new-stamp-post')
     render_dict.update(
-        url=new_stamp_url,
+        post_url=new_stamp_url,
     )
 
     return render_dict
+
+
+@view_config(route_name='new-stamp-post', renderer='new_stamp.mako', permission='edit')
+def new_stamp_post(request):
+    render_dict = {}
+    if 'form.submitted' not in request.params:
+        # How did we get to a POST endpoint without a form?
+        render_dict.update(
+            error='Sorry, there was an error submitting that information.'
+        )
+        return render_dict
+
+    location_id = request.params.get('location', None)
+    text = request.params.get('text', None)
+    if location_id is None or text is None:
+        render_dict.update(
+            error='There was an error submitting that information.'
+        )
+    else:
+        try:
+            location_id = int(location_id)
+            park_url = create_stamp(
+                location_id,
+                text,
+                authenticated_userid(request)
+            )
+            return HTTPFound(
+                location=request.route_url('park', park_url=park_url),
+            )
+        except ValueError, e:
+            render_dict.update(error=str(e))
 
 
 @view_config(route_name='stamp-locations-json', renderer='json')

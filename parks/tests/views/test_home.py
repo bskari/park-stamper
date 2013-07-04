@@ -9,5 +9,5 @@ class HomeUnitTest(IntegrationTestBase):
         request = testing.DummyRequest()
         page = home(request)
 
-        self.assertIn('carousel_information', page.keys())
+        self.assertIn('carousel_information', page)
         self.assertGreaterEqual(len(page['carousel_information']), 2)

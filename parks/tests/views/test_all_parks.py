@@ -9,5 +9,5 @@ class AllParksUnitTest(IntegrationTestBase):
         request = testing.DummyRequest()
         page = all_parks(request)
 
-        self.assertIn('parks', page.keys())
+        self.assertIn('parks', page)
         # TODO(bskari|2013-02-02) Create some park data

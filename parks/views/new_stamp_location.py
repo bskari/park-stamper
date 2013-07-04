@@ -14,45 +14,53 @@ from parks.logic import user as user_logic
 def new_stamp_location(request):
     render_dict = {}
 
-    # TODO(bskari|2013-02-13) Using this endpoint for both GET and POST is
-    # really ugly
-    if request.method == 'POST' and 'new-stamp-location' in request.params:
-        park_name = request.params.get('park', None)
-        description = request.params.get('description', None)
-        address = request.params.get('address', None)
-        latitude = request.params.get('latitude', None)
-        longitude = request.params.get('longitude', None)
-        if park_name is None or description is None:
-            render_dict.update(
-                error='There was an error submitting that information.'
-            )
-        else:
-            try:
-                park = park_logic.get_park_by_name(park_name)
-                stamp_location_id = create_stamp_location(
-                    park_id=park.id,
-                    description=description,
-                    address=address,
-                    latitude=latitude,
-                    longitude=longitude,
-                    added_by_user=authenticated_userid(request),
-                )
-                return HTTPFound(
-                    location=request.route_url(
-                        'stamp-location',
-                        park=park.url,
-                        id=stamp_location_id,
-                    ),
-                )
-            except ValueError, e:
-                render_dict.update(error=str(e))
-
-    new_stamp_location_url = request.route_url('new-stamp-location')
+    new_stamp_location_url = request.route_url('new-stamp-location-post')
     render_dict.update(
-        url=new_stamp_location_url,
+        post_url=new_stamp_location_url,
     )
 
     return render_dict
+
+
+@view_config(route_name='new-stamp-location-post', renderer='new_stamp_location.mako', permission='edit')
+def new_stamp_location_post(request):
+    render_dict = {}
+    if 'form.submitted' not in request.params:
+        # How did we get to a POST endpoint without a form?
+        render_dict.update(
+            error='Sorry, there was an error submitting that information.'
+        )
+        return render_dict
+
+    park_name = request.params.get('park', None)
+    description = request.params.get('description', None)
+    address = request.params.get('address', None)
+    latitude = request.params.get('latitude', None)
+    longitude = request.params.get('longitude', None)
+    if park_name is None or description is None:
+        render_dict.update(
+            error='There was an error submitting that information.'
+        )
+    else:
+        try:
+            park = park_logic.get_park_by_name(park_name)
+            stamp_location_id = create_stamp_location(
+                park_id=park.id,
+                description=description,
+                address=address,
+                latitude=latitude,
+                longitude=longitude,
+                added_by_user=authenticated_userid(request),
+            )
+            return HTTPFound(
+                location=request.route_url(
+                    'stamp-location',
+                    park=park.url,
+                    id=stamp_location_id,
+                ),
+            )
+        except ValueError, e:
+            render_dict.update(error=str(e))
 
 
 def create_stamp_location(

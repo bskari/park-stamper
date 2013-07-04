@@ -20,12 +20,12 @@ class NearbyUnitTest(IntegrationTestBase):
             )
         )
         json = nearby_json(request)
-        self.assertIn('success', json.keys())
+        self.assertIn('success', json)
         self.assertEqual(json['success'], True)
-        self.assertIn('stamps', json.keys())
+        self.assertIn('stamps', json)
         self.assertGreater(len(json['stamps']), 0)
         stamp = json['stamps'][0]
-        self.assertIn('direction', stamp.keys())
+        self.assertIn('direction', stamp)
         self.assertEqual(expected_direction, stamp['direction'])
 
 

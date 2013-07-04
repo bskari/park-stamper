@@ -38,7 +38,7 @@ inline_script = "\
     <input type="text" name="park" id="park">
     <br>
 
-    <form action="${url}" method="post">
+    <form action="${post_url}" method="post">
         <input type="hidden" name="csrf-token" value="${csrf_token}">
 
         <label for="location">

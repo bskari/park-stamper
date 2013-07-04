@@ -5,6 +5,7 @@ from transaction import manager
 from parks.models import User
 from parks.tests.integration_test_base import IntegrationTestBase
 from parks.views.log_in import log_in
+from parks.views.log_in import log_in_post
 
 class LogInUnitTest(IntegrationTestBase):
     def setUp(self):
@@ -31,7 +32,7 @@ class LogInUnitTest(IntegrationTestBase):
             came_from=log_in_url,
         )
         page = log_in(request)
-        self.assertIn('came_from', page.keys())
+        self.assertIn('came_from', page)
         self.assertNotEqual(page['came_from'], log_in_url)
 
         # Check the referrer URL
@@ -42,7 +43,7 @@ class LogInUnitTest(IntegrationTestBase):
         )
         request.referrer = log_in_url
         page = log_in(request)
-        self.assertIn('came_from', page.keys())
+        self.assertIn('came_from', page)
         self.assertNotEqual(page['came_from'], log_in_url)
 
     def test_came_from(self):
@@ -58,7 +59,7 @@ class LogInUnitTest(IntegrationTestBase):
             came_from=original_url,
         )
         page = log_in(request)
-        self.assertIn('came_from', page.keys())
+        self.assertIn('came_from', page)
         self._assert_equal_urls(page['came_from'], original_url)
 
         # Check the referrer URL
@@ -69,7 +70,7 @@ class LogInUnitTest(IntegrationTestBase):
         )
         request.referrer = original_url
         page = log_in(request)
-        self.assertIn('came_from', page.keys())
+        self.assertIn('came_from', page)
         # The trailing slash is getting stripped for some reason, so strip it
         # here when we check for it
         self.assertEqual(page['came_from'], original_url[:-1])
@@ -77,26 +78,28 @@ class LogInUnitTest(IntegrationTestBase):
     def test_successful_log_in(self):
         request = testing.DummyRequest()
         original_url = request.route_url('home')
+        request.url = request.route_url('log-in')
         request.params = {
             'login': self.username,
             'password': self.password,
             'came_from': original_url,
             'form.submitted': 'Log In',
         }
-        response = log_in(request)
+        response = log_in_post(request)
         self.assertIsInstance(response, HTTPFound)
 
     def test_failed_log_in(self):
         request = testing.DummyRequest()
-        original_url = request.route_url('home')
+        original_url = request.route_url('log-in')
+        request.url = request.route_url('log-in')
         request.params = {
             'login': 'invalid user',
             'password': 'invalid password',
             'came_from': original_url,
             'form.submitted': 'Log In',
         }
-        response = log_in(request)
-        self.assertIn('error', response.keys())
+        response = log_in_post(request)
+        self.assertIn('error', response)
 
     def _assert_equal_urls(self, url1, url2):
         self.assertTrue(

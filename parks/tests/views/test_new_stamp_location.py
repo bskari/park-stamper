@@ -12,5 +12,5 @@ class NewStampLocationUnitTest(IntegrationTestBase):
         page = new_stamp_location(request)
 
         # Post URL should be pointing here
-        self.assertIn('url', page.keys())
-        self.assertEqual(page['url'], request.route_url('new-stamp-location'))
+        self.assertIn('post_url', page)
+        self.assertEqual(page['post_url'], request.route_url('new-stamp-location-post'))
