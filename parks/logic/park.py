@@ -86,7 +86,6 @@ def count_parks_by_region_visited_by_user_id(user_id):
     ).group_by(
         Park.region
     ).all()
-    import pdb; pdb.set_trace()
 
     all_regions = set(Park.region.property.columns[0].type.enums)
     visited_regions = set([region for region, _ in regions_and_counts])
