@@ -1,24 +1,23 @@
 from pyramid import testing
 from pyramid.httpexceptions import HTTPFound
-from transaction import manager
 
 from parks.models import User
-from parks.tests.integration_test_base import IntegrationTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.log_in import log_in
 from parks.views.log_in import log_in_post
+
 
 class LogInUnitTest(IntegrationTestBase):
     def setUp(self):
         super(LogInUnitTest, self).setUp()
         self.username = 'guest'
         self.password = 'password'
-        with manager:
-            model = User(
-                username=self.username,
-                password=self.password,
-                signup_ip=1,
-            )
-            self.session.add(model)
+        model = User(
+            username=self.username,
+            password=self.password,
+            signup_ip=1,
+        )
+        self.session.add(model)
 
     def test_came_from_is_never_log_in(self):
         """We should never be redirected back to the log_in page."""

@@ -8,11 +8,19 @@ from parks.routes import add_routes
 from parks.routes import add_static_views
 
 
-class IntegrationTestBase(TestCase):
+class UnitTestBase(TestCase):
     def setUp(self):
         self.config = testing.setUp()
         add_routes(self.config)
         add_static_views(self.config)
+
+    def tearDown(self):
+        testing.tearDown()
+
+
+class IntegrationTestBase(UnitTestBase):
+    def setUp(self):
+        super(IntegrationTestBase, self).setUp()
         engine = create_engine('sqlite://')
         self.session = DBSession
         self.session.configure(bind=engine)
@@ -20,4 +28,4 @@ class IntegrationTestBase(TestCase):
 
     def tearDown(self):
         DBSession.remove()
-        testing.tearDown()
+        super(IntegrationTestBase, self).tearDown()

@@ -5,7 +5,7 @@ from parks.logic.security import group_finder
 from parks.logic.security import check_login_and_get_user_id
 from parks.models import User
 from parks.models import UserEmail
-from parks.tests.integration_test_base import IntegrationTestBase
+from parks.tests.test_base import IntegrationTestBase
 
 
 class SecurityTestCase(IntegrationTestBase):
