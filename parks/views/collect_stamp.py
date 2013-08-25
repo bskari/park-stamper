@@ -10,12 +10,12 @@ from parks.logic import stamp_collection as stamp_collection_logic
 @view_config(route_name='collect-stamp', renderer='json')
 def collect_stamp(request):
     if request.method != 'POST':
-        return dict(success=False)
+        return {'success': False}
 
     render_dict = {}
 
-    stamp_id = request.params.get('stampId', None)
-    park_id = request.params.get('parkId', None)
+    stamp_id = request.params.get('stamp-id', None)
+    park_id = request.params.get('park-id', None)
     date_string = request.params.get('date', None)
     if date_string is not None:
         try:
@@ -28,10 +28,10 @@ def collect_stamp(request):
             # Give some wiggle room for timezone concerns
             tomorrow = datetime.date.today() + datetime.timedelta(days=1)
             if date > tomorrow:
-                return dict(
-                    success=False,
-                    error="You can't collect stamps in the future!",
-                )
+                return {
+                    'success': False,
+                    'error': "You can't collect stamps in the future!",
+                }
         except:
             date = None
     user_id = authenticated_userid(request)

@@ -49,7 +49,7 @@ parkStamper.collectStamp.init = function(parameters) {
         maxDate: 0 // 0 => today
     };
     if (parameters.collectDate !== '') {
-        datePickerParameters['defaultDate'] = parameters.collectDate;
+        datePickerParameters.defaultDate = parameters.collectDate;
     }
     parkStamper.collectStamp.datePicker.datepicker(datePickerParameters);
 };
@@ -128,10 +128,10 @@ parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
     throbber.css('display', 'inline-block');
 
     var data = {
-        stampId: parkStamper.collectStamp.stampId,
-        parkId: parkStamper.collectStamp.parkId,
-        date: dateText,
-        csrfToken: parkStamper.collectStamp.csrfToken
+        'stamp-id': parkStamper.collectStamp.stampId,
+        'park-id': parkStamper.collectStamp.parkId,
+        'date': dateText,
+        'csrf-token': parkStamper.collectStamp.csrfToken
     };
 
     $.ajax({
@@ -140,7 +140,7 @@ parkStamper.collectStamp.sendCollectStampRequest = function(dateText) {
         data: data,
         success: parkStamper.collectStamp.sendCollectStampRequestSuccess,
         error: function(_1, _2, errorThrown) {
-            if (errorThrown == 'Unauthorized') {
+            if (errorThrown === 'Unauthorized') {
                 parkStamper.util.message.popError(
                     'Sorry, you need to logged in collect stamps.'
                 );

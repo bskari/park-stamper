@@ -76,7 +76,8 @@ parkStamper.nearby.loadNearbyStampInformation = function() {
             data: data,
             datatype: 'json',
             success: parkStamper.nearby.createStampRows,
-            error: parkStamper.nearby.nearbyErrorCallback
+            error: parkStamper.nearby.nearbyErrorCallback,
+            timeout: 3000
         }
     );
 };
@@ -101,8 +102,14 @@ parkStamper.nearby.loadNearbyStampInformation = function() {
  */
 parkStamper.nearby.createStampRows = function(data, textStatus) {
     'use strict';
+    var errorMessage,
+        tbody,
+        i,
+        stamp,
+        row,
+        stampText;
+
     function makeCell(message) {
-        'use strict';
         return $('<td>' + message + '</td>');
     }
     /**
@@ -111,18 +118,17 @@ parkStamper.nearby.createStampRows = function(data, textStatus) {
      * @param {number} digits The number of digits to round to (defaults to 1).
      */
     function round(number, digits) {
-        'use strict';
-        var undefined;
-        if (digits === undefined) {
+        var power;
+        if (typeof digits === 'undefined') {
             digits = 1;
         }
-        var power = Math.pow(10, digits);
+        power = Math.pow(10, digits);
         return Math.round(number * power) / power;
     }
 
     if (data.success === true) {
         if (data.stamps.length === 0) {
-            var errorMessage = "Looks like there aren't any stamps within " +
+            errorMessage = "Looks like there aren't any stamps within " +
                 parkStamper.nearby.distance.val() +
                 ' miles of you.';
             if (parkStamper.nearby.distance.val() < 100) {
@@ -132,12 +138,12 @@ parkStamper.nearby.createStampRows = function(data, textStatus) {
             }
             parkStamper.util.message.popError(errorMessage);
         }
-        var tbody = parkStamper.nearby.table.find('tbody');
-        for (var stampIndex in data.stamps) {
-            var stamp = data.stamps[stampIndex];
-            var row = $('<tr></tr>');
+        tbody = parkStamper.nearby.table.find('tbody');
+        for (i = 0; i < data.stamps.length; ++i) {
+            stamp = data.stamps[i];
+            row = $('<tr></tr>');
 
-            var stampText = stamp.text.replace('\n', '<br />');
+            stampText = stamp.text.replace('\n', '<br />');
 
             // Park, Text, Location, GPS, Distance, Last Seen
             row.append(makeCell('<a href=' + stamp.url + '>' + stamp.park));
