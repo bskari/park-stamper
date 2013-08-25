@@ -160,9 +160,24 @@ class Stamp(Base):
     id = Column(Integer, primary_key=True)
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    time_updated = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
     type = Column(Enum('normal', 'bonus'), nullable=False)
     status = Column(Enum('active', 'lost', 'archived'), nullable=False)
     added_by_user_id = Column(Integer, ForeignKey('user.id'))
+
+
+class StampHistory(Base):
+    """A history of stamp edits."""
+    # TODO(bskari|2013-08-24) This should be stored in a log or something
+    # instead of the database
+    __tablename__ = 'stamp_history'
+    id = Column(Integer, primary_key=True)
+    stamp_id = Column(Integer, ForeignKey('stamp.id'))
+    text = Column(String(255), nullable=False)
+    time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    type = Column(Enum('normal', 'bonus'), nullable=False)
+    status = Column(Enum('active', 'lost', 'archived'), nullable=False)
+    edited_by_user_id = Column(Integer, ForeignKey('user.id'))
 
 
 class StampCollection(Base):

@@ -1,0 +1,10 @@
+label.checkbox {
+    display: inline;
+    padding-left: 2px;
+    padding-right: 20px;
+    vertical-align: bottom;
+}
+
+#text {
+    width: 250px;
+}

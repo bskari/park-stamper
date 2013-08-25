@@ -1,5 +1,6 @@
 from sqlalchemy import asc
 from sqlalchemy import func
+from transaction import manager
 
 from parks.logic.math_logic import latitude_to_miles
 from parks.logic.math_logic import latitude_longitude_distance
@@ -8,6 +9,7 @@ from parks.models import DBSession
 from parks.models import Park
 from parks.models import Stamp
 from parks.models import StampCollection
+from parks.models import StampHistory
 from parks.models import StampLocation
 from parks.models import StampToLocation
 
@@ -153,6 +155,33 @@ def create_new_stamp(stamp_text, stamp_type, added_by_user_id):
     ).one()
 
     return stamp_id[0]
+
+
+def edit_stamp(stamp_id, stamp_text, stamp_type, stamp_status, edited_by_user_id):
+    # The model allows for nulls here because my initial database population
+    # script doesn't have a user, so just enforce this rule here
+    if edited_by_user_id is None:
+        raise ValueError('edited_by_user should not be None')
+
+    with manager:
+        stamp = DBSession.query(
+            Stamp
+        ).filter(
+            Stamp.id == stamp_id
+        ).one()
+
+        stamp.text = stamp_text
+        stamp.type = stamp_type
+        stamp.status = stamp_status
+
+        stamp_history = StampHistory(
+            stamp_id=stamp_id,
+            text=stamp_text,
+            type=stamp_type,
+            status='active',
+            edited_by_user_id=edited_by_user_id,
+        )
+        DBSession.add(stamp_history)
 
 
 def get_stamps_beginning_with_string(text, limit=None):

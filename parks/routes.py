@@ -8,6 +8,7 @@ def add_routes(config):
     for name, pattern in (
         ('add-stamp-to-location', '/add-stamp-to-location'),
         ('all-parks', '/all-parks'),
+        ('edit-stamp', '/edit-stamp/{id}/'),
         ('home', '/'),
         ('log-in', '/log-in'),
         ('log-out', '/log-out'),
@@ -31,6 +32,7 @@ def add_routes(config):
     for name, pattern in (
         ('add-stamp-to-location-post', '/add-stamp-to-location'),
         ('collect-stamp', '/collect-stamp'),
+        ('edit-stamp-post', '/edit-stamp-post/{id}/'),
         ('log-in-post', '/log-in-post'),
         ('new-stamp-post', '/new-stamp-post'),
         ('new-stamp-location-post', '/new-stamp-location-post'),

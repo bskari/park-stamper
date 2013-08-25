@@ -50,7 +50,7 @@
             <div class="loading" style="display:none;">
                 <img src="${request.static_url('Parks:images/throbber.gif')}">
             </div>
-            <a class="btn btn-small btn-primary edit-stamp" href="#" title="Edit this stamp">
+            <a class="btn btn-small btn-primary edit-stamp" href="${request.route_url('edit-stamp', id=stamp.id)}" title="Edit this stamp">
                 <i class="icon-edit icon-white"></i>
             </a>
             <a class="btn btn-small btn-primary report-stamp" href="#" title="Report stamp as missing">
