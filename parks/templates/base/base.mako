@@ -112,8 +112,21 @@
         ${footer()}
 
         ## JS placed at the bottom for faster loading
-        <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.8.2.min.js"></script>
-        <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.10.1.min.js"></script>
+        <script type="text/javascript">
+            ## Fall back to localhost if network is down or something
+            if (!window.jQuery) {
+                var script = '/static/js/jquery-1.10.1.min.js';
+                document.write('<script src="' + script + '"><\/script>');
+            }
+        </script>
+
+        <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.1/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+            ## Fall back to localhost if network is down or something
+            //window.jQuery || document.write('<script src="/static/js/jquery-ui-1.10.1.min.js"><\/script>');
+        </script>
+
         <script type="text/javascript" src="/static/bootstrap/js/bootstrap.js"></script>
         <script type="text/javascript" src="/static/js/lib/closure-library/closure/goog/base.js"></script>
         <script type="text/javascript" src="/static/js/deps.js"></script>
@@ -127,14 +140,17 @@
                 if (!/Android|webOS|iPhone|BlackBerry/i.test(navigator.userAgent)) {
                     $.backstretch('/static/images/background.jpg');
                 }
+
                 ## Highlight the page in navigation
                 var navTab = document.getElementById('nav-li-' + '${request.matched_route.name}');
                 if (null != navTab) {
                     navTab.setAttribute('class', 'active');
                 }
+
                 ## Email
                 var email = '(gro.' + 'irzks' + '@nodnzrb)';
                 document.getElementById('email-span').innerHTML = email.replace(/z/g, 'a');
+
                 ${self.insert_inline_script()}
             });
         </script>
