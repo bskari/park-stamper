@@ -1,6 +1,7 @@
 .coverage
 Parks.sqlite
 Parks.egg-info
+initializedb.log
 
 *.swp
 *.pyc
