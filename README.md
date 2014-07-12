@@ -19,6 +19,7 @@ not going to use locally. Yay MySQL.
     sudo apt-get install libmysqlclient-dev
 
 And set everything up.
+    git submodule init
     python setup.py develop
     initialize_Parks_db development.ini
 
