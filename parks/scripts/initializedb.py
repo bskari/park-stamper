@@ -879,9 +879,9 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
     state_set = set(state_names)
 
     # Try to count direct links to states first
-    for a in wiki_soup.fetch(u'a'):
-        if a.has_key(u'href') and u'/wiki/' in a['href']:
-            wiki_state = a[u'href'].split(u'/wiki/')[1]
+    for link in wiki_soup.fetch(u'a'):
+        if link.has_key(u'href') and u'/wiki/' in link['href']:
+            wiki_state = link[u'href'].split(u'/wiki/')[1]
             state = wiki_state.replace('_', ' ')
             if state in state_set:
                 if state_counts.has_key(state):
@@ -891,19 +891,23 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
                 continue
 
     if len(state_counts) > 0:
-        most_common_state = max(state_counts.iteritems(), key=lambda s_c: s_c[1])[0]
+        most_common_state = max(
+            state_counts.iteritems(),
+            key=lambda s_c: s_c[1]
+        )[0]
         max_count = state_counts[most_common_state]
         ties_for_first = [
             s_c[0] for s_c in state_counts.iteritems() if s_c[1] == max_count
         ]
 
     if len(state_counts) == 0 or len(ties_for_first) == 0:
-        # Count direct links to states and links to places with states in the name,
-        # like "Essex County, Massachusetts". I could do this in a one-liner, but
-        # it would be create tons of temporary variables and be super slow.
+        # Count direct links to states and links to places with states in the
+        # name, like "Essex County, Massachusetts". I could do this in a
+        # one-liner, but it would be create tons of temporary variables and be
+        # super slow.
         state_counts = dict()
-        for a in wiki_soup.fetch(u'a'):
-            link_text = a.text
+        for link in wiki_soup.fetch(u'a'):
+            link_text = link.text
             for state in state_set:
                 if state.replace(' ', '_') in link_text:
                     if state in state_counts:
@@ -912,7 +916,10 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
                         state_counts[state] = 1
                     continue
 
-        most_common_state = max(state_counts.iteritems(), key=lambda s_c: s_c[1])[0]
+        most_common_state = max(
+            state_counts.iteritems(),
+            key=lambda s_c: s_c[1]
+        )[0]
 
     # Sanity check
     max_count = state_counts[most_common_state]
@@ -922,7 +929,8 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
     if len(ties_for_first) > 1:
         title = wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0]
         logger.warning(
-            'Unable to reliably choose between states for {park}: {states}'.format(
+            'Unable to reliably choose between states'
+            ' for {park}: {states}'.format(
                 park=title,
                 states=', '.join(ties_for_first),
             )
@@ -937,7 +945,10 @@ def _get_latitude_longitude_from_wiki_soup(wiki_soup):
     if len(geo_decimal_spans) == 0:
         return (None, None)
     geo_dec_text = geo_decimal_spans[0].text
-    latitude_text, longitude_text = re.findall(r'([-]?\d+(?:\.\d+)?)', geo_dec_text)
+    latitude_text, longitude_text = re.findall(
+        r'([-]?\d+(?:\.\d+)?)',
+        geo_dec_text
+    )
     try:
         latitude = float(latitude_text)
         longitude = float(longitude_text)
@@ -994,15 +1005,21 @@ def guess_canonical_park(park_name, session):
     if not hasattr(guess_canonical_park, u'canonical_parks'):
         full_parks = session.query(Park).all()
         guess_canonical_park.canonical_parks = []
-        for fp in full_parks:
-            trimmed_name = _remove_common_park_words(fp.name)
-            guess_canonical_park.canonical_parks.append((fp, trimmed_name))
+        for full_park in full_parks:
+            trimmed_name = _remove_common_park_words(full_park.name)
+            guess_canonical_park.canonical_parks.append(
+                (full_park, trimmed_name)
+            )
 
     trimmed_park = unicode(_remove_common_park_words(park_name))
 
     best_closeness_index = -1
     best_closeness = -100000.0
-    for index in xrange(len(guess_canonical_park.canonical_parks)):
+    for index in xrange(
+        len(
+            guess_canonical_park.canonical_parks
+        )
+    ):
         trimmed_canonical = guess_canonical_park.canonical_parks[index][1]
         new_closeness = levenshtein_ratio(trimmed_canonical, trimmed_park, cutoff=best_closeness)
         if new_closeness > best_closeness:
@@ -1010,7 +1027,7 @@ def guess_canonical_park(park_name, session):
             best_closeness_index = index
 
     canonical = guess_canonical_park.canonical_parks[best_closeness_index][0].name
-    trimmed_canonical=guess_canonical_park.canonical_parks[best_closeness_index][1]
+    trimmed_canonical = guess_canonical_park.canonical_parks[best_closeness_index][1]
     if levenshtein_ratio(trimmed_park, trimmed_canonical) < .8:
         logger.warning(
             u'"{park}":"{trimmed_park}" guessed as\n"{canonical}":"{trimmed_canonical}"'.format(
@@ -1054,14 +1071,16 @@ def _remove_common_park_words(park_name):
 
 
 def load_park_stamps_csv(csv_reader):
-    """Loads the parks, stamps, and stamp location entries from the master list
-    CSV. Returns an array of NamedTuples with park, text, and address.
+    """Loads the parks, stamps, and stamp location entries from the list CSV.
+    Returns an array of NamedTuples with park and text.
     """
-    c = {'update': 0, u'park': 1, u'stamp': 2, u'address': 3, u'last_seen': 4, u'confirmed_by': 5, u'comment': 6}
+    c = {
+        u'first-column': 0,
+        u'park': 1,
+        u'stamp': 2,
+    }
 
-    # There were misspellings of bonus, so use this to find them
     bonus_re = re.compile(r'bonus|bonue|bpnus', re.IGNORECASE)
-    # Stampers have their own custom stamps; skip them
     stamper_re = re.compile(r'stamp|stanp', re.IGNORECASE)
 
     lost_stamps = False
@@ -1069,22 +1088,32 @@ def load_park_stamps_csv(csv_reader):
 
     rows = []
 
-    StampTuple = namedtuple(u'StampTuple', [u'park', u'text', u'address', u'state'])
+    StampTuple = namedtuple(u'StampTuple', [u'park', u'text', u'state'])
     state = u'Alabama' # Prime the loop, this is the first alphabetic state
 
     for row in csv_reader:
-        # The list toggles between retired and active stamps - ignore retired ones
+        # The list toggles between retired and active stamps - ignore retired
+        # ones
         if u'RETIRED' in row[c[u'park']]:
             lost_stamps = True
             continue
         # Good rows start with the name of a state in the park column
-        elif lost_stamps and row[c[u'update']].strip() == '' and row[c['park']] != ''  and row[c[u'stamp']].strip() == '':
+        elif (
+            lost_stamps
+            and row[c[u'first-column']].strip() == ''
+            and row[c['park']] != ''
+            and row[c[u'stamp']].strip() == ''
+        ):
             lost_stamps = False
-            # The master list has "George Washington Memorial Parkway" on its
-            # own (ugh, this thing is terribly formatted) so if a state has a
-            # space and doesn't start with "New", assume it's just bad formatting
+            # The list has "George Washington Memorial Parkway" on its own
+            # (ugh, this thing is terribly formatted) so if a state has a space
+            # and doesn't start with "New", assume it's just bad formatting
             if u' ' in row[c[u'park']] and u'New' not in row[c[u'park']]:
-                logger.warning(u'Assuming that {entry} is not a state'.format(entry=row[c[u'park']]))
+                logger.warning(
+                    u'Assuming that {entry} is not a state'.format(
+                        entry=row[c[u'park']],
+                    )
+                )
                 continue
             state = row[c[u'park']].strip()
             # Some states list which region they're in, so remove that
@@ -1094,18 +1123,16 @@ def load_park_stamps_csv(csv_reader):
             continue
 
         if state == 'Other':
-            # Entries under this heading are things from things like National
-            # Parks Travelers Club, so just ignore them
             continue
 
-        # The Excel document merges the park cells and had the same park for a
-        # few stamps in a row
+        # Sometimes merges the park cells and had the same park for a few
+        # stamps in a row
         if row[c[u'park']] != '':
             new_park = remove_whitespace(remove_newlines(row[c[u'park']]))
             new_park = new_park.decode(u'utf-8')
             new_park = new_park.strip()
-            # Some parks have dashes, while their identical counterparts in other
-            # regions don't, so just remove dashes
+            # Some parks have dashes, while their identical counterparts in
+            # other regions don't, so just remove dashes
             new_park = new_park.replace('-', ' ')
             # Try to make some things consistent I guess
             new_park = new_park.replace('&', 'and')
@@ -1121,15 +1148,11 @@ def load_park_stamps_csv(csv_reader):
             current_park = new_park
 
         stamp = remove_whitespace(row[c[u'stamp']]).strip()
-        address = row[c[u'address']]
-        address = address.decode(u'utf-8')
 
         if (
             # Anything that doesn't have exactly 2 lines deserves a second look
             stamp.count('\n') != 1
-            # Anything that says bonus, we ignore for now
             or bonus_re.search(stamp)
-            # The stampers have their own custom ones; skip them
             or stamper_re.search(stamp) or stamper_re.search(current_park)
         ):
             if not isinstance(stamp, unicode):
@@ -1154,12 +1177,13 @@ def load_park_stamps_csv(csv_reader):
             )
             continue
 
-        rows.append(StampTuple(current_park, stamp, address, state))
+        rows.append(StampTuple(current_park, stamp, state))
 
     return rows
 
 
 def get_region_from_state(state, session):
+    """Given a state, returns the region that the state belongs to."""
     mapping = {
         u'AL': u'SE',
         u'AK': u'PNWA',
@@ -1298,17 +1322,17 @@ def save_states(states, session):
         session.add(state)
 
 
-def format_park_tuples(wiki_list, master_list_stamp_entries):
-    """Returns a list of ParkTuples with data loaded from the master list and
+def format_park_tuples(wiki_list, list_stamp_entries):
+    """Returns a list of ParkTuples with data loaded from the list and
     Wikipedia.
     """
-    # We want to have data for as many of the entries from the master list
+    # We want to have data for as many of the entries from the list
     # as possible
     names_from_wiki = set([p.name for p in wiki_list])
     wiki_dict = dict([(p.name, p) for p in wiki_list])
     park_list = []
     unique_park_list = set()
-    for entry in master_list_stamp_entries:
+    for entry in list_stamp_entries:
         if entry.park not in unique_park_list:
             unique_park_list.add(entry.park)
             if entry.park in names_from_wiki:
@@ -1391,6 +1415,7 @@ def save_parks(session, parks):
         else:
             used_once_url.add(url)
 
+    urls = set()
     for park in parks:
         park_type = guess_park_type(park.name)
 
@@ -1426,17 +1451,21 @@ def save_parks(session, parks):
             if u'Virgin' in state:
                 state = u'U.S. Virgin Islands'
 
-        park_row = Park(
-            name=park.name,
-            url=url,
-            type=park_type,
-            region=get_region_from_state(state, session),
-            state=state,
-            latitude=park.latitude,
-            longitude=park.longitude,
-            date_founded=park.date,
-        )
-        session.add(park_row)
+        if url not in urls:
+            urls.add(url)
+            park_row = Park(
+                name=park.name,
+                url=url,
+                type=park_type,
+                region=get_region_from_state(state, session),
+                state=state,
+                latitude=park.latitude,
+                longitude=park.longitude,
+                date_founded=park.date,
+            )
+            session.add(park_row)
+        else:
+            logger.error('Duplicate URL for {park}'.format(park=park.name))
 
 
 def save_stamps(session, stamp_texts):
@@ -1448,8 +1477,6 @@ def save_stamps(session, stamp_texts):
 
 def save_stamp_locations(session, stamp_info_entries):
     """Creates StampLocation entries in the database."""
-    # I'm not sure about the legality of directly copying the address
-    # information, so just create dummy entries for now
     park_id_objects = session.query(Park.id, Park.latitude, Park.longitude).all()
     for park_id_object in park_id_objects:
         stamp_location = StampLocation(
@@ -1528,7 +1555,7 @@ def main(argv=sys.argv):
     other_areas = get_other_areas()
 
     # Load data for parks
-    with open(u'parks/scripts/initialize_db/master_list.csv', u'rb') as f:
+    with open(u'parks/scripts/initialize_db/list.csv', u'rb') as f:
         reader = csv.reader(f, quotechar='"')
         stamp_info_entries = load_park_stamps_csv(reader)
 

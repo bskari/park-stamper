@@ -1,5 +1,5 @@
 #!/bin/python
-"""Fixes some common spelling errors in the master list. Might I add that this
+"""Fixes some common spelling errors in the list. Might I add that this
 is one of the reasons why having a website is useful?
 """
 import os
@@ -131,7 +131,7 @@ def fix_misspellings(test=None):
                     '{word} found {times} times'.format(
                         word=misspelling,
                         times=os.popen(
-                            r"grep -c -P '\b{word}\b' master_list.csv".format(
+                            r"grep -c -P '\b{word}\b' list.csv".format(
                                 word=misspelling,
                             )
                         ).readlines()[0][:-1],
@@ -146,7 +146,7 @@ def fix_misspellings(test=None):
             else:
 
                 os.system(
-                    r"sed -i -r 's/\b{misspelling}\b/{replacement}/g' master_list.csv".format(
+                    r"sed -i -r 's/\b{misspelling}\b/{replacement}/g' list.csv".format(
                         misspelling=misspelling,
                         replacement=replacement,
                     )
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == '--run':
         fix_misspellings(test=False)
         # Fix whte space too
-        os.system(r"sed -i -r 's/\s+$//' master_list.csv")
+        os.system(r"sed -i -r 's/\s+$//' list.csv")
     else:
         print('Usage: {program} [--test|--run]'.format(program=sys.argv[0]))
         sys.exit(1)
