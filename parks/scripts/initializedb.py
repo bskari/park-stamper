@@ -456,7 +456,7 @@ def get_rivers():
     for state_river_list in state_river_lists:
         # Some lists have sublists, so if there are no spans, just skip it
         try:
-            state = state_river_list.previousSibling.previousSibling.fetch(u'span')[1].text
+            state = state_river_list.previousSibling.previousSibling.fetch(u'span')[0].text
             # Some headings have things like "Georgia, North Carolina and South Carolina"
             if u',' in state:
                 state = state.split(u',')[0].strip()
@@ -635,24 +635,39 @@ def get_nps_exclusive_areas(state_names):
     that are exclusively listed by the National Park Service and therefore
     the list on the areas in the US NPS wiki page is exhaustive.
     """
-    soup = load_wiki_page(u'List_of_areas_in_the_United_States_National_Park_System')
+    soup = load_wiki_page(
+        u'List_of_areas_in_the_United_States_National_Park_System'
+    )
     tables = soup.fetch(u'table')
     wikitables = [t for t in tables if u'wikitable' in t['class']]
-    assert len(wikitables) == 32
-    nps_table = wikitables[4] # National preserves
-    nhps_table = wikitables[5]
-    nhs_table = wikitables[7]
-    ihs_table = wikitables[10]
-    nbps_table = wikitables[11]
-    nmps_table = wikitables[12]
-    nbs_table = wikitables[14]
-    nbss_table = wikitables[15]
-    nra_table = wikitables[19]
-    nrs_table = wikitables[24]
-    npws_table = wikitables[25]
-    nhst_table = wikitables[26]
-    ncs_table = wikitables[27]
-    other_table = wikitables[29]
+    def get_table(location_name):
+        """Returns the only table that contains a given location name. We use
+        this because the format of the Wiki page keeps moving around.
+        """
+        potential_tables = [
+            table for table in wikitables
+            if location_name in table.text
+        ]
+        if len(potential_tables) != 1:
+            logger.error(location_name + ' not found in any wiki table')
+            assert False
+        return potential_tables[0]
+
+    # National preserves
+    nps_table = get_table('Big Cypress National Preserve')
+    nhps_table = get_table('Adams National Historical Park')
+    nhs_table = get_table('Allegheny Portage Railroad National Historic Site')
+    ihs_table = get_table('Saint Croix Island International Historic Site')
+    nbps_table = get_table('Kennesaw Mountain National Battlefield Park')
+    nmps_table = get_table('Gettysburg National Military Park')
+    nbs_table = get_table('Antietam National Battlefield')
+    nbss_table = get_table('Brices Cross Roads National Battlefield Site')
+    nra_table = get_table('Amistad National Recreation Area')
+    nrs_table = get_table('Alagnak Wild and Scenic River')
+    npws_table = get_table('Blue Ridge Parkway')
+    nhst_table = get_table('Ala Kahakai National Historic Trail')
+    ncs_table = get_table('Arlington National Cemetery')
+    other_table = get_table('Catoctin Mountain Park')
 
     areas = []
 
@@ -905,14 +920,13 @@ def _get_state_from_wiki_soup(state_names, wiki_soup):
         s_c[0] for s_c in state_counts.iteritems() if s_c[1] == max_count
     ]
     if len(ties_for_first) > 1:
-        logger.warning(''.join((
-            'Unable to choose between states for ',
-            wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0],
-            ': ',
-            ', '.join(ties_for_first),
-            '; returning None',
-        )))
-        return None
+        title = wiki_soup.fetch(u'title')[0].text.split('Wikipedia')[0]
+        logger.warning(
+            'Unable to reliably choose between states for {park}: {states}'.format(
+                park=title,
+                states=', '.join(ties_for_first),
+            )
+        )
 
     return most_common_state
 
@@ -967,7 +981,7 @@ def _get_date_from_wiki_soup(wiki_soup):
                 date = parse(year)
             except:
                 logger.warning(
-                    u'Couldn\'t parse "{date}" as date on page'.format(
+                    u'Couldn\'t parse "{date}" as date on page {page}'.format(
                         date=date_string,
                         page=wiki_soup.fetch(u'title')[0].text,
                     )
@@ -1216,7 +1230,7 @@ def get_region_from_state(state, session):
             state=state,
         )
     )
-    return None
+    return 'PNWA'
 
 
 def guess_park_type(park_name):

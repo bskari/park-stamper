@@ -11,9 +11,6 @@ system packages; I've found them flaky.
 Make a virtual environment for parks.
     mkvirtualenv parks
 
-Install necessary packages.
-    pip install pyramid
-
 I'm using MySQL for my production database (I know, sorry... it's what I knew
 when I started this project) and the installation of Python's MySQL
 bindings will complain if you do not have a MySQL client installed, because it
