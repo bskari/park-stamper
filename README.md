@@ -26,7 +26,7 @@ is like BeautifulSoup, but I like it more. It's very similar to jQuery.
 And set everything up.
 
     git submodule init
-    pushd parks/static/js ; python lib/closure-library/closure/bin/calcdeps.py -i src -o deps > deps.js ; popd
+    pushd parks; make ; popd
     python setup.py develop
     initialize_Parks_db development.ini
 
