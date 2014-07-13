@@ -9,7 +9,7 @@ from parks.models import UserEmail
 
 @view_config(route_name='sign-up', renderer='sign_up.mako')
 def sign_up(request):
-    sign_up_url = request.route_url('sign-up')
+    sign_up_url = request.route_url('sign-up-post')
     referrer = request.url
     came_from = request.params.get('came-from', referrer)
     if came_from == sign_up_url:
@@ -41,7 +41,7 @@ def sign_up_post(request):
     password = request.params.get('password', None)
 
     # Use a fake loop so that I can break out early on errors
-    for _ in xrange(1):
+    for _ in range(1):
         if '@' not in email or len(email) < 5:
             render_dict.update(error="Your email doesn't look quite right.")
             break

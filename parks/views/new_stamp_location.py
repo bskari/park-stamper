@@ -59,7 +59,7 @@ def new_stamp_location_post(request):
                     id=stamp_location_id,
                 ),
             )
-        except ValueError, e:
+        except ValueError as e:
             render_dict.update(error=str(e))
 
 
@@ -80,10 +80,10 @@ def create_stamp_location(
                 " like to see all of the stamp locations at that park?"
             )
 
-        address, latitude, longitude = [
+        address, latitude, longitude = (
             None if s == '' else s
-            for s in address, latitude, longitude
-        ]
+            for s in (address, latitude, longitude)
+        )
 
         # Basic validation
         if latitude is not None:
@@ -106,7 +106,7 @@ def create_stamp_location(
         if longitude > 0.0:
             longitude = -longitude
 
-        if isinstance(added_by_user, str) or isinstance(added_by_user, unicode):
+        if isinstance(added_by_user, str) or isinstance(added_by_user, bytes):
             added_by_user = user_logic.get_user_by_username_or_email(added_by_user).id
 
         id_ = stamp_location_logic.create_new_stamp_location(

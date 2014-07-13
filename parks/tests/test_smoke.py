@@ -20,7 +20,7 @@ class AllParksUnitTest(FunctionalTestBase):
 
         routes = self.test_app.app.routes_mapper.routes
         GET_request_descriptions = (
-            description for description in routes.itervalues()
+            description for description in routes.values()
             # Some static routes don't have predicates
             if len(description.predicates) > 0
             and 'GET' in description.predicates[0].val

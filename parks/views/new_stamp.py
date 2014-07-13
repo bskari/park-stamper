@@ -49,7 +49,7 @@ def new_stamp_post(request):
             return HTTPFound(
                 location=request.route_url('park', park_url=park_url),
             )
-        except ValueError, e:
+        except ValueError as e:
             render_dict.update(error=str(e))
 
 
@@ -92,7 +92,7 @@ def create_stamp(location_id, text, user):
                 " another location? If so, click here to add it to that location."
             )
 
-        if isinstance(user, str) or isinstance(user, unicode):
+        if isinstance(user, str) or isinstance(user, bytes):
             user = user_logic.get_user_by_username_or_email(user).id
 
         stamp_id = stamp_logic.create_new_stamp(text, 'normal', user)

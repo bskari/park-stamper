@@ -39,7 +39,7 @@ def add_stamp_to_location(request):
                 return HTTPFound(
                     location=request.route_url('park', park_url=park.url),
                 )
-            except ValueError, e:
+            except ValueError as e:
                 render_dict.update(error=str(e))
 
     url = request.route_url('add-stamp-to-location')

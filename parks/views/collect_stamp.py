@@ -54,7 +54,7 @@ def collect_stamp(request):
                 park_id=park_id,
                 date=date
             )
-        except ValueError, e:
+        except ValueError as e:
             render_dict.update(success=False, error=str(e))
         else:
             render_dict.update(success=True)

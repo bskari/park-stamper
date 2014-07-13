@@ -73,5 +73,5 @@ def edit_stamp_post(request):
             })
             return render_dict
 
-        except ValueError, e:
+        except ValueError as e:
             return {'error': str(e)}

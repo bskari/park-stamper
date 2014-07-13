@@ -28,7 +28,7 @@ def levenshtein(s1, s2, cutoff=None):
     if len(s2) == 0:
         return len(s1)
 
-    previous_row = xrange(len(s2) + 1)
+    previous_row = range(len(s2) + 1)
     for i, c1 in enumerate(s1):
         current_row = [i + 1]
         current_row_min = sys.maxint

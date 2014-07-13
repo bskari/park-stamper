@@ -7,7 +7,7 @@ def _return_or_write(context, string):
     if context is None:
         return string
     else:
-        context.write(unicode(string))
+        context.write(str(string))
         return ''
 
 def css_url(context=None, string=''):

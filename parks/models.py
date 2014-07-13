@@ -1,21 +1,22 @@
-from datetime import datetime
-from datetime import date
 from bcrypt import gensalt
 from bcrypt import hashpw
+from datetime import date
+from datetime import datetime
+from functools import reduce
 from sqlalchemy import BigInteger
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
-from sqlalchemy import DateTime
 from sqlalchemy import Date
-from sqlalchemy import Time
+from sqlalchemy import DateTime
 from sqlalchemy import Enum
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Integer
-from sqlalchemy import or_
 from sqlalchemy import String
+from sqlalchemy import Time
 from sqlalchemy import UniqueConstraint
+from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
@@ -56,7 +57,7 @@ class UserEmail(Base):
     def __init__(self, user, email):
         if isinstance(user, int):
             self.user_id = user
-        elif isinstance(user, str) or isinstance(user, unicode):
+        elif isinstance(user, str) or isinstance(user, bytes):
             user_id = DBSession.query(User.id).filter_by(username=user).first()
             self.user_id = user_id.id
 
@@ -135,7 +136,7 @@ class Park(Base):
 
         if isinstance(state, int):
             self.state_id = state
-        elif isinstance(state, str) or isinstance(state, unicode):
+        elif isinstance(state, str) or isinstance(state, bytes):
             # Try both the name and the abbreviation
             self.state_id = DBSession.query(
                 State.id

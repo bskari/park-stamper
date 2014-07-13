@@ -73,5 +73,5 @@ def csrf_validation_event(event):
         csrf_token = request.params.get('csrf-token', None)
 
     if (request.method == 'POST' or request.is_xhr) and \
-        (csrf_token != unicode(request.session.get_csrf_token())):
+        (csrf_token != str(request.session.get_csrf_token())):
             raise HTTPUnauthorized
