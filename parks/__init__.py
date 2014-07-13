@@ -39,6 +39,7 @@ def main(global_config, **settings):
     config.set_authorization_policy(authz_policy)
 
     # Rendering policies
+    config.include('pyramid_mako')
     config.add_subscriber(add_renderer_globals, BeforeRender)
     config.add_subscriber(csrf_validation_event, NewRequest)
 

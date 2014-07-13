@@ -1195,7 +1195,7 @@ def get_region_from_state(state, session):
     if len(abbreviations) == 1 and abbreviations[0].abbreviation in mapping:
         return mapping[abbreviations[0].abbreviation]
     logger.warning(
-        u"Couldn't find region for state {state}".format(
+        "Couldn't find region for state {state}".format(
             state=state,
         )
     )
@@ -1323,7 +1323,7 @@ def save_parks(session, parks):
     def normalized_url_from_name(name):
         url = name.lower()
         url = url.strip()
-        url = re.sub(u"'", '', url)
+        url = re.sub("'", '', url)
         def strip_accents(unicode):
             return unicodedata.normalize(
                 'NFKD',
@@ -1341,7 +1341,7 @@ def save_parks(session, parks):
         url = re.sub('-+', '-', url)
         url = re.sub('-$', '', url)
         url = re.sub('^-', '', url)
-        url = re.sub(u"'", '', url)
+        url = re.sub("'", '', url)
         return url
 
     def stripped_url_from_name(name):

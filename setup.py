@@ -15,6 +15,7 @@ requires = [
     'pyramid',
     'pyramid_beaker',
     'pyramid_debugtoolbar',
+    'pyramid_mako',
     'pyramid_tm',
     'python-dateutil',
     'transaction',
