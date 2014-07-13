@@ -5,18 +5,16 @@ Getting Started
 ---------------
 
 Install virtualenv from pip if you don't have it. Don't use your operating
-system packages; I've found them flaky.
+system packages; I've found them to be flaky.
     sudo pip install virtualenvwrapper
 
-Make a virtual environment for parks.
-    mkvirtualenv parks
+Make a virtual environment for parks. Also, I'm using Python 3, dammit. I'm
+tired of Unicode errors.
+    mkvirtualenv parks --python=/usr/bin/python3
 
-I'm using MySQL for my production database (I know, sorry... it's what I knew
-when I started this project) and the installation of Python's MySQL
-bindings will complain if you do not have a MySQL client installed, because it
-wants to read a configuration file. So, you have to install it, even if you're
-not going to use locally. Yay MySQL.
-    sudo apt-get install libmysqlclient-dev
+You'll need to install the lib XML headers in order to install PyQuery. PyQuery
+is like BeautifulSoup, but I like it more. It's very similar to jQuery.
+    sudo apt-get install libxml2-dev libxslt-dev
 
 And set everything up.
     git submodule init

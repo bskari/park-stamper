@@ -1,6 +1,6 @@
 #!/bin/python
-"""Fixes some common spelling errors in the list. Might I add that this
-is one of the reasons why having a website is useful?
+"""Fixes some common spelling errors. Might I add that this is one of the
+reasons why having a website is useful?
 """
 import os
 import sys
@@ -56,6 +56,7 @@ def fix_misspellings(test=None):
         test = False
 
     words = (
+        'Anniversary',
         'Bonus',
         'Cemetery',
         'Heritage',

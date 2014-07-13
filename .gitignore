@@ -6,9 +6,13 @@ initializedb.log
 *.swp
 *.pyc
 
+parks/bin
+parks/include
+parks/lib
+
 # This is downloaded automatically from Wikipedia
 parks/scripts/initialize_db/*.html
-parks/scripts/initialize_db/*.html.soup.pickle
+parks/scripts/initialize_db/*.html.pq.pickle
 
 # Created automatically by Closure
 parks/static/js/deps.js

@@ -7,16 +7,16 @@ README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'BeautifulSoup',
+    'PyMySql',
+    'PyQuery',
+    'SQLAlchemy',
     'mock',
-    'mysql-python',
     'py-bcrypt',
     'pyramid',
-    'pyramid_debugtoolbar',
     'pyramid_beaker',
+    'pyramid_debugtoolbar',
     'pyramid_tm',
     'python-dateutil',
-    'SQLAlchemy',
     'transaction',
     'waitress',
     'webtest',
