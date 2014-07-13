@@ -171,7 +171,11 @@
 
 <%def name="insert_inline_script()">
 ## Iterate over the namespaces that aren't in the inheritance hierarchy
-% for ns in context.namespaces.values():
+## We have to grab the values and then iterate through them instead of just
+## doing it all at once, because otherwise Mako throws an exception:
+## "dictionary changed size during iteration"
+<% namespaces = list(context.namespaces.values()) %>
+% for ns in namespaces:
     % if hasattr(ns, 'inline_script'):
         ${ns.inline_script()}
     % endif
@@ -191,7 +195,11 @@ ${all_inline_script | n}
 
 <%def name="insert_script_files()">
 ## Iterate over the namespaces that aren't in the inheritance hierarchy
-% for ns in context.namespaces.values():
+## We have to grab the values and then iterate through them instead of just
+## doing it all at once, because otherwise Mako throws an exception:
+## "dictionary changed size during iteration"
+<% namespaces = list(context.namespaces.values()) %>
+% for ns in namespaces:
     % if hasattr(ns, 'script_files'):
         ${ns.script_files()}
     % endif
