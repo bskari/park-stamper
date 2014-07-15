@@ -1325,12 +1325,14 @@ def save_parks(session, parks):
         url = url.strip()
         url = re.sub("'", '', url)
         def strip_accents(unicode):
-            return unicodedata.normalize(
-                'NFKD',
-                unicode
-            ).encode(
-                'ascii',
-                'ignore'
+            return bytes.decode(
+                unicodedata.normalize(
+                    'NFKD',
+                    unicode
+                ).encode(
+                    'ascii',
+                    'ignore'
+                )
             )
         url = strip_accents(url)
         url = str(url)

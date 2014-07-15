@@ -14,7 +14,8 @@ system packages; I've found them to be flaky.
     sudo pip install virtualenvwrapper
 
 Make a virtual environment for parks. Also, I'm using Python 3, dammit. I'm
-tired of Unicode errors.
+tired of Unicode errors. (Be warned, I had some trouble getting Mako and
+Pyramid to work on Python 3.2).
 
     mkvirtualenv parks --python=/usr/bin/python3
 
@@ -26,7 +27,8 @@ is like BeautifulSoup, but I like it more. It's very similar to jQuery.
 And set everything up.
 
     git submodule init
-    pushd parks; make ; popd
+    git submodule update
+    pushd parks; make; popd
     python setup.py develop
     initialize_Parks_db development.ini
 
