@@ -54,13 +54,13 @@ inline_script = "\
         <label for="latitude">
             Latitude (optional)
         </label>
-        <input type="number" name="latitude" id="latitude">
+        <input type="number" name="latitude" id="latitude" min="-89.999" max="89.999" step="0.00000001">
         <br>
 
         <label for="longitude">
             Longitude (optional)
         </label>
-        <input type="number" name="longitude" id="longitude">
+        <input type="number" name="longitude" id="longitude" min="-179.999" max="179.999" step="0.00000001">
         <br>
 
         ${base.show_if_mobile(
