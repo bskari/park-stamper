@@ -25,10 +25,12 @@ def new_stamp_location(request):
 @view_config(route_name='new-stamp-location-post', renderer='new_stamp_location.mako', permission='edit')
 def new_stamp_location_post(request):
     render_dict = {}
-    if 'form.submitted' not in request.params:
+    if len(request.params) == 0:
         # How did we get to a POST endpoint without a form?
+        new_stamp_location_url = request.route_url('new-stamp-location-post')
         render_dict.update(
-            error='Sorry, there was an error submitting that information.'
+            error='Sorry, there was an error submitting that information.',
+            post_url=new_stamp_location_url,
         )
         return render_dict
 

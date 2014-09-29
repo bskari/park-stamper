@@ -82,7 +82,6 @@ class LogInUnitTest(IntegrationTestBase):
             'login': self.username,
             'password': self.password,
             'came_from': original_url,
-            'form.submitted': 'Log In',
         }
         response = log_in_post(request)
         self.assertIsInstance(response, HTTPFound)
@@ -95,7 +94,6 @@ class LogInUnitTest(IntegrationTestBase):
             'login': 'invalid user',
             'password': 'invalid password',
             'came_from': original_url,
-            'form.submitted': 'Log In',
         }
         response = log_in_post(request)
         self.assertIn('error', response)

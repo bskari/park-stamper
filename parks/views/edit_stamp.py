@@ -32,7 +32,7 @@ def edit_stamp(request):
 
 @view_config(route_name='edit-stamp-post', renderer='edit_stamp.mako', permission='edit')
 def edit_stamp_post(request):
-    if 'form.submitted' not in request.params:
+    if len(request.params) == 0:
         # How did we get to a POST endpoint without a form?
         return {
             'error': 'Sorry, there was an error submitting that information.'

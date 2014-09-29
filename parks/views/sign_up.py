@@ -29,7 +29,7 @@ def sign_up(request):
 def sign_up_post(request):
     render_dict = {}
 
-    if 'form.submitted' not in request.params:
+    if len(request.params) == 0:
         # How did we get to a POST endpoint without a form?
         render_dict.update(
             error='Sorry, there was an error submitting that information.'

@@ -20,7 +20,7 @@ def log_in_post(request):
     render_dict = default_login_variables(request)
     came_from = render_dict['came_from']
 
-    if 'form.submitted' not in request.params:
+    if len(request.params) == 0:
         # How did we get to a POST endpoint without a form?
         render_dict.update(
             error="Sorry, there was an error submitting your login."

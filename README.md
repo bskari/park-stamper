@@ -49,4 +49,4 @@ and restart the test server.
 Running Tests
 -------------
 
-    ../bin/nosetests --cover-package=parks --cover-erase --with-coverage
+    python setup.py test -q
