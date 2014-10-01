@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
+"""Functions for creating a new stamp location."""
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config
-import re
 from transaction import manager
+import re
 
 from parks.logic import park as park_logic
 from parks.logic import stamp_location as stamp_location_logic
 from parks.logic import user as user_logic
 
 
-@view_config(route_name='new-stamp-location', renderer='new_stamp_location.mako', permission='edit')
+@view_config(
+    route_name='new-stamp-location',
+    renderer='new_stamp_location.mako',
+    permission='edit'
+)
 def new_stamp_location(request):
+    """Handles the create a new stamp page."""
     render_dict = {}
 
     new_stamp_location_url = request.route_url('new-stamp-location-post')
@@ -22,15 +28,23 @@ def new_stamp_location(request):
     return render_dict
 
 
-@view_config(route_name='new-stamp-location-post', renderer='new_stamp_location.mako', permission='edit')
+@view_config(
+    route_name='new-stamp-location-post',
+    renderer='new_stamp_location.mako',
+    permission='edit'
+)
 def new_stamp_location_post(request):
-    render_dict = {}
+    """Handles the POST endpoint of making a new stamp location."""
+    new_stamp_location_url = request.route_url('new-stamp-location-post')
+    render_dict = {
+        'post_url': new_stamp_location_url,
+    }
+
     if len(request.params) == 0:
         # How did we get to a POST endpoint without a form?
         new_stamp_location_url = request.route_url('new-stamp-location-post')
         render_dict.update(
             error='Sorry, there was an error submitting that information.',
-            post_url=new_stamp_location_url,
         )
         return render_dict
 
@@ -61,8 +75,10 @@ def new_stamp_location_post(request):
                     id=stamp_location_id,
                 ),
             )
-        except ValueError as e:
-            render_dict.update(error=str(e))
+        except ValueError as error:
+            render_dict.update(error=str(error))
+
+    return render_dict
 
 
 def create_stamp_location(
@@ -98,7 +114,11 @@ def create_stamp_location(
             # Remove non-numerical stuff from strings like '80.4° W'
             longitude = re.sub(r'[^\d\.-]', '', longitude)
             longitude = float(longitude)
-            if longitude > 180.0 or longitude < -180.0:
+            if longitude > 0.0:
+                # So, GPS devices will show 120.54 W instead of negative
+                # values, so let's just negate it
+                longitude = -longitude
+            if longitude < -180.0:
                 raise ValueError('Longitude needs to be between -180 and 180.')
         # Soooo... all of the parks that I scraped off of Wikipedia have
         # latitudes between 17.74694 and 71.29861, and longitudes between
@@ -109,7 +129,9 @@ def create_stamp_location(
             longitude = -longitude
 
         if isinstance(added_by_user, str) or isinstance(added_by_user, bytes):
-            added_by_user = user_logic.get_user_by_username_or_email(added_by_user).id
+            added_by_user = user_logic.get_user_by_username_or_email(
+                added_by_user
+            ).id
 
         id_ = stamp_location_logic.create_new_stamp_location(
             park_id=park_id,
