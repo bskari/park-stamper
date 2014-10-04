@@ -14,7 +14,6 @@ stylesheet_files = [css_url(string='edit_stamp.css')]
     <h1>Edit stamp</h1>
 
     <form action="${post_url}" method="post">
-        <input type="hidden" name="csrf-token" value="${csrf_token}">
         <input type="hidden" name="stamp-id" value="${stamp.id}">
 
         <label for="text">Text</label>

@@ -16,7 +16,6 @@ stylesheet_files = [css_url(string='park.css')]
 
 <%block name="content">
     <form action="${post_url}" method="post">
-        <input type="hidden" name="csrf-token" value="${csrf_token}">
         <input type="hidden" name="came-from" value="${came_from}">
         <label for="username">
             Username

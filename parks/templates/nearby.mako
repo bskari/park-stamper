@@ -33,8 +33,6 @@ inline_script = "\
 %>
 
 <%block name="content">
-    <input type="hidden" id="csrf-token" value="${csrf_token}">
-
     <h1>Nearby stamps</h1>
 
     <div class="row">

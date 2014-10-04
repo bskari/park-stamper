@@ -1,3 +1,4 @@
+import logging
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
@@ -13,6 +14,8 @@ from parks.models import DBSession
 from parks.models import Base
 from parks.routes import add_routes
 from parks.routes import add_static_views
+
+logger = logging.getLogger(__name__)
 
 
 def main(global_config, **settings):
@@ -66,6 +69,11 @@ def csrf_validation_event(event):
     validation fails.
     """
     request = event.request
+
+    # We only need to CSRF validate POST and XHR requests
+    if request.method != 'POST' and not request.is_xhr:
+        return
+
     # CSRF tokens could come from AJAX where you're supposed to have JSON
     # encoded parameters (which use camelCase) or from form inputs (which use
     # dashed-names) so just try both.
@@ -73,6 +81,9 @@ def csrf_validation_event(event):
     if csrf_token is None:
         csrf_token = request.params.get('csrf-token', None)
 
-    if (request.method == 'POST' or request.is_xhr) and \
-        (csrf_token != str(request.session.get_csrf_token())):
-            raise HTTPUnauthorized
+    if csrf_token is None:
+        logger.warn('No CSRF token found for request {0}'.format(request))
+        return HTTPUnauthorized
+    elif csrf_token != str(request.session.get_csrf_token()):
+        logger.warn('Invalid CSRF token found for request {0}'.format(request))
+        raise HTTPUnauthorized

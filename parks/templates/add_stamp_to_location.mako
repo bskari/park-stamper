@@ -42,7 +42,6 @@ inline_script = "\
     <input type="hidden" id="stamp-locations-url" value="${stamp_locations_url}">
     <input type="hidden" id="stamps-url" value="${stamps_url}">
     <input type="hidden" id="stamp-location-id" value="${stamp_location_id}">
-    <input type="hidden" id="csrf-token" value="${csrf_token}">
 
     <h1>Add stamps to location</h1>
     <p>Found a stamp at a location?</p>
@@ -58,7 +57,6 @@ inline_script = "\
     <br>
 
     <form action="${add_stamp_to_location_post_url}" method="post">
-        <input type="hidden" name="csrf-token" value="${csrf_token}">
 
         <label for="location">
             Stamp location

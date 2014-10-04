@@ -27,7 +27,6 @@ inline_script = "\
 
 <%block name="content">
     <input type="hidden" id="parks-json-url" value="${request.route_url('park-names-json')}">
-    <input type="hidden" id="csrf-token" value="${csrf_token}">
 
     <h1>New location</h1>
     <p>Found a place with stamps? Give me the skinny!</p>
@@ -69,8 +68,6 @@ inline_script = "\
             '<br>'
             '<br>'
         )}
-
-        <input type="hidden" name="csrf-token" value="${csrf_token}">
 
         <input type="submit" name="new-stamp-location" value="Add Location" class="btn btn-primary">
     </form>

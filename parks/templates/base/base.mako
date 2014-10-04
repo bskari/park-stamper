@@ -119,6 +119,8 @@
                 var script = '/static/js/jquery-1.10.1.min.js';
                 document.write('<script src="' + script + '"><\/script>');
             }
+            var csrfInput = $('#csrf-token');
+            $('form').add(csrfInput);
         </script>
 
         <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.10.1/jquery-ui.min.js"></script>
