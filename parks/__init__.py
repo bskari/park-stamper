@@ -33,7 +33,7 @@ def main(global_config, **settings):
 
     # Authentication
     authn_policy = AuthTktAuthenticationPolicy(
-        'b5kUolGpl79YxIWqzaNKedhtv7yEi7c6lAcbdBYi',
+        settings['authn_key'],
         callback=group_finder,
         hashalg='sha512',
     )
