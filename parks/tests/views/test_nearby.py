@@ -7,11 +7,11 @@ import parks.logic.stamp
 from parks.models import Park
 from parks.models import Stamp
 from parks.models import StampLocation
-from parks.tests.test_base import UnitTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.nearby import nearby_json
 
 
-class NearbyUnitTest(UnitTestBase):
+class NearbyUnitTest(IntegrationTestBase):
     def _test_direction(self, latitude, longitude, expected_direction):
         request = DummyRequest(
             params=dict(

@@ -2,11 +2,11 @@ from mock import patch
 from pyramid import testing
 
 from parks.models import Park
-from parks.tests.test_base import UnitTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.all_parks import all_parks
 
 
-class AllParksUnitTest(UnitTestBase):
+class AllParksUnitTest(IntegrationTestBase):
     @patch('parks.logic.park.get_all_parks')
     def test_view(self, mock_get_all_parks):
         request = testing.DummyRequest()

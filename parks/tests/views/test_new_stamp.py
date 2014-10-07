@@ -1,10 +1,10 @@
 from pyramid import testing
 
-from parks.tests.test_base import UnitTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.new_stamp import new_stamp
 
 
-class NewStampUnitTest(UnitTestBase):
+class NewStampUnitTest(IntegrationTestBase):
     # TODO(bskari|2013-02-02) Test the POST half of this form page.
 
     def test_view(self):

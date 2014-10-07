@@ -1,4 +1,5 @@
 from pyramid import testing
+from pyramid.events import BeforeRender
 from sqlalchemy import create_engine
 from unittest import TestCase
 from webtest import TestApp
@@ -13,8 +14,6 @@ from parks.routes import add_static_views
 class UnitTestBase(TestCase):
     def setUp(self):
         self.config = testing.setUp()
-        add_routes(self.config)
-        add_static_views(self.config)
 
     def tearDown(self):
         testing.tearDown()
@@ -28,6 +27,19 @@ class IntegrationTestBase(UnitTestBase):
         self.session.configure(bind=engine)
         Base.metadata.create_all(engine)
 
+        add_routes(self.config)
+        add_static_views(self.config)
+        self.config.add_settings({'mako.directories': 'parks:templates'})
+        self.config.include('pyramid_mako')
+
+        def add_renderer_globals(event):
+            request = event['request']
+            event['user_id'] = None
+            event['csrf_token'] = 'csrf'
+            event['came_from'] = 'log-in'
+
+        self.config.add_subscriber(add_renderer_globals, BeforeRender)
+
     def tearDown(self):
         DBSession.remove()
         super(IntegrationTestBase, self).tearDown()
@@ -39,6 +51,7 @@ class FunctionalTestBase(TestCase):
         settings = {
             'sqlalchemy.url': 'sqlite:///Parks.sqlite',
             'mako.directories': 'parks:templates',
+            'authn_key': 'test_authn_key',
         }
         app = main({}, **settings)
         self.test_app = TestApp(app)

@@ -42,7 +42,7 @@ def add_stamp_to_location(request):
             except ValueError as e:
                 render_dict.update(error=str(e))
 
-    url = request.route_url('add-stamp-to-location')
+    url = request.route_url('add-stamp-to-location-post')
     # We may have been redirected here after being primpted to add some stamps
     # to a location that had none
     stamp_location_id = request.GET.get('stamp-location-id', None)

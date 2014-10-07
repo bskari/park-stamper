@@ -3,11 +3,11 @@ from pyramid import testing
 
 from parks.models import Park
 from parks.models import StampLocation
-from parks.tests.test_base import UnitTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.stamp_location import stamp_location
 
 
-class StampLocationUnitTest(UnitTestBase):
+class StampLocationUnitTest(IntegrationTestBase):
     @patch('parks.logic.park.get_park_by_id')
     @patch('parks.logic.stamp_location.get_stamp_location_by_id')
     @patch('parks.logic.stamp.get_stamps_by_location_id')

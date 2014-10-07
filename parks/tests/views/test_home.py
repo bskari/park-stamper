@@ -1,11 +1,11 @@
 from mock import patch
 from pyramid import testing
 
-from parks.tests.test_base import UnitTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.home import home
 
 
-class HomeUnitTest(UnitTestBase):
+class HomeUnitTest(IntegrationTestBase):
     @patch('parks.logic.user.get_recent_user_collections')
     def test_view(self, mock_get_recent_user_collections):
         request = testing.DummyRequest()

@@ -2,11 +2,11 @@ from mock import patch
 from pyramid import testing
 
 from parks.models import User
-from parks.tests.test_base import UnitTestBase
+from parks.tests.test_base import IntegrationTestBase
 from parks.views.profile import profile_user
 
 
-class ProfileUnitTest(UnitTestBase):
+class ProfileUnitTest(IntegrationTestBase):
     @patch('parks.logic.user.get_user_by_username_or_email')
     @patch('parks.logic.stamp_collection.get_recent_collections_by_user_id')
     def test_profile_user_view(self, mock_get_user_by_username_or_email, _):
