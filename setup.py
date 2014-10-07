@@ -8,7 +8,6 @@ README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'PyMySql',
     'PyQuery',
     'SQLAlchemy',
     'py-bcrypt',
@@ -30,6 +29,10 @@ if 'develop' in sys.argv:
         'mock',
         'pyquery',
         'pyramid_debugtoolbar',
+    ))
+elif 'install' in sys.argv:
+    requires.extend((
+        'psycopg2',
     ))
 
 setup(

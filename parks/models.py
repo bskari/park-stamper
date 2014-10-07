@@ -126,8 +126,8 @@ class Park(Base):
     CheckConstraint('longitude >= -90 and longitude <= 90')
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     date_founded = Column(Date)
-    region = Column(Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA'), nullable=False)
-    type = Column(Enum(*get_park_types().keys()))
+    region = Column(Enum('NA', 'MA', 'NC', 'SE', 'MW', 'SW', 'RM', 'W', 'PNWA', name='region'), nullable=False)
+    type = Column(Enum(*get_park_types().keys(), name='park_type'))
     added_by_user_id = Column(Integer, ForeignKey('user.id'))
 
 
@@ -162,8 +162,8 @@ class Stamp(Base):
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
     time_updated = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
-    type = Column(Enum('normal', 'bonus'), nullable=False)
-    status = Column(Enum('active', 'lost', 'archived'), nullable=False)
+    type = Column(Enum('normal', 'bonus', name='stamp_type'), nullable=False)
+    status = Column(Enum('active', 'lost', 'archived', name='stamp_status'), nullable=False)
     added_by_user_id = Column(Integer, ForeignKey('user.id'))
 
 
@@ -176,8 +176,8 @@ class StampHistory(Base):
     stamp_id = Column(Integer, ForeignKey('stamp.id'))
     text = Column(String(255), nullable=False)
     time_created = Column(DateTime, nullable=False, default=datetime.utcnow)
-    type = Column(Enum('normal', 'bonus'), nullable=False)
-    status = Column(Enum('active', 'lost', 'archived'), nullable=False)
+    type = Column(Enum('normal', 'bonus', name='stamp_history_type'), nullable=False)
+    status = Column(Enum('active', 'lost', 'archived', name='stamp_status_type'), nullable=False)
     edited_by_user_id = Column(Integer, ForeignKey('user.id'))
 
 
@@ -257,6 +257,7 @@ class OperatingHours(Base):
             'Thursday',
             'Friday',
             'Saturday',
+            name='weekday',
         ),
         nullable=False
     )
