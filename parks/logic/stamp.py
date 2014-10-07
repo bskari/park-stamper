@@ -32,11 +32,17 @@ def get_stamps_by_park_id(park_id):
         StampLocation,
     ).outerjoin(
         max_time_subquery,
-        Stamp.id == max_time_subquery.c.stamp_id,
+        Stamp.id == max_time_subquery.c.stamp_id
     ).filter(
-        StampLocation.park_id == park_id,
+        StampLocation.park_id == park_id
     ).group_by(
         Stamp.id
+    ).group_by(
+        # This group_by needs to be included for the query to run in Postgres
+        StampLocation.id
+    ).group_by(
+        # This group_by needs to be included for the query to run in Postgres
+        max_time_subquery.c.most_recent_time
     ).all()
 
 
@@ -63,6 +69,12 @@ def get_stamps_by_location_id(location_id):
         StampLocation.id == location_id,
     ).group_by(
         Stamp.id
+    ).group_by(
+        # This group_by needs to be included for the query to run in Postgres
+        StampLocation.id
+    ).group_by(
+        # This group_by needs to be included for the query to run in Postgres
+        max_time_subquery.c.most_recent_time
     ).all()
 
 
