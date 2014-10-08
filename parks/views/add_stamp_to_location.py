@@ -9,6 +9,7 @@ from parks.logic import stamp_location as stamp_location_logic
 
 @view_config(route_name='add-stamp-to-location', renderer='add_stamp_to_location.mako', permission='edit')
 def add_stamp_to_location(request):
+    """Add stamp to location request handler."""
     render_dict = {}
 
     url = request.route_url('add-stamp-to-location-post')
@@ -41,39 +42,44 @@ def add_stamp_to_location(request):
 
 @view_config(route_name='add-stamp-to-location-post', renderer='add_stamp_to_location.mako', permission='edit')
 def add_stamp_to_location_post(request):
+    """Saves a stamp at location to the database."""
     render_dict = {}
-    if 'add-stamp-to-location' in request.params:
-        stamp_location_id = request.params.get('location', None)
-        stamp_ids = request.params.getall('stamp')
+    if len(request.params) == 0:
+        # How did we get to a POST endpoint without a form?
+        render_dict.update(
+            error='Sorry, there was an error submitting that information.'
+        )
+        return render_dict
 
-        if stamp_location_id is None:
-            render_dict.update(
-                error='There was an error submitting that information.'
-            )
-        elif len(stamp_ids) == 0:
-            render_dict.update(
-                error='Please select some stamps.'
-            )
-        else:
-            try:
-                stamp_location_id = int(stamp_location_id)
-                for stamp_id in stamp_ids:
-                    stamp_id = int(stamp_id)
-                    stamp_location_logic.add_stamp_to_location(
-                        stamp_id,
-                        stamp_location_id
-                    )
-                stamp_location = stamp_location_logic.get_stamp_location_by_id(
+    stamp_location_id = request.params.get('location', None)
+    stamp_ids = request.params.getall('stamp')
+
+    if stamp_location_id is None:
+        render_dict.update(
+            error='There was an error submitting that information.'
+        )
+    elif len(stamp_ids) == 0:
+        render_dict.update(
+            error='Please select some stamps.'
+        )
+    else:
+        try:
+            stamp_location_id = int(stamp_location_id)
+            for stamp_id in stamp_ids:
+                stamp_id = int(stamp_id)
+                stamp_location_logic.add_stamp_to_location(
+                    stamp_id,
                     stamp_location_id
                 )
-                park = park_logic.get_park_by_id(stamp_location.park_id)
-                return HTTPFound(
-                    location=request.route_url('park', park_url=park.url),
-                )
-            except ValueError as e:
-                render_dict.update(error=str(e))
-    else:
-        render_dict.update(error='No POST data received')
+            stamp_location = stamp_location_logic.get_stamp_location_by_id(
+                stamp_location_id
+            )
+            park = park_logic.get_park_by_id(stamp_location.park_id)
+            return HTTPFound(
+                location=request.route_url('park', park_url=park.url),
+            )
+        except ValueError as error:
+            render_dict.update(error=str(error))
 
 
 @view_config(route_name='stamps-substring-json', renderer='json')
