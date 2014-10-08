@@ -56,7 +56,7 @@ inline_script = "\
     % endif
     <br>
 
-    <form action="${add_stamp_to_location_post_url}" method="post">
+    <form action="${post_url}" method="post">
 
         <label for="location">
             Stamp location

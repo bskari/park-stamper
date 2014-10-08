@@ -60,11 +60,11 @@ def add_stamp_to_location(request):
         park_name = None
 
     render_dict.update(
-        add_stamp_to_location_post_url=url,
+        post_url=url,
         stamp_locations_url=request.route_url('stamp-locations-json'),
         stamps_url=request.route_url('stamps-substring-json'),
         stamp_location_id=stamp_location_id,
-        park_name = park_name,
+        park_name=park_name,
     )
 
     return render_dict
