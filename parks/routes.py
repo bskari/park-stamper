@@ -30,8 +30,8 @@ def add_routes(config):
 
     # POSTs
     for name, pattern in (
-        ('add-stamp-to-location-post', '/add-stamp-to-location'),
-        ('collect-stamp', '/collect-stamp'),
+        ('add-stamp-to-location-post', '/add-stamp-to-location-post'),
+        ('collect-stamp', '/collect-stamp-post'),
         ('edit-stamp-post', '/edit-stamp-post/{id}/'),
         ('log-in-post', '/log-in-post'),
         ('new-stamp-post', '/new-stamp-post'),

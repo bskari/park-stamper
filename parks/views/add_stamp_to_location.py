@@ -11,6 +11,37 @@ from parks.logic import stamp_location as stamp_location_logic
 def add_stamp_to_location(request):
     render_dict = {}
 
+
+    url = request.route_url('add-stamp-to-location-post')
+    # We may have been redirected here after being primpted to add some stamps
+    # to a location that had none
+    stamp_location_id = request.GET.get('stamp-location-id', None)
+    if stamp_location_id is not None:
+        try:
+            stamp_location = stamp_location_logic.get_stamp_location_by_id(
+                stamp_location_id
+            )
+            park = park_logic.get_park_by_id(stamp_location.park_id)
+            park_name = park.name
+        except:
+            stamp_location_id = None
+            park_name = None
+    else:
+        park_name = None
+
+    render_dict.update(
+        add_stamp_to_location_post_url=url,
+        stamp_locations_url=request.route_url('stamp-locations-json'),
+        stamps_url=request.route_url('stamps-substring-json'),
+        stamp_location_id=stamp_location_id,
+        park_name = park_name,
+    )
+
+    return render_dict
+
+
+@view_config(route_name='add-stamp-to-location-post', renderer='add_stamp_to_location.mako', permission='edit')
+def add_stamp_to_location_post(request):
     if 'add-stamp-to-location' in request.params:
         stamp_location_id = request.params.get('location', None)
         stamp_ids = request.params.getall('stamp')
@@ -41,33 +72,6 @@ def add_stamp_to_location(request):
                 )
             except ValueError as e:
                 render_dict.update(error=str(e))
-
-    url = request.route_url('add-stamp-to-location-post')
-    # We may have been redirected here after being primpted to add some stamps
-    # to a location that had none
-    stamp_location_id = request.GET.get('stamp-location-id', None)
-    if stamp_location_id is not None:
-        try:
-            stamp_location = stamp_location_logic.get_stamp_location_by_id(
-                stamp_location_id
-            )
-            park = park_logic.get_park_by_id(stamp_location.park_id)
-            park_name = park.name
-        except:
-            stamp_location_id = None
-            park_name = None
-    else:
-        park_name = None
-
-    render_dict.update(
-        add_stamp_to_location_post_url=url,
-        stamp_locations_url=request.route_url('stamp-locations-json'),
-        stamps_url=request.route_url('stamps-substring-json'),
-        stamp_location_id=stamp_location_id,
-        park_name = park_name,
-    )
-
-    return render_dict
 
 
 @view_config(route_name='stamps-substring-json', renderer='json')

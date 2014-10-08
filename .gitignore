@@ -19,3 +19,7 @@ parks/static/js/deps.js
 
 # Beaker session stuff
 data
+
+# Leftovers from building for production
+build/
+dist/
