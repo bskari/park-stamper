@@ -11,7 +11,6 @@ from parks.logic import stamp_location as stamp_location_logic
 def add_stamp_to_location(request):
     render_dict = {}
 
-
     url = request.route_url('add-stamp-to-location-post')
     # We may have been redirected here after being primpted to add some stamps
     # to a location that had none
@@ -30,11 +29,11 @@ def add_stamp_to_location(request):
         park_name = None
 
     render_dict.update(
-        add_stamp_to_location_post_url=url,
+        post_url=url,
         stamp_locations_url=request.route_url('stamp-locations-json'),
         stamps_url=request.route_url('stamps-substring-json'),
         stamp_location_id=stamp_location_id,
-        park_name = park_name,
+        park_name=park_name,
     )
 
     return render_dict
@@ -42,6 +41,7 @@ def add_stamp_to_location(request):
 
 @view_config(route_name='add-stamp-to-location-post', renderer='add_stamp_to_location.mako', permission='edit')
 def add_stamp_to_location_post(request):
+    render_dict = {}
     if 'add-stamp-to-location' in request.params:
         stamp_location_id = request.params.get('location', None)
         stamp_ids = request.params.getall('stamp')
@@ -72,6 +72,8 @@ def add_stamp_to_location_post(request):
                 )
             except ValueError as e:
                 render_dict.update(error=str(e))
+    else:
+        render_dict.update(error='No POST data received')
 
 
 @view_config(route_name='stamps-substring-json', renderer='json')

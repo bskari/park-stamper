@@ -98,6 +98,19 @@ class LogInUnitTest(IntegrationTestBase):
         response = log_in_post(request)
         self.assertIn('error', response)
 
+    def test_urls(self):
+        """Test that the urls are correct."""
+        request = testing.DummyRequest()
+        log_in_url = request.route_url('log-in')
+        request.params = dict(
+            login=self.username,
+            password=self.password,
+            came_from=log_in_url,
+        )
+        page = log_in(request)
+        self.assertIn('post_url', page)
+        self.assertEqual(page['post_url'], request.route_url('log-in-post'))
+
     def _assert_equal_urls(self, url1, url2):
         self.assertTrue(
             url1 == url2

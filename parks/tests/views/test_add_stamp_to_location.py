@@ -1,19 +1,18 @@
 from pyramid import testing
 
 from parks.tests.test_base import IntegrationTestBase
-from parks.views.new_stamp import new_stamp
+from parks.views.add_stamp_to_location import add_stamp_to_location
 
 
-class NewStampUnitTest(IntegrationTestBase):
-    # TODO(bskari|2013-02-02) Test the POST half of this form page.
+class AddStampToLocationUnitTest(IntegrationTestBase):
+    # TODO(bskari|2014-10-06) Test the POST half of this form page.
 
     def test_urls(self):
         """Test that the urls are correct."""
         request = testing.DummyRequest()
-        page = new_stamp(request)
+        page = add_stamp_to_location(request)
         self.assertIn('post_url', page)
-        self.assertTrue(page['post_url'], 'post')
         self.assertEqual(
             page['post_url'],
-            request.route_url('new-stamp-post')
+            request.route_url('add-stamp-to-location-post')
         )
