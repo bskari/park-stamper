@@ -120,13 +120,6 @@ def create_stamp_location(
                 longitude = -longitude
             if longitude < -180.0:
                 raise ValueError('Longitude needs to be between -180 and 180.')
-        # Soooo... all of the parks that I scraped off of Wikipedia have
-        # latitudes between 17.74694 and 71.29861, and longitudes between
-        # -164.167 and -64.62 (as of 2012-01-27). However, many GPS units
-        # report longitude as degrees west, which is negative. So, if somebody
-        # types in a negative value, let's just negate it.
-        if longitude > 0.0:
-            longitude = -longitude
 
         if isinstance(added_by_user, str) or isinstance(added_by_user, bytes):
             added_by_user = user_logic.get_user_by_username_or_email(
