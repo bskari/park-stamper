@@ -6,8 +6,9 @@ ${base.title_string('New stamp')}
 </%block>
 
 <%!
+from parks.templates.base.functions import css_url
 from parks.templates.base.functions import css_lib_url
-stylesheet_files = [css_lib_url(string='jquery-ui.css')]
+stylesheet_files = [css_url(string='new_stamp.css'), css_lib_url(string='jquery-ui.css')]
 
 from parks.templates.base.functions import js_url
 script_files = [js_url(string='new_stamp.js')]
@@ -49,6 +50,18 @@ inline_script = "\
             Stamp text
         </label>
         <textarea rows="2" name="text" id="text"></textarea>
+        <br>
+
+        <label for="type">Type</label>
+        % for type in type_values:
+            <input type="radio" name="type" value="${type}"
+                % if type == "normal":
+                    checked="checked"
+                % endif
+            id="type-${type}" class="checked"></input>
+            <label for="type-${type}" class="checkbox">${type}</label>
+        % endfor
+        <br>
         <br>
 
         <input type="submit" name="form.submitted" value="Add Stamp" class="btn">

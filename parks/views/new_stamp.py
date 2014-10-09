@@ -8,6 +8,7 @@ from parks.logic import park as park_logic
 from parks.logic import stamp as stamp_logic
 from parks.logic import stamp_location as stamp_location_logic
 from parks.logic import user as user_logic
+from parks.models import Stamp
 
 
 @view_config(route_name='new-stamp', renderer='new_stamp.mako', permission='edit')
@@ -17,6 +18,7 @@ def new_stamp(request):
     new_stamp_url = request.route_url('new-stamp-post')
     render_dict.update(
         post_url=new_stamp_url,
+        type_values=Stamp.type.property.columns[0].type.enums,
     )
 
     return render_dict
@@ -34,7 +36,8 @@ def new_stamp_post(request):
 
     location_id = request.params.get('location', None)
     text = request.params.get('text', None)
-    if location_id is None or text is None:
+    stamp_type = request.params.get('type', None)
+    if location_id is None or text is None or stamp_type is None:
         render_dict.update(
             error='There was an error submitting that information.'
         )
@@ -44,13 +47,20 @@ def new_stamp_post(request):
             park_url = create_stamp(
                 location_id,
                 text,
-                authenticated_userid(request)
+                authenticated_userid(request),
+                stamp_type
             )
             return HTTPFound(
                 location=request.route_url('park', park_url=park_url),
             )
-        except ValueError as e:
-            render_dict.update(error=str(e))
+        except ValueError as error:
+            new_stamp_url = request.route_url('new-stamp-post')
+            render_dict.update(
+                error=str(error),
+                post_url=new_stamp_url,
+            )
+
+    return render_dict
 
 
 @view_config(route_name='stamp-locations-json', renderer='json')
@@ -80,7 +90,7 @@ def stamp_locations(request):
     )
 
 
-def create_stamp(location_id, text, user):
+def create_stamp(location_id, text, user, stamp_type):
     """Creates a new stamp at the given location with the given text. On
     success, it returns the location's park's URL.
     """
@@ -88,18 +98,21 @@ def create_stamp(location_id, text, user):
         if stamp_logic.stamp_exists(text):
             #TODO(bskari|2013-01-06) Make this click here go somewhere
             raise ValueError(
-                "I already have a stamp with that text. Did you find that stamp at"
-                " another location? If so, click here to add it to that location."
+'''I already have a stamp with that text. Did you find that stamp at another
+location? If so, click "New -> Add stamp to location" to add it to that
+location.'''
             )
 
         if isinstance(user, str) or isinstance(user, bytes):
             user = user_logic.get_user_by_username_or_email(user).id
 
-        stamp_id = stamp_logic.create_new_stamp(text, 'normal', user)
+        stamp_id = stamp_logic.create_new_stamp(text, stamp_type, user)
         stamp_location_logic.add_stamp_to_location(stamp_id, location_id)
 
         location = stamp_location_logic.get_stamp_location_by_id(location_id)
         park = park_logic.get_park_by_id(location.park_id)
         park_url = park.url
 
-    return park_url
+        return park_url
+
+    raise ValueError('Invalid park')
